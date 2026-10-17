@@ -132,6 +132,19 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .wrow strong{font-size:15px;font-weight:600}
 .wrow span{font-size:13px;color:var(--accent)}
 .wrow span.late{color:var(--up)}
+#rieWin{display:grid;gap:8px}
+#rieWin:empty{display:none}
+.win{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--accent)}
+.win svg{width:34px;height:34px;color:var(--accent)}
+.win b{display:block;font-size:16px}
+.win span{font-size:13px;color:var(--muted)}
+.win em{font-style:normal;font-family:var(--f-display);font-size:24px;color:var(--accent)}
+.board{display:grid;gap:0}
+.board div{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.board div:first-child{border-top:0}
+.board i{font-style:normal;color:var(--muted)}
+.board b{font-weight:600}
+.board span{color:var(--muted)}
 .share{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 #title{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
 #fire{position:fixed;inset:0;z-index:60;background:linear-gradient(180deg,rgba(18,18,18,.92) 0%,#3a1405 55%,#7a2a08 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
@@ -200,6 +213,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
   <section class="band">
     <h2 class="disp">Rie it gewicht</h2>
     <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Fier dyn gok yn. Nei de update sjochst hoe tichtby do sitst.</p>
+    <div id="rieWin"></div>
     <div id="rieResult"></div>
     <div class="box">
       <label for="gok" id="gokLbl">Myn gok foar de folgjende weging</label>
@@ -395,6 +409,18 @@ $("medals").addEventListener("click",e=>{if(e.target.closest(".medal.got"))confe
 try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),now=MED.filter(m=>m[1]).map(m=>m[0]);
   if(now.some(n=>!seen.includes(n))){setTimeout(confetti,600)}
   localStorage.setItem(key,JSON.stringify(now));}catch(e){}
+
+// rieder fan 'e wike (út de WhatsApp-groep)
+(()=>{
+  const W=(D.winners||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
+  if(!W.length){$("rieWin").innerHTML='<div class="empty" style="font-size:14px">Set dyn gok ek yn de WhatsApp-groep. Wa\'t it tichtst by sit, komt hjir as Rieder fan \'e wike.</div>';return}
+  const CUP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>';
+  const L=W[W.length-1];
+  const cnt={}; W.forEach(w=>{cnt[w[1]]=(cnt[w[1]]||0)+1});
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5);
+  $("rieWin").innerHTML='<div class="box win">'+CUP+'<div><span>Rieder fan \'e wike · '+fd(L[0])+'</span><b>'+esc(L[1])+'</b></div>'+(L[2]!=null?'<em>'+fmt(L[2])+'</em>':'')+'</div>'+
+    (top.length>1||W.length>1?'<div class="box"><span class="lbl">Ranglist</span><div class="board">'+top.map((t,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(t[0])+'</b><span>'+t[1]+'× wûn</span></div>').join('')+'</div></div>':'');
+})();
 
 // rie it gewicht
 (()=>{
