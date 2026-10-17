@@ -172,7 +172,7 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
   const ref=D.updated?pd(D.updated):new Date();
   const CAKE='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Jierdei"><path d="M4 21h16"/><path d="M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM12 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM16 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5z" fill="currentColor"/></svg>';
   const BEER='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Bouwfak"><path d="M6 8h10v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M6 8a2.5 2.5 0 0 1 1.5-4.6A3 3 0 0 1 13 3a2.5 2.5 0 0 1 3 2.6A2 2 0 0 1 16 8"/><path d="M9.5 12v6M12.5 12v6"/></svg>';
-  const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Jierdei · 13 april",date:"2027-04-13",target:119.9,done:cur<120},
+  const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"13 april · feest de 18e",extra:"Op snein 18 april fier ik myn jierdei. Dan wol ik der stean op ûnder de 120!",date:"2027-04-13",target:119.9,done:cur<120},
            {kg:110,title:"110 kilo",icon:BEER,sub:"Bouwfak · 24 july",date:"2027-07-24",target:110,done:cur<=110},
            {kg:goal,title:fmt(goal,0)+" kilo",sub:"Einddoel",date:null,target:goal,done:cur<=goal}];
   const firstOpen=G.findIndex(g=>!g.done);
@@ -185,7 +185,7 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
     else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
     else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(left)+" wiken.";
     const cells=g.done?'':'<div><b>'+fmt(left)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'');
-    return '<details class="goal" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+(g.icon||'')+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+'<p class="tip">'+tip+'</p></div></details>';
+    return '<details class="goal" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+(g.icon||'')+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+tip+'</p></div></details>';
   }).join("");
 })();
 // ien doel tagelyk iepen
