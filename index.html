@@ -693,9 +693,17 @@ function stokerFig(kwyt, total){
 (()=>{
   $("figBtn").innerHTML=stokerFig(lost,total);
   const left=Math.max(0,Math.ceil((cur-goal)*10)/10);
-  const Q=lost>=total?["Sjoch dy spieren!","100 kilo, feest!","Wa docht my wat?"]:
-    ["Hee, net kidelje!","Noch "+fmt(left)+" kilo!","Stoker stookt troch! 🔥","Gjin snoeperij hjoed!","Op nei de sportskoalle!","Dyn gok al dien?","Gean ris mei te sporten!"];
-  let i=Math.floor(Math.random()*Q.length), tm=0;
+  const kw=Math.floor(lost);
+  const ALG=["Hee, net kidelje!","Noch "+fmt(left)+" kilo!","Stoker stookt troch! 🔥","Gjin snoeperij hjoed!","Op nei de sportskoalle!","Dyn gok al dien?",
+    "Gean ris mei te sporten!","Woansdei is weachdei!","Wetter drinke, wetter drinke!","Hjoed al 10.000 stappen?","Snoeperij? Nee, tankjewol!",
+    "Krat bier? Allinne om te tillen.","Ik rûk de patat wol, mar ik yt it net.","Deadlift? Kom mar op!","De kachel moat brâne!",
+    "Kom, in rûntsje kuierje!","Oant de bouwfak: fol gas!","Hoi! Ik bin Stoker.","Elke kilo telt!","Net opjaan, gewoan trochgean."];
+  const DIK=["Net op myn bûk drukke, ik sit fol!","Ik bin net te dik, allinne wat te koart.","Dizze bûk hat syn bêste tiid hân.","Puh puh... is dit al sporte?"];
+  const FIT=["Sjoch dy earms ris!","Sterk as in Fries hynder!","Myn broek sakket ôf!","Dizze spieren binne net fan sûker.","Wa hat myn bûk sjoen?"];
+  const DOEL=["Sjoch dy spieren!","100 kilo, feest!","Wa docht my wat?","Ik bin der! Tank foar jim help!","Stoker is binnen! 🔥"];
+  const shuffle=a=>{for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]]}return a};
+  const Q=shuffle(lost>=total?DOEL:ALG.concat(kw<10?DIK:[],kw>=15?FIT:[]));
+  let i=0, tm=0;
   $("figBtn").addEventListener("click",()=>{
     const b=$("figBtn"); b.classList.remove("wiebel"); void b.offsetWidth; b.classList.add("wiebel");
     $("figBubble").textContent=Q[i%Q.length]; i++; $("figBubble").classList.add("on");
