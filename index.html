@@ -676,6 +676,11 @@ function stokerFig(kwyt, total){
   const hr=18+3*k;
   if(k>0.05) s+='<ellipse cx="'+cx+'" cy="'+(top-8+2*k)+'" rx="'+(9+7*k)+'" ry="'+(3+3*k)+'" fill="'+skin+'"/>';
   s+='<circle cx="'+cx+'" cy="'+(top-26)+'" r="'+hr+'" fill="'+skin+'"/>';
+  // hier: koart, wat rûch
+  {const hy=top-26, t=hy-hr-3, e=hy-hr*0.35, H="#6b4a2e";
+   s+='<path d="M'+(cx-hr-0.5)+' '+(hy-1)+' C'+(cx-hr-1)+' '+(t+2)+' '+(cx-hr*0.4)+' '+t+' '+cx+' '+t+' C'+(cx+hr*0.4)+' '+t+' '+(cx+hr+1)+' '+(t+2)+' '+(cx+hr+0.5)+' '+(hy-1)+
+     ' L'+(cx+hr-3)+' '+(e+2)+' L'+(cx+hr*0.55)+' '+(e-3)+' L'+(cx+hr*0.3)+' '+(e+1)+' L'+(cx)+' '+(e-4)+' L'+(cx-hr*0.3)+' '+(e+1)+' L'+(cx-hr*0.55)+' '+(e-3)+' L'+(cx-hr+3)+' '+(e+2)+'Z" fill="'+H+'"/>';
+   s+='<path d="M'+(cx-3)+' '+(t+0.5)+' q2 -6 6 -5 q-3 2 -2 6z" fill="'+H+'"/>';}
   if(m>=0.5) s+='<rect x="'+(cx-hr)+'" y="'+(top-40)+'" width="'+(hr*2)+'" height="6" rx="3" '+A+'/>'; // swietbantsje
   const ey=top-27;
   s+='<circle cx="'+(cx-7)+'" cy="'+ey+'" r="2.2" fill="'+dark+'"/><circle cx="'+(cx+7)+'" cy="'+ey+'" r="2.2" fill="'+dark+'"/>';
