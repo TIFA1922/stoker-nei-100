@@ -110,6 +110,8 @@ h2.disp{font-size:26px;line-height:1}
 .box{min-width:0}
 html,body{overflow-x:hidden}
 .inp{flex:1;min-width:0;width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-family:var(--f-display);font-size:26px}
+.inp-s{font-family:var(--f-body);font-size:17px}
+.btn:disabled{opacity:.6}
 .inp:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .btn{background:var(--accent);color:#06261e;border:0;border-radius:6px;padding:0 18px;min-height:46px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 .btn.alt{background:var(--band);color:var(--fg);border:1px solid var(--line)}
@@ -215,11 +217,14 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     <div id="rieWin"></div>
     <div id="rieResult"></div>
     <div class="box">
+      <label for="gokNaam">Dyn foarnamme</label>
+      <input class="inp inp-s" id="gokNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
       <label for="gok" id="gokLbl">Myn gok foar de folgjende weging</label>
       <div class="row"><input class="inp" id="gok" type="text" inputmode="decimal" placeholder="bv. 123,6" autocomplete="off"><button type="button" class="btn" id="gokSave">Bewarje</button></div>
       <p class="ok-line" id="gokMsg" hidden></p>
     </div>
-    <p class="note">Dyn gok wurdt allinne op dizze telefoan bewarre.</p>
+    <div id="rieNow"></div>
+    <p class="note">Dyn foarnamme en gok binne te sjen foar elkenien mei de link. De gokken komme pas yn byld nei de weging.</p>
   </section>
 
   <section class="band">
@@ -410,39 +415,77 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
   if(now.some(n=>!seen.includes(n))){setTimeout(confetti,600)}
   localStorage.setItem(key,JSON.stringify(now));}catch(e){}
 
-// rieder fan 'e wike (út de WhatsApp-groep)
+// rie it gewicht: gokken yn Supabase, rieder fan 'e wike wurdt automatysk berekkene
 (()=>{
-  const W=(D.winners||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
-  if(!W.length){$("rieWin").innerHTML='<div class="empty" style="font-size:14px">Set dyn gok ek yn de WhatsApp-groep. Wa\'t it tichtst by sit, komt hjir as Rieder fan \'e wike.</div>';return}
+  const SB="https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/gokken", KEY="sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
+  const H={apikey:KEY,"Content-Type":"application/json"};
   const CUP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>';
-  const L=W[W.length-1];
-  const cnt={}; W.forEach(w=>{cnt[w[1]]=(cnt[w[1]]||0)+1});
-  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5);
-  $("rieWin").innerHTML='<div class="box win">'+CUP+'<div><span>Rieder fan \'e wike · '+fd(L[0])+'</span><b>'+esc(L[1])+'</b></div>'+(L[2]!=null?'<em>'+fmt(L[2])+'</em>':'')+'</div>'+
-    (top.length>1||W.length>1?'<div class="box"><span class="lbl">Ranglist</span><div class="board">'+top.map((t,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(t[0])+'</b><span>'+t[1]+'× wûn</span></div>').join('')+'</div></div>':'');
-})();
-
-// rie it gewicht
-(()=>{
-  const KEY="stoker-gok", base=D.updated||null, nextWeek=ws.length?weekNo+1:1;
+  const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+  const round=(D.updated||today()), nextWeek=ws.length?weekNo+1:1;
+  const norm=n=>String(n||"").trim().replace(/\s+/g," ");
+  const keyOf=n=>norm(n).toLowerCase();
   $("gokLbl").textContent="Myn gok foar wike "+nextWeek;
-  let g=null; try{g=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
-  const show=()=>{
-    if(g&&g.base!==base&&ws.length){
-      const diff=Math.abs(g.kg-cur);
-      const t=diff<=0.2?"Raak! Do koest Stoker syn weachskaal wêze.":diff<=0.5?"Tige tichtby!":diff<=1?"Net slim, hiel tichtby.":"Dat wie in eintsje dernêst. Folgjende wike better!";
-      $("rieResult").innerHTML='<div class="box res"><span class="lbl">Dyn lêste gok</span><div class="three"><div><b>'+fmt(g.kg)+'</b><span>dyn gok</span></div><div><b>'+fmt(cur)+'</b><span>echt</span></div><div><b style="color:var(--accent)">'+fmt(diff)+'</b><span>kilo dernêst</span></div></div><p>'+t+'</p></div>';
-    } else $("rieResult").innerHTML="";
-    if(g&&g.base===base){$("gok").value=fmt(g.kg);$("gokMsg").hidden=false;$("gokMsg").textContent="Bewarre: "+fmt(g.kg)+" kg. Woansdei sjochst it antwurd."}
+  let me=null; try{me=JSON.parse(localStorage.getItem("stoker-gok")||"null")}catch(e){}
+  try{const n=localStorage.getItem("stoker-namme"); if(n)$("gokNaam").value=n}catch(e){}
+  if(me&&me.base===round){$("gok").value=fmt(me.kg);$("gokMsg").hidden=false;$("gokMsg").textContent="Bewarre: "+fmt(me.kg)+" kg. Nei de weging sjochst it antwurd."}
+
+  // in gok heart by de earste weging nei de dei dat er dien is
+  const resolve=w=>ws.find(x=>x[0]>w)||null;
+  const render=rows=>{
+    const rounds={}; // weegdatum -> {naam: rij}
+    const open={};
+    rows.forEach(r=>{
+      const hit=resolve(String(r.week).slice(0,10)), bag=hit?(rounds[hit[0]]=rounds[hit[0]]||{kg:hit[1],g:{}}).g:open;
+      bag[keyOf(r.naam)]=r; // lêste gok per namme telt
+    });
+    const done=Object.keys(rounds).sort();
+    const wins=[];
+    done.forEach(d=>{
+      const R=rounds[d], list=Object.values(R.g).map(r=>({n:norm(r.naam),g:+r.gok,d:Math.abs(+r.gok-R.kg)})).sort((a,b)=>a.d-b.d);
+      R.list=list; const best=list.length?list[0].d:null;
+      list.filter(x=>x.d===best).forEach(x=>wins.push([d,x.n,x.g]));
+    });
+    // rieder fan 'e wike + ranglist
+    if(wins.length){
+      const L=done[done.length-1], lw=wins.filter(w=>w[0]===L);
+      const cnt={}; wins.forEach(w=>{const k=keyOf(w[1]);cnt[k]=cnt[k]||{n:w[1],c:0};cnt[k].c++});
+      const top=Object.values(cnt).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n)).slice(0,5);
+      $("rieWin").innerHTML=lw.map(w=>'<div class="box win">'+CUP+'<div><span>Rieder fan \'e wike · '+fd(L)+'</span><b>'+esc(w[1])+'</b></div><em>'+fmt(w[2])+'</em></div>').join('')+
+        (done.length>1?'<div class="box"><span class="lbl">Ranglist</span><div class="board">'+top.map((t,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(t.n)+'</b><span>'+t.c+'× wûn</span></div>').join('')+'</div></div>':'');
+      // útslach fan de lêste rûne
+      const R=rounds[L];
+      $("rieResult").innerHTML='<div class="box res"><span class="lbl">Utslach '+fd(L)+' · echt '+fmt(R.kg)+' kg</span><div class="board">'+R.list.slice(0,10).map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+fmt(x.g)+' · '+(x.d===0?'raak!':fmt(x.d)+' dernêst')+'</span></div>').join('')+'</div>'+(R.list.length>10?'<p class="note">En noch '+(R.list.length-10)+' oaren.</p>':'')+'</div>';
+    } else {
+      $("rieWin").innerHTML='<div class="empty" style="font-size:14px">Wa\'t it tichtst by sit, komt hjir as Rieder fan \'e wike.</div>';
+      $("rieResult").innerHTML="";
+    }
+    const names=Object.values(open).map(r=>norm(r.naam));
+    $("rieNow").innerHTML=names.length?'<p class="note" style="font-size:14px;color:var(--soft)"><b style="color:var(--fg)">'+names.length+(names.length===1?' gok':' gokken')+'</b> foar wike '+nextWeek+': '+names.map(esc).join(', ')+'</p>':'';
   };
-  show();
+  const load=()=>fetch(SB+"?select=naam,gok,week,created_at&order=created_at.asc&limit=5000",{headers:{apikey:KEY}})
+    .then(r=>{if(!r.ok)throw 0;return r.json()}).then(render).catch(()=>{
+      // gjin ferbining: lit de hânmjittige winners sjen as dy der binne
+      const W=(D.winners||[]);
+      $("rieWin").innerHTML=W.length?'<div class="box win">'+CUP+'<div><span>Rieder fan \'e wike · '+fd(W[W.length-1][0])+'</span><b>'+esc(W[W.length-1][1])+'</b></div></div>':'';
+    });
+  load();
+
+  let busy=false;
   $("gokSave").addEventListener("click",()=>{
-    const v=Number(String($("gok").value).trim().replace(",","."));
-    if(!isFinite(v)||v<60||v>200){$("gokMsg").hidden=false;$("gokMsg").textContent="Fier in gewicht yn tusken 60 en 200 kilo.";return}
-    const keep=g&&g.base!==base?g:null; g={kg:v,base:base,t:Date.now()};
-    try{localStorage.setItem(KEY,JSON.stringify(g))}catch(e){}
-    $("gokMsg").hidden=false;$("gokMsg").textContent="Bewarre: "+fmt(v)+" kg. Woansdei sjochst it antwurd.";
-    if(keep){} 
+    if(busy)return;
+    const naam=norm($("gokNaam").value), v=Number(String($("gok").value).trim().replace(",","."));
+    const say=t=>{$("gokMsg").hidden=false;$("gokMsg").textContent=t};
+    if(!naam){say("Fier earst dyn foarnamme yn.");$("gokNaam").focus();return}
+    if(!isFinite(v)||v<80||v>160){say("Fier in gewicht yn tusken 80 en 160 kilo.");return}
+    const kg=Math.round(v*10)/10;
+    busy=true; $("gokSave").disabled=true; say("Even bewarje...");
+    fetch(SB,{method:"POST",headers:Object.assign({Prefer:"return=minimal"},H),body:JSON.stringify({week:round,naam:naam,gok:kg})})
+      .then(r=>{if(!r.ok)throw 0;
+        me={kg:kg,base:round,t:Date.now()};
+        try{localStorage.setItem("stoker-gok",JSON.stringify(me));localStorage.setItem("stoker-namme",naam)}catch(e){}
+        say("Bewarre: "+fmt(kg)+" kg. Nei de weging sjochst it antwurd."); load();})
+      .catch(()=>say("Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .finally(()=>{busy=false;$("gokSave").disabled=false});
   });
 })();
 
