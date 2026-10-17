@@ -162,96 +162,115 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .sw[aria-pressed="true"]{border-color:var(--fg)}
 .sw:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 #foot{margin:0}
+/* Telefoan: ien kolom yn de oarspronklike folchoarder. Desktop: twa kolommen */
+.page{display:flex;flex-direction:column}
+.col{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}.o10{order:10}.o11{order:11}
+@media (min-width:1000px){
+  .page{max-width:1200px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start;padding:24px 32px 0}
+  .col{display:flex;flex-direction:column;min-width:0}
+  .col-l{border-right:1px solid var(--line);padding-right:16px}
+  .col-r{padding-left:16px}
+  #photoBand,footer{grid-column:1/-1}
+  .col .band:last-child{border-bottom:0}
+  #photoBand{border-top:1px solid var(--line)}
+  footer{border-top:1px solid var(--line)}
+  .stats{border-top:0}
+}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body style="margin:0">
 
 <div class="page">
-  <section class="band">
-    <div class="top">
-      <h1 class="disp" id="title">Stoker<br>nei 100</h1>
-      <div class="when" id="when">Start<br>21 oktober</div>
-    </div>
-    <div class="big"><b id="lost">0,0</b><span>kilo<br>kwyt</span></div>
-    <div>
-      <div class="ticks" id="ticks" role="group" aria-label="30 kilo, tik op in blûkje"></div>
-      <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
-    </div>
-    <p class="tick-info" id="tickInfo" hidden></p>
-    <p class="ms-line" id="msLine"></p>
-    <div class="kwyt" id="kwyt"></div>
-  </section>
+  <div class="col col-l">
+    <section class="band o1">
+      <div class="top">
+        <h1 class="disp" id="title">Stoker<br>nei 100</h1>
+        <div class="when" id="when">Start<br>21 oktober</div>
+      </div>
+      <div class="big"><b id="lost">0,0</b><span>kilo<br>kwyt</span></div>
+      <div>
+        <div class="ticks" id="ticks" role="group" aria-label="30 kilo, tik op in blûkje"></div>
+        <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
+      </div>
+      <p class="tick-info" id="tickInfo" hidden></p>
+      <p class="ms-line" id="msLine"></p>
+      <div class="kwyt" id="kwyt"></div>
+    </section>
 
-  <section class="band">
-    <h2 class="disp">Doelen</h2>
-    <div class="count" id="count"></div>
-    <div class="goals" id="goals"></div>
-  </section>
+    <div class="stats o3">
+      <div class="stat"><b id="left">30,0</b><span>noch te gean</span></div>
+      <div class="stat"><b id="train">0</b><span>trainingen</span></div>
+      <div class="stat"><b id="dl">–</b><span>kg deadlift</span></div>
+    </div>
 
-  <div class="stats">
-    <div class="stat"><b id="left">30,0</b><span>noch te gean</span></div>
-    <div class="stat"><b id="train">0</b><span>trainingen</span></div>
-    <div class="stat"><b id="dl">–</b><span>kg deadlift</span></div>
+    <section class="band o4">
+      <h2 class="disp">Gewicht</h2>
+      <div id="chart"></div>
+      <p class="note" id="chartNote">Stippellyn: it plan fan sa'n 1 kilo yn 'e wike.</p>
+    </section>
+
+    <section class="band o5">
+      <h2 class="disp">Alle wiken</h2>
+      <div id="weeks"></div>
+    </section>
+
+    <section class="band o6">
+      <h2 class="disp">Medaljes</h2>
+      <div class="medals" id="medals"></div>
+      <p class="note" id="medalNote"></p>
+    </section>
   </div>
 
-  <section class="band">
-    <h2 class="disp">Gewicht</h2>
-    <div id="chart"></div>
-    <p class="note" id="chartNote">Stippellyn: it plan fan sa'n 1 kilo yn 'e wike.</p>
-  </section>
+  <div class="col col-r">
+    <section class="band o2">
+      <h2 class="disp">Doelen</h2>
+      <div class="count" id="count"></div>
+      <div class="goals" id="goals"></div>
+    </section>
 
-  <section class="band">
-    <h2 class="disp">Alle wiken</h2>
-    <div id="weeks"></div>
-  </section>
+    <section class="band o7">
+      <h2 class="disp">Rie it gewicht</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Fier dyn gok yn. Nei de update sjochst hoe tichtby do sitst.</p>
+      <div id="rieWin"></div>
+      <div id="rieResult"></div>
+      <div class="box">
+        <label for="gokNaam">Dyn foarnamme</label>
+        <input class="inp inp-s" id="gokNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
+        <div class="hp" aria-hidden="true"><label for="gokWeb">Website</label><input id="gokWeb" type="text" tabindex="-1" autocomplete="off"></div>
+        <label for="gok" id="gokLbl">Myn gok foar de folgjende weging</label>
+        <div class="row"><input class="inp" id="gok" type="text" inputmode="decimal" placeholder="bv. 123,6" autocomplete="off"><button type="button" class="btn" id="gokSave">Bewarje</button></div>
+        <p class="ok-line" id="gokMsg" hidden></p>
+      </div>
+      <div id="rieNow"></div>
+      <p class="note">Dyn foarnamme en gok binne te sjen foar elkenien mei de link. De gokken komme pas yn byld nei de weging.</p>
+    </section>
 
-  <section class="band">
-    <h2 class="disp">Medaljes</h2>
-    <div class="medals" id="medals"></div>
-    <p class="note" id="medalNote"></p>
-  </section>
+    <section class="band o8">
+      <h2 class="disp">Wat as...?</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)" id="watIntro">Skuif mei it tempo en sjoch wannear't Stoker by syn doelen is.</p>
+      <div class="box">
+        <div class="pace-top"><label for="tempo">Tempo</label><b id="paceLbl">0,8 kg / wike</b></div>
+        <input id="tempo" type="range" min="3" max="12" step="1" value="8" aria-describedby="paceLbl">
+        <div class="ends2"><span>0,3 rêstich</span><span>1,2 hurd</span></div>
+      </div>
+      <div style="display:grid;gap:8px" id="watRows"></div>
+      <p class="note">Allinne in skatting. Elke wike is oars.</p>
+    </section>
 
-  <section class="band">
-    <h2 class="disp">Rie it gewicht</h2>
-    <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Fier dyn gok yn. Nei de update sjochst hoe tichtby do sitst.</p>
-    <div id="rieWin"></div>
-    <div id="rieResult"></div>
-    <div class="box">
-      <label for="gokNaam">Dyn foarnamme</label>
-      <input class="inp inp-s" id="gokNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
-      <div class="hp" aria-hidden="true"><label for="gokWeb">Website</label><input id="gokWeb" type="text" tabindex="-1" autocomplete="off"></div>
-      <label for="gok" id="gokLbl">Myn gok foar de folgjende weging</label>
-      <div class="row"><input class="inp" id="gok" type="text" inputmode="decimal" placeholder="bv. 123,6" autocomplete="off"><button type="button" class="btn" id="gokSave">Bewarje</button></div>
-      <p class="ok-line" id="gokMsg" hidden></p>
-    </div>
-    <div id="rieNow"></div>
-    <p class="note">Dyn foarnamme en gok binne te sjen foar elkenien mei de link. De gokken komme pas yn byld nei de weging.</p>
-  </section>
+    <section class="band o9" id="storyBand">
+      <h2 class="disp">Dizze wike</h2>
+      <p class="story" id="story"></p>
+    </section>
+  </div>
 
-  <section class="band">
-    <h2 class="disp">Wat as...?</h2>
-    <p class="note" style="font-size:14px;color:var(--soft)" id="watIntro">Skuif mei it tempo en sjoch wannear't Stoker by syn doelen is.</p>
-    <div class="box">
-      <div class="pace-top"><label for="tempo">Tempo</label><b id="paceLbl">0,8 kg / wike</b></div>
-      <input id="tempo" type="range" min="3" max="12" step="1" value="8" aria-describedby="paceLbl">
-      <div class="ends2"><span>0,3 rêstich</span><span>1,2 hurd</span></div>
-    </div>
-    <div style="display:grid;gap:8px" id="watRows"></div>
-    <p class="note">Allinne in skatting. Elke wike is oars.</p>
-  </section>
-
-  <section class="band" id="storyBand">
-    <h2 class="disp">Dizze wike</h2>
-    <p class="story" id="story"></p>
-  </section>
-
-  <section class="band" id="photoBand" hidden>
+  <section class="band o10" id="photoBand" hidden>
     <h2 class="disp">Begjin en no</h2>
     <div id="photos"></div>
   </section>
 
-  <footer>
+  <footer class="o11">
     <div class="swatches" id="swatches" role="group" aria-label="Kies in kleur"><span>Kleur:</span></div>
     <p id="foot">Elke woansdei in update.</p>
   </footer>
