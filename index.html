@@ -217,6 +217,10 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .days button[aria-pressed="true"],.parts button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#06261e}
 .days button[aria-pressed="true"] small{color:#06261e}
 .parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.daynav{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+.dn button{width:36px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:18px;line-height:1;cursor:pointer}
+.dn button:disabled{opacity:.3;cursor:default}
 .parts.two-up{grid-template-columns:repeat(2,minmax(0,1fr))}
 .inp.tiid{-webkit-appearance:none;appearance:none;display:block;width:140px;max-width:100%;min-width:0;box-sizing:border-box;height:46px;text-align:left}
 .inp.tiid::-webkit-date-and-time-value{text-align:left}
@@ -332,7 +336,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
         <div class="hp" aria-hidden="true"><label for="meiWeb">Website</label><input id="meiWeb" type="text" tabindex="-1" autocomplete="off"></div>
         <span class="lbl" id="meiWatLbl">Wat dogge we?</span>
         <div class="parts two-up" id="meiWat" role="group" aria-labelledby="meiWatLbl"></div>
-        <span class="lbl" id="meiDayLbl">Hokker dei?</span>
+        <div class="daynav"><span class="lbl" id="meiDayLbl">Hokker dei?</span><span class="dn"><button type="button" id="meiPrev" aria-label="Eardere wiken">‹</button><span id="meiRange"></span><button type="button" id="meiNext" aria-label="Letter wiken">›</button></span></div>
         <div class="days" id="meiDays" role="group" aria-labelledby="meiDayLbl"></div>
         <span class="lbl" id="meiPartLbl">Wannear?</span>
         <div class="parts" id="meiParts" role="group" aria-labelledby="meiPartLbl"></div>
@@ -630,7 +634,7 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
   const MS=["jan","feb","mrt","apr","maaie","jun","jul","aug","sep","okt","nov","des"];
   const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   const t=new Date(); t.setHours(0,0,0,0); const today=iso(t);
-  const days=[...Array(14)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
+  const WEEKS=6, days=[...Array(WEEKS*7)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
   const PARTS=["moarns","middeis","jûns"];
   const WAT={sporte:"Sporte",kuierje:"Rûntsje kuierje"};
   const ICO={sporte:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>',
@@ -639,12 +643,23 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
   const nice=s=>{const d=pd(s);return WD[d.getDay()]+" "+d.getDate()+" "+MS[d.getMonth()]};
   const norm=n=>String(n||"").trim().replace(/\s+/g," ");
   let day=null, part=null;
-  $("meiDays").innerHTML=days.map(d=>'<button type="button" data-d="'+iso(d)+'" aria-pressed="false" aria-label="'+WD[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+'"><small>'+WS[d.getDay()]+'</small><b>'+d.getDate()+'</b></button>').join("");
+  let pg=0; const PER=14, PAGES=Math.ceil(days.length/PER);
+  const drawDays=()=>{
+    const sl=days.slice(pg*PER,pg*PER+PER);
+    $("meiDays").innerHTML=sl.map(d=>'<button type="button" data-d="'+iso(d)+'" aria-pressed="false" aria-label="'+WD[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+'"><small>'+WS[d.getDay()]+'</small><b>'+d.getDate()+'</b></button>').join("");
+    if(day) pick($("meiDays"),"d",day);
+    const a=sl[0], z=sl[sl.length-1];
+    $("meiRange").textContent=a.getDate()+" "+MS[a.getMonth()]+" – "+z.getDate()+" "+MS[z.getMonth()];
+    $("meiPrev").disabled=pg===0; $("meiNext").disabled=pg>=PAGES-1;
+  };
+  $("meiPrev").addEventListener("click",()=>{if(pg>0){pg--;drawDays()}});
+  $("meiNext").addEventListener("click",()=>{if(pg<PAGES-1){pg++;drawDays()}});
   $("meiWat").innerHTML=Object.keys(WAT).map(k=>'<button type="button" data-w="'+k+'" aria-pressed="'+(k===wat)+'">'+ICO[k]+WAT[k]+'</button>').join("");
   $("meiWat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;wat=b.dataset.w;pick($("meiWat"),"w",wat)});
   $("meiParts").innerHTML=PARTS.map(p=>'<button type="button" data-p="'+p+'" aria-pressed="false">'+p+'</button>').join("");
   const pick=(box,attr,val)=>box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val)));
   $("meiDays").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;day=b.dataset.d;pick($("meiDays"),"d",day)});
+  drawDays();
   $("meiParts").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;part=b.dataset.p;pick($("meiParts"),"p",part)});
   // in tiid kieze set ek it dieldei goed
   $("meiTiid").addEventListener("change",()=>{const v=$("meiTiid").value;if(!v)return;const h=+v.slice(0,2);part=h<12?"moarns":h<17?"middeis":"jûns";pick($("meiParts"),"p",part);typed=true});
@@ -680,7 +695,7 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
       .then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
         try{localStorage.setItem("stoker-namme",naam)}catch(e){}
         say(ok); load();})
-      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende twa wiken.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende seis wiken.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
       .finally(()=>{busy=false;$("meiSend").disabled=false});
   });
 })();
