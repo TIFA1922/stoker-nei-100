@@ -634,7 +634,8 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
 // Stoker-poppe. kwyt = hiele kilo's kwyt (0..30). Per kilo in stapke slanker en sterker.
 function stokerFig(kwyt, total){
   total=total||30;
-  const kg=Math.max(0,Math.min(total,Math.floor(kwyt+1e-9)));
+  // per 5 kilo in stap; by it doel altyd de lêste stân
+  const raw=Math.max(0,Math.min(total,Math.floor(kwyt+1e-9))), kg=raw>=total?total:Math.floor(raw/5)*5;
   const k=1-kg/total, m=kg/total;            // k: dikte, m: spieren
   const A='style="fill:var(--accent,#3ef0c0)"', skin="#f2c9a0", skinD="#d9a77e", dark="#121212";
   const cx=60, top=64, hip=136;
@@ -706,7 +707,7 @@ function stokerFig(kwyt, total){
 // poppe yn 'e kop, mei wiebelje en in tekstballonke
 (()=>{
   $("figBtn").innerHTML=stokerFig(lost,total);
-  if(Math.floor(lost)<total*0.4) $("figBtn").classList.add("zwit"); // swiere poppe swit oan ien stik troch
+  if(Math.floor(lost)<10) $("figBtn").classList.add("zwit"); // swiere poppe swit oan ien stik troch
   const left=Math.max(0,Math.ceil((cur-goal)*10)/10);
   const kw=Math.floor(lost);
   const ALG=["Hee, net kidelje!","Noch "+fmt(left)+" kilo!","Stoker stookt troch! 🔥","Gjin snoeperij hjoed!","Op nei de sportskoalle!","Dyn gok al dien?",
