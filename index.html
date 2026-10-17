@@ -108,6 +108,12 @@ h2.disp{font-size:26px;line-height:1}
 .goal .what span{font-size:12px}
 .goal .pill{padding:3px 8px;font-size:11px}
 .goal .ico{width:17px;height:17px}
+.goal:not(.step){border-left:4px solid var(--accent)}
+.goal:not(.step) .kg{font-size:26px!important;color:var(--accent)}
+.goal:not(.step) .what b{font-size:15px;font-weight:700}
+.goal.step{background:transparent;border-style:dashed}
+.goal.step .kg{color:var(--muted)!important}
+.goal.step .what b{color:var(--soft)}
 
 .goal.step .kg{font-size:22px;color:var(--soft)}
 .goal.step .what b{font-size:14px;font-weight:500}
