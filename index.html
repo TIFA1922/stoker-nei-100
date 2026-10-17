@@ -38,7 +38,13 @@ h2.disp{font-size:26px;line-height:1}
 @media (min-width:1000px){.figbtn{width:96px}.bubble{right:100px}}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .when{font-size:13px;color:var(--muted);text-align:right;padding-top:6px}
-.big{display:flex;align-items:baseline;gap:12px}
+.weachdei{margin:0 0 4px;background:var(--accent);color:#06261e;font-weight:600;font-size:14px;border-radius:6px;padding:9px 12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--fg);color:#121212;font-weight:600;font-size:15px;padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:50;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.cake-tap{cursor:pointer}
+.big{display:flex;align-items:baseline;gap:12px;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
+.big:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+.big b.lang{font-size:clamp(56px,17vw,96px)}
 .big b{font-family:var(--f-display);font-weight:400;font-size:clamp(84px,28vw,120px);line-height:.9;color:var(--accent);font-variant-numeric:tabular-nums}
 .big span{font-size:16px;color:var(--soft)}
 .ticks{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:2px}
@@ -252,6 +258,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
 <div class="page">
   <div class="col col-a">
     <section class="band o1">
+      <p class="weachdei" id="weachdei" hidden></p>
       <div class="top">
         <h1 class="disp" id="title">Stoker<br>nei 100</h1>
         <div class="herofig">
@@ -260,7 +267,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
         <div class="when" id="when">Start<br>21 oktober</div>
       </div>
       </div>
-      <div class="big"><b id="lost">0,0</b><span>kilo<br>kwyt</span></div>
+      <button type="button" class="big" id="bigBtn" aria-label="Tik foar in oare ienheid"><b id="lost">0,0</b><span id="lostUnit">kilo<br>kwyt</span></button>
       <div>
         <div class="ticks" id="ticks" role="group" aria-label="30 kilo, tik op in blûkje"></div>
         <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
@@ -710,6 +717,41 @@ function stokerFig(kwyt, total){
     const b=$("figBtn"); b.classList.remove("wiebel"); void b.offsetWidth; b.classList.add("wiebel");
     $("figBubble").textContent=Q[i%Q.length]; i++; $("figBubble").classList.add("on");
     clearTimeout(tm); tm=setTimeout(()=>$("figBubble").classList.remove("on"),2200);
+  });
+})();
+
+
+// grapkes
+(()=>{
+  // toast
+  const toast=document.createElement("div"); toast.className="toast"; toast.setAttribute("role","status"); document.body.appendChild(toast);
+  let tt=0; const say=t=>{toast.textContent=t;toast.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove("on"),2400)};
+  // 1. oare ienheden
+  const nf=(n,d)=>n.toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
+  const U=[[lost,1,"kilo<br>kwyt"],[lost/17,1,"kratten bier<br>kwyt"],[Math.round(lost/0.25),0,"pakjes bûter<br>kwyt"],[Math.round(lost*1000/2.5),0,"pinda's<br>kwyt"]];
+  let u=0;
+  $("bigBtn").addEventListener("click",()=>{
+    u=(u+1)%U.length; const [v,d,lab]=U[u], txt=(v>0?"−":"")+nf(v,d);
+    $("lost").textContent=txt; $("lost").classList.toggle("lang",txt.length>5); $("lostUnit").innerHTML=lab;
+  });
+  // 2. it ljepblêd mist dy
+  const T0=document.title; let back=0;
+  document.addEventListener("visibilitychange",()=>{
+    clearTimeout(back);
+    if(document.hidden) document.title="Stoker mist dy al… 🥲";
+    else { document.title="Dêr bisto wer! 💪"; back=setTimeout(()=>document.title=T0,2500); }
+  });
+  // 3. weachdei-balke op woansdei
+  const now=new Date();
+  if(now.getDay()===3){
+    const iso=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    $("weachdei").textContent=D.updated===iso?"It is weachdei! De nije stân stiet der al yn. 🔥":"It is weachdei! Stoker stiet no op 'e skaal… 😬";
+    $("weachdei").hidden=false;
+  }
+  // 5. net oan 'e taart komme
+  document.querySelectorAll('#goals svg[aria-label="Jierdei"]').forEach(c=>{
+    c.classList.add("cake-tap");
+    c.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();say("Ho! Dy is foar 18 april! 🎂")});
   });
 })();
 
