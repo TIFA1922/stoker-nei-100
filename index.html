@@ -110,6 +110,7 @@ h2.disp{font-size:26px;line-height:1}
 .box{min-width:0}
 html,body{overflow-x:hidden}
 .inp{flex:1;min-width:0;width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-family:var(--f-display);font-size:26px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .inp-s{font-family:var(--f-body);font-size:17px}
 .btn:disabled{opacity:.6}
 .inp:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -219,6 +220,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     <div class="box">
       <label for="gokNaam">Dyn foarnamme</label>
       <input class="inp inp-s" id="gokNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
+      <div class="hp" aria-hidden="true"><label for="gokWeb">Website</label><input id="gokWeb" type="text" tabindex="-1" autocomplete="off"></div>
       <label for="gok" id="gokLbl">Myn gok foar de folgjende weging</label>
       <div class="row"><input class="inp" id="gok" type="text" inputmode="decimal" placeholder="bv. 123,6" autocomplete="off"><button type="button" class="btn" id="gokSave">Bewarje</button></div>
       <p class="ok-line" id="gokMsg" hidden></p>
@@ -470,7 +472,8 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
     });
   load();
 
-  let busy=false;
+  let busy=false, typed=false; const t0=Date.now();
+  ["gokNaam","gok"].forEach(id=>$(id).addEventListener("input",()=>{typed=true}));
   $("gokSave").addEventListener("click",()=>{
     if(busy)return;
     const naam=norm($("gokNaam").value), v=Number(String($("gok").value).trim().replace(",","."));
@@ -478,13 +481,15 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
     if(!naam){say("Fier earst dyn foarnamme yn.");$("gokNaam").focus();return}
     if(!isFinite(v)||v<80||v>160){say("Fier in gewicht yn tusken 80 en 160 kilo.");return}
     const kg=Math.round(v*10)/10;
+    // bot-fal: ûnsichtber fjild ynfolle, of te hurd/sûnder typen? Dan dwaan we as oft it slagge is
+    if($("gokWeb").value||Date.now()-t0<3000||!typed){say("Bewarre: "+fmt(kg)+" kg. Nei de weging sjochst it antwurd.");return}
     busy=true; $("gokSave").disabled=true; say("Even bewarje...");
     fetch(SB,{method:"POST",headers:Object.assign({Prefer:"return=minimal"},H),body:JSON.stringify({week:round,naam:naam,gok:kg})})
-      .then(r=>{if(!r.ok)throw 0;
+      .then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
         me={kg:kg,base:round,t:Date.now()};
         try{localStorage.setItem("stoker-gok",JSON.stringify(me));localStorage.setItem("stoker-namme",naam)}catch(e){}
         say("Bewarre: "+fmt(kg)+" kg. Nei de weging sjochst it antwurd."); load();})
-      .catch(()=>say("Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .catch(e=>say(/te_folle_namme/.test(e.message)?"Do hast dizze wike al trije kear gokt. Wachtsje op de weging!":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Wachtsje even en besykje it nochris.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
       .finally(()=>{busy=false;$("gokSave").disabled=false});
   });
 })();
