@@ -87,6 +87,12 @@ h2.disp{font-size:26px;line-height:1}
 .goal .more b{font-family:var(--f-display);font-weight:400;font-size:22px}
 .goal .more span{font-size:12px;color:var(--muted)}
 .goal .tip{grid-column:1 / -1;font-size:14px;color:var(--soft);margin:0}
+.swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.swatches span{font-size:12px;color:var(--muted);margin-right:2px}
+.sw{width:32px;height:32px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 3px var(--bg)}
+.sw[aria-pressed="true"]{border-color:var(--fg)}
+.sw:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#foot{margin:0}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 </style>
 </head>
@@ -140,7 +146,10 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     <div id="photos"></div>
   </section>
 
-  <footer id="foot">Elke woansdei in update.</footer>
+  <footer>
+    <div class="swatches" id="swatches" role="group" aria-label="Kies in kleur"><span>Kleur:</span></div>
+    <p id="foot">Elke woansdei in update.</p>
+  </footer>
 </div>
 
 <script type="application/json" id="data">{"updated":null,"start":130,"goal":100,"weights":[],"weeks":[],"deadlift":[],"note":"","photos":[],"contour":null}</script>
@@ -251,6 +260,14 @@ if(ph.length){
   $("photos").innerHTML='<div class="compare"><figure>'+box(a,"Begjin")+'<figcaption>Begjin · '+fd(a.date)+'</figcaption></figure>'+(ph.length>1?'<figure>'+box(b,"No")+'<figcaption>No · '+fd(b.date)+'</figcaption></figure>':'')+'</div>';
   $("photoBand").hidden=false;
 }
+
+// kleurkeuze (bewarre yn dizze browser)
+const COLS=[["Mint","#3ef0c0"],["Stoker-oranje","#ff7a2f"],["Goud","#ffd23f"],["Fries blau","#4da3ff"],["Pompeblêd-read","#ff4d5a"],["Lime","#b6f03e"]];
+let saved=null; try{saved=localStorage.getItem("stoker-kleur")}catch(e){}
+const setCol=c=>{document.documentElement.style.setProperty("--accent",c);document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed",b.dataset.c===c?"true":"false"))};
+$("swatches").insertAdjacentHTML("beforeend",COLS.map(([n,c])=>'<button type="button" class="sw" data-c="'+c+'" style="background:'+c+'" aria-label="'+n+'" title="'+n+'" aria-pressed="false"></button>').join(""));
+setCol(COLS.some(x=>x[1]===saved)?saved:COLS[0][1]);
+$("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;setCol(b.dataset.c);try{localStorage.setItem("stoker-kleur",b.dataset.c)}catch(x){}});
 
 $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in update.":"De earste update komt op woansdei 21 oktober.";
 })();
