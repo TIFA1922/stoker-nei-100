@@ -87,6 +87,22 @@ h2.disp{font-size:26px;line-height:1}
 .goal .more b{font-family:var(--f-display);font-weight:400;font-size:22px}
 .goal .more span{font-size:12px;color:var(--muted)}
 .goal .tip{grid-column:1 / -1;font-size:14px;color:var(--soft);margin:0}
+.kwyt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--band);border-radius:6px;padding:12px 14px}
+.kwyt svg{width:34px;height:34px;color:var(--accent)}
+.kwyt b{display:block;font-size:15px}
+.kwyt span{font-size:13px;color:var(--muted)}
+.count{display:flex;gap:8px;flex-wrap:wrap}
+.count div{flex:1 1 140px;background:var(--band);border-radius:6px;padding:10px 12px;display:grid;gap:2px}
+.count b{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.count span{font-size:12px;color:var(--muted)}
+.medals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.medal{background:var(--band);border:1px solid var(--line);border-radius:6px;padding:12px 6px;display:grid;justify-items:center;gap:6px;text-align:center;color:var(--dim);cursor:default;font:inherit}
+.medal svg{width:34px;height:34px}
+.medal b{font-size:12px;font-weight:600;line-height:1.25}
+.medal.got{color:var(--accent);border-color:var(--accent);cursor:pointer}
+.medal.got b{color:var(--fg)}
+.medal:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 .swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .swatches span{font-size:12px;color:var(--muted);margin-right:2px}
 .sw{width:32px;height:32px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 3px var(--bg)}
@@ -112,10 +128,12 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     </div>
     <p class="tick-info" id="tickInfo" hidden></p>
     <p class="ms-line" id="msLine"></p>
+    <div class="kwyt" id="kwyt"></div>
   </section>
 
   <section class="band">
     <h2 class="disp">Doelen</h2>
+    <div class="count" id="count"></div>
     <div class="goals" id="goals"></div>
   </section>
 
@@ -134,6 +152,12 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
   <section class="band">
     <h2 class="disp">Alle wiken</h2>
     <div id="weeks"></div>
+  </section>
+
+  <section class="band">
+    <h2 class="disp">Medaljes</h2>
+    <div class="medals" id="medals"></div>
+    <p class="note" id="medalNote"></p>
   </section>
 
   <section class="band" id="storyBand">
@@ -260,6 +284,56 @@ if(ph.length){
   $("photos").innerHTML='<div class="compare"><figure>'+box(a,"Begjin")+'<figcaption>Begjin · '+fd(a.date)+'</figcaption></figure>'+(ph.length>1?'<figure>'+box(b,"No")+'<figcaption>No · '+fd(b.date)+'</figcaption></figure>':'')+'</div>';
   $("photoBand").hidden=false;
 }
+
+// wat bist kwyt?
+(()=>{
+  const IT=[[1,"pak sûker","pakken sûker"],[5,"sek ierappels","sekken ierappels"],[17,"krat bier","kratten bier"],[25,"sek sement","sekken sement"]];
+  const BAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l1.5 13a1 1 0 0 1-1 1.1h-13a1 1 0 0 1-1-1.1z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/><path d="M9 12h6"/></svg>';
+  let have=null; IT.forEach(x=>{if(lost>=x[0])have=x});
+  const nxt=IT.find(x=>x[0]>lost);
+  let t,s;
+  if(!have){t="Noch neat kwyt, mar dat komt.";s="Earste stap: in pak sûker (1 kg)."}
+  else{const n=Math.floor(lost/have[0]);t="Al kwyt: "+n+" "+(n>1?have[2]:have[1])+" ("+have[0]+" kg"+(n>1?" it stik":"")+")";s=nxt?"Folgjende: in "+nxt[1]+" ("+nxt[0]+" kg)":"Mear as in sek sement. Ongelooflik!"}
+  $("kwyt").innerHTML=BAG+'<div><b>'+t+'</b><span>'+s+'</span></div>';
+})();
+
+// ofteljen
+(()=>{
+  const today=new Date(); today.setHours(0,0,0,0);
+  const days=s=>Math.ceil((pd(s)-today)/864e5);
+  const C=[["2027-04-18","dagen oant it feest"],["2027-07-24","dagen oant de bouwfak"]].map(([d,l])=>[days(d),l]).filter(x=>x[0]>=0);
+  $("count").innerHTML=C.map(([n,l])=>'<div><b>'+(n===0?"Hjoed!":n)+'</b><span>'+(n===0?l.replace("dagen oant ",""):l)+'</span></div>').join("");
+  if(!C.length)$("count").hidden=true;
+})();
+
+// medaljes
+const MEDAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2l2.5 6M16 2l-2.5 6"/><circle cx="12" cy="14.5" r="6.5"/><path d="M12 11.2l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="currentColor"/></svg>';
+const maxDl=dl.length?Math.max(...dl.map(x=>x[1])):0;
+const full=wk.some(w=>w[1]>=5);
+let run=0,best=0; wk.forEach(w=>{run=w[1]>=4?run+1:0;best=Math.max(best,run)});
+const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["Ûnder de 120",cur<120],["20 kilo kwyt",lost>=20],["Ûnder de 110",cur<=110],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100 kg",maxDl>=100],["Deadlift mear as ik weach",maxDl>0&&maxDl>=cur],["25 kilo kwyt",lost>=25],["100 kilo!",cur<=goal]];
+$("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
+const nGot=MED.filter(m=>m[1]).length;
+$("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste kilo is de earste medalje.";
+
+// konfetty
+function confetti(){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  let cv=$("confetti"); if(!cv){cv=document.createElement("canvas");cv.id="confetti";document.body.appendChild(cv)}
+  const W=cv.width=innerWidth*devicePixelRatio, H=cv.height=innerHeight*devicePixelRatio, x=cv.getContext("2d");
+  const acc=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"#3ef0c0";
+  const cols=[acc,"#ffffff","#ffd23f","#ff7a2f","#4da3ff"];
+  const P=Array.from({length:140},()=>({x:W/2+(Math.random()-.5)*W*.3,y:H*.35,vx:(Math.random()-.5)*16*devicePixelRatio,vy:(-Math.random()*14-4)*devicePixelRatio,r:Math.random()*Math.PI,s:(4+Math.random()*5)*devicePixelRatio,c:cols[Math.floor(Math.random()*cols.length)]}));
+  const t0=performance.now();
+  (function f(t){const k=(t-t0)/2600; x.clearRect(0,0,W,H); if(k>1){cv.remove();return}
+    P.forEach(p=>{p.vy+=.45*devicePixelRatio;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=.2;x.save();x.globalAlpha=1-k;x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
+    requestAnimationFrame(f)})(t0);
+}
+$("medals").addEventListener("click",e=>{if(e.target.closest(".medal.got"))confetti()});
+// nij helle doel? ien kear konfetty foar elke besiker
+try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),now=MED.filter(m=>m[1]).map(m=>m[0]);
+  if(now.some(n=>!seen.includes(n))){setTimeout(confetti,600)}
+  localStorage.setItem(key,JSON.stringify(now));}catch(e){}
 
 // kleurkeuze (bewarre yn dizze browser)
 const COLS=[["Mint","#3ef0c0"],["Stoker-oranje","#ff7a2f"],["Goud","#ffd23f"],["Fries blau","#4da3ff"],["Pompeblêd-read","#ff4d5a"],["Lime","#b6f03e"]];
