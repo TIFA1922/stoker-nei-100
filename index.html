@@ -174,15 +174,14 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .col{display:contents}
 .o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}.o10{order:10}.o11{order:11}.o12{order:12}.o13{order:13}
 @media (min-width:1000px){
-  .page{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "c c";align-items:start;padding:24px 32px 0}
+  .page{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "c c";align-items:stretch;padding:24px 32px 0}
   .col{display:flex;flex-direction:column;min-width:0}
   .col-a{grid-area:a;border-right:1px solid var(--line);padding-right:16px}
   .col-b{grid-area:b;padding-left:16px}
-  .col-c{grid-area:c;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;border-top:1px solid var(--line)}
+  .col-c{grid-area:c;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;align-content:start;border-top:1px solid var(--line)}
   .col-c>.band{border-bottom:0}
   .col-c>.band:first-child{grid-row:span 2;border-right:1px solid var(--line);padding-right:36px}
   .col-c>.band:not(:first-child){padding-left:36px}
-  .col-c>#storyBand{border-top:1px solid var(--line)}
   .col .band:last-child{border-bottom:0}
   #photoBand,footer{grid-column:1/-1;border-top:1px solid var(--line)}
 }
@@ -193,7 +192,6 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
   .col-c>.band:first-child{border-right:0;padding-right:max(20px,env(safe-area-inset-right,0px))}
   .col-c>.band:not(:first-child){padding-left:max(20px,env(safe-area-inset-left,0px))}
   .col-c>.band:not(:last-child){border-bottom:1px solid var(--line)}
-  .col-c>#storyBand{border-top:0}
 }
 /* kachel */
 :root{--fire:#ff7a2f}
@@ -275,6 +273,10 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">30</b><span>noch op 'e stapel</span></div></div>
       <p class="kquip" id="kQuip"></p>
     </section>
+    <section class="band o11" id="storyBand">
+      <h2 class="disp">Dizze wike</h2>
+      <p class="story" id="story"></p>
+    </section>
 
   </div>
 
@@ -334,7 +336,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
         <label for="meiNaam">Dyn foarnamme</label>
         <input class="inp inp-s" id="meiNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
         <div class="hp" aria-hidden="true"><label for="meiWeb">Website</label><input id="meiWeb" type="text" tabindex="-1" autocomplete="off"></div>
-        <span class="lbl" id="meiWatLbl">Wat dogge we?</span>
+        <span class="lbl" id="meiWatLbl">Wat dogge wy?</span>
         <div class="parts two-up" id="meiWat" role="group" aria-labelledby="meiWatLbl"></div>
         <div class="daynav"><span class="lbl" id="meiDayLbl">Hokker dei?</span><span class="dn"><button type="button" id="meiPrev" aria-label="Eardere wiken">‹</button><span id="meiRange"></span><button type="button" id="meiNext" aria-label="Letter wiken">›</button></span></div>
         <div class="days" id="meiDays" role="group" aria-labelledby="meiDayLbl"></div>
@@ -349,10 +351,6 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <div id="meiBoard"></div>
     </section>
 
-    <section class="band o11" id="storyBand">
-      <h2 class="disp">Dizze wike</h2>
-      <p class="story" id="story"></p>
-    </section>
 
   </div>
 
@@ -400,7 +398,7 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
   const PARTY='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Feest"><path d="M4 20l4.5-12 7.5 7.5z"/><path d="M7 12.5l4.5 4.5"/><path d="M14 3v2M19 8h2M17.5 4.5l-1.5 1.5"/><circle cx="20" cy="3.5" r=".8" fill="currentColor"/><circle cx="13" cy="9" r=".8" fill="currentColor"/><path d="M15 12c1.5-1.5 3.5-1.5 5 0"/></svg>';
   const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Feest op 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it. Dan wol ik der stean op ûnder de 120!",date:"2027-04-13",target:119.9,done:cur<120},
            {kg:110,title:"110 kilo",icon:BEER,sub:"Bouwfak · 24 july",date:"2027-07-24",target:110,done:cur<=110},
-           {kg:goal,title:fmt(goal,0)+" kilo",icon:PARTY,sub:"Feest · datum ?",extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",date:null,target:goal,done:cur<=goal}];
+           {kg:goal,title:fmt(goal,0)+" kilo",icon:PARTY,sub:"Feest · datum komt",extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",date:null,target:goal,done:cur<=goal}];
   const firstOpen=G.findIndex(g=>!g.done);
   $("goals").innerHTML=G.map((g,i)=>{
     const left=Math.max(0,cur-g.target), wks=g.date?Math.max(0,Math.ceil((pd(g.date)-ref)/(7*864e5))):null;
@@ -504,7 +502,7 @@ const MEDAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const maxDl=dl.length?Math.max(...dl.map(x=>x[1])):0;
 const full=wk.some(w=>w[1]>=5);
 let run=0,best=0; wk.forEach(w=>{run=w[1]>=4?run+1:0;best=Math.max(best,run)});
-const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["Ûnder de 120",cur<120],["20 kilo kwyt",lost>=20],["Ûnder de 110",cur<=110],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100 kg",maxDl>=100],["Deadlift mear as ik weach",maxDl>0&&maxDl>=cur],["25 kilo kwyt",lost>=25],["100 kilo!",cur<=goal]];
+const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["Ûnder de 120",cur<120],["20 kilo kwyt",lost>=20],["Ûnder de 110",cur<=110],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["Deadlift mear as ik weach",maxDl>0&&maxDl>=cur],["25 kilo kwyt",lost>=25],["100 kilo!",cur<=goal]];
 $("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
 const nGot=MED.filter(m=>m[1]).length;
 $("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste kilo is de earste medalje.";
