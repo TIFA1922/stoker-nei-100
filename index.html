@@ -676,12 +676,11 @@ function stokerFig(kwyt, total){
   const hr=18+3*k;
   if(k>0.05) s+='<ellipse cx="'+cx+'" cy="'+(top-8+2*k)+'" rx="'+(9+7*k)+'" ry="'+(3+3*k)+'" fill="'+skin+'"/>';
   s+='<circle cx="'+cx+'" cy="'+(top-26)+'" r="'+hr+'" fill="'+skin+'"/>';
-  // hier: koart, wat rûch
-  {const hy=top-26, t=hy-hr-3, e=hy-hr*0.35, H="#6b4a2e";
-   s+='<path d="M'+(cx-hr-0.5)+' '+(hy-1)+' C'+(cx-hr-1)+' '+(t+2)+' '+(cx-hr*0.4)+' '+t+' '+cx+' '+t+' C'+(cx+hr*0.4)+' '+t+' '+(cx+hr+1)+' '+(t+2)+' '+(cx+hr+0.5)+' '+(hy-1)+
-     ' L'+(cx+hr-3)+' '+(e+2)+' L'+(cx+hr*0.55)+' '+(e-3)+' L'+(cx+hr*0.3)+' '+(e+1)+' L'+(cx)+' '+(e-4)+' L'+(cx-hr*0.3)+' '+(e+1)+' L'+(cx-hr*0.55)+' '+(e-3)+' L'+(cx-hr+3)+' '+(e+2)+'Z" fill="'+H+'"/>';
-   s+='<path d="M'+(cx-3)+' '+(t+0.5)+' q2 -6 6 -5 q-3 2 -2 6z" fill="'+H+'"/>';}
-  if(m>=0.5) s+='<rect x="'+(cx-hr)+'" y="'+(top-40)+'" width="'+(hr*2)+'" height="6" rx="3" '+A+'/>'; // swietbantsje
+  // hier: donker en koart, mei ynhammen
+  {const hy=top-26, t=hy-hr-2.5, H="#2b211b", th=t+hr*0.3, pk=hy-hr*0.5;
+   s+='<path d="M'+(cx-hr-0.5)+' '+(hy-2)+' C'+(cx-hr-1)+' '+(t+3)+' '+(cx-hr*0.45)+' '+t+' '+cx+' '+t+' C'+(cx+hr*0.45)+' '+t+' '+(cx+hr+1)+' '+(t+3)+' '+(cx+hr+0.5)+' '+(hy-2)+
+     ' L'+(cx+hr-2.5)+' '+(hy-3)+' Q'+(cx+hr-1)+' '+(th+3)+' '+(cx+hr*0.42)+' '+th+' Q'+(cx+hr*0.12)+' '+(th+2)+' '+cx+' '+pk+
+     ' Q'+(cx-hr*0.12)+' '+(th+2)+' '+(cx-hr*0.42)+' '+th+' Q'+(cx-hr+1)+' '+(th+3)+' '+(cx-hr+2.5)+' '+(hy-3)+'Z" fill="'+H+'"/>';}
   const ey=top-27;
   s+='<circle cx="'+(cx-7)+'" cy="'+ey+'" r="2.2" fill="'+dark+'"/><circle cx="'+(cx+7)+'" cy="'+ey+'" r="2.2" fill="'+dark+'"/>';
   s+='<circle cx="'+(cx-12-2*k)+'" cy="'+(ey+8)+'" r="3.3" fill="#ff9c8a" opacity=".55"/><circle cx="'+(cx+12+2*k)+'" cy="'+(ey+8)+'" r="3.3" fill="#ff9c8a" opacity=".55"/>';
