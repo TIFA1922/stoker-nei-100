@@ -77,7 +77,8 @@ h2.disp{font-size:26px;line-height:1}
 .goal .what{display:grid;gap:2px;min-width:0}
 .goal .what b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px}
 .goal .ico{width:20px;height:20px;color:var(--accent);flex:none}
-.goal .what span{font-size:13px;color:var(--muted)}
+.goal .what span{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.goal summary{min-height:72px}
 .pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--empty);color:var(--soft);white-space:nowrap}
 .pill.ok{background:var(--accent);color:#06261e}
 .goal .more{padding:0 14px 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -170,9 +171,9 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
   const ref=D.updated?pd(D.updated):new Date();
   const CAKE='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Jierdei"><path d="M4 21h16"/><path d="M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM12 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM16 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5z" fill="currentColor"/></svg>';
   const BEER='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Bouwfak"><path d="M6 8h10v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M6 8a2.5 2.5 0 0 1 1.5-4.6A3 3 0 0 1 13 3a2.5 2.5 0 0 1 3 2.6A2 2 0 0 1 16 8"/><path d="M9.5 12v6M12.5 12v6"/></svg>';
-  const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Op myn jierdei, 13 april",date:"2027-04-13",target:119.9,done:cur<120},
-           {kg:110,title:"110 kilo",icon:BEER,sub:"Mei de bouwfak, 24 july",date:"2027-07-24",target:110,done:cur<=110},
-           {kg:goal,title:fmt(goal,0)+" kilo",sub:"It einddoel",date:null,target:goal,done:cur<=goal}];
+  const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Jierdei · 13 april",date:"2027-04-13",target:119.9,done:cur<120},
+           {kg:110,title:"110 kilo",icon:BEER,sub:"Bouwfak · 24 july",date:"2027-07-24",target:110,done:cur<=110},
+           {kg:goal,title:fmt(goal,0)+" kilo",sub:"Einddoel",date:null,target:goal,done:cur<=goal}];
   const firstOpen=G.findIndex(g=>!g.done);
   $("goals").innerHTML=G.map((g,i)=>{
     const left=Math.max(0,cur-g.target), wks=g.date?Math.max(0,Math.ceil((pd(g.date)-ref)/(7*864e5))):null;
