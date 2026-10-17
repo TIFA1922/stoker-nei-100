@@ -75,10 +75,11 @@ h2.disp{font-size:26px;line-height:1}
 .goal summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 .goal .kg{font-family:var(--f-display);font-size:28px;line-height:1;min-width:52px}
 .goal .what{display:grid;gap:2px;min-width:0}
-.goal .what b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px}
+.goal .what b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:0}
 .goal .ico{width:20px;height:20px;color:var(--accent);flex:none}
 .goal .what span{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .goal summary{min-height:72px}
+@media (max-width:380px){.goal summary{gap:10px;padding:12px}.goal .kg{font-size:24px;min-width:44px}.pill{padding:4px 8px;font-size:11px}}
 .pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--empty);color:var(--soft);white-space:nowrap}
 .pill.ok{background:var(--accent);color:#06261e}
 .goal .more{padding:0 14px 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
