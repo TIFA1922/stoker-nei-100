@@ -30,9 +30,13 @@ h2.disp{font-size:26px;line-height:1}
 .big b{font-family:var(--f-display);font-weight:400;font-size:clamp(84px,28vw,120px);line-height:.9;color:var(--accent);font-variant-numeric:tabular-nums}
 .big span{font-size:16px;color:var(--soft)}
 .ticks{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:2px}
-.ticks i{height:18px;background:var(--empty)}
-.ticks i.on{background:var(--accent)}
-.ticks i.ms{box-shadow:inset 0 0 0 2px var(--fg)}
+.ticks button{height:22px;border:0;padding:0;margin:0;background:var(--empty);cursor:pointer;border-radius:1px}
+.ticks button.on{background:var(--accent)}
+.ticks button.ms{box-shadow:inset 0 0 0 2px var(--fg)}
+.ticks button.sel{outline:2px solid var(--fg);outline-offset:2px}
+.ticks button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tick-info{margin:0;font-size:14px;color:var(--soft);background:var(--band);border-radius:6px;padding:10px 12px}
+.tick-info b{color:var(--fg)}
 .ms-line{font-size:14px;color:var(--soft);margin:0}
 .ms-line b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--fg);letter-spacing:.01em}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
@@ -94,9 +98,10 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     </div>
     <div class="big"><b id="lost">0,0</b><span>kilo<br>kwyt</span></div>
     <div>
-      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <div class="ticks" id="ticks" role="group" aria-label="30 kilo, tik op in blûkje"></div>
       <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
     </div>
+    <p class="tick-info" id="tickInfo" hidden></p>
     <p class="ms-line" id="msLine"></p>
   </section>
 
@@ -157,7 +162,7 @@ $("startLbl").textContent=fmt(start,0); $("goalLbl").textContent=fmt(goal,0);
 const on=Math.min(30,Math.round(lost/total*30));
 const MSS=[{kg:120,goal:"ûnder de 120 kilo",when:"op myn jierdei (13 april)",done:c=>c<120},{kg:110,goal:"110 kilo",when:"mei de bouwfak (24 july)",done:c=>c<=110}];
 const msIdx=MSS.map(m=>Math.round((start-m.kg)/total*30)-1);
-$("ticks").innerHTML=Array.from({length:30},(_,i)=>{const c=[];if(i<on)c.push("on");if(msIdx.includes(i))c.push("ms");return '<i'+(c.length?' class="'+c.join(" ")+'"':'')+'></i>'}).join("");
+$("ticks").innerHTML=Array.from({length:30},(_,i)=>{const c=[];if(i<on)c.push("on");if(msIdx.includes(i))c.push("ms");return '<button type="button" data-k="'+i+'" aria-label="Kilo '+(i+1)+'"'+(c.length?' class="'+c.join(" ")+'"':'')+'></button>'}).join("");
 const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
 // klikbere doelen
 (()=>{
@@ -175,9 +180,21 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
     else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
     else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(left)+" wiken.";
     const cells=g.done?'':'<div><b>'+fmt(left)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'');
-    return '<details class="goal"'+(i===firstOpen?' open':'')+'><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+'<p class="tip">'+tip+'</p></div></details>';
+    return '<details class="goal" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+'<p class="tip">'+tip+'</p></div></details>';
   }).join("");
 })();
+// ien doel tagelyk iepen
+document.querySelectorAll("#goals details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#goals details").forEach(o=>{if(o!==d)o.open=false})}));
+// klikbere blûkjes
+$("ticks").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-k]"); if(!b)return;
+  const k=+b.dataset.k, step=total/30, from=start-k*step, to=start-(k+1)*step;
+  let gi=msIdx.indexOf(k); if(k===29)gi=2;
+  document.querySelectorAll("#ticks button.sel").forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
+  $("tickInfo").hidden=false;
+  $("tickInfo").innerHTML='<b>Kilo '+(k+1)+' fan 30</b> · fan '+fmt(from)+' nei '+fmt(to)+' kg · '+(k<on?'helle':'noch te dwaan')+(gi>=0?' · '+['tuskendoel jierdei','tuskendoel bouwfak','einddoel'][gi]:'');
+  if(gi>=0){const d=$("goal"+gi); if(d){d.open=true; d.scrollIntoView({behavior:"smooth",block:"nearest"})}}
+});
 $("msLine").innerHTML=(hit.length?'<b>Helle:</b> '+hit.map(m=>m.goal).join(", ")+'. ':'')+(next?'<b>Tuskendoel: '+next.goal+'</b> '+next.when+'. Noch '+fmt(Math.max(0,cur-(next.kg===120?119.9:next.kg)))+' kilo.':'');
 $("when").innerHTML=ws.length&&weekNo>0?"Wike "+weekNo+"<br>"+fd(ws[ws.length-1][0]):"Start<br>"+(ws.length?fd(ws[0][0]):"21 oktober");
 
