@@ -728,7 +728,7 @@ function stokerFig(kwyt, total){
   let tt=0; const say=t=>{toast.textContent=t;toast.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove("on"),2400)};
   // 1. oare ienheden
   const nf=(n,d)=>n.toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
-  const U=[[lost,1,"kilo<br>kwyt"],[lost/17,1,"kratten bier<br>kwyt"],[Math.round(lost/0.25),0,"pakjes bûter<br>kwyt"],[Math.round(lost*1000/2.5),0,"pinda's<br>kwyt"]];
+  const U=[[lost,1,"kilo<br>kwyt"],[lost/17,1,"kratten bier<br>kwyt"],[Math.round(lost/0.2),0,"hamburgers<br>kwyt 🍔"],[Math.round(lost/0.25),0,"pakjes bûter<br>kwyt"],[Math.round(lost*1000/2.5),0,"pinda's<br>kwyt"]];
   let u=0;
   $("bigBtn").addEventListener("click",()=>{
     u=(u+1)%U.length; const [v,d,lab]=U[u], txt=(v>0?"−":"")+nf(v,d);
