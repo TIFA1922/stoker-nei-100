@@ -698,6 +698,8 @@ setCol(COLS.some(x=>x[1]===saved)?saved:COLS[0][1]);
 $("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;setCol(b.dataset.c);try{localStorage.setItem("stoker-kleur",b.dataset.c)}catch(x){}});
 
 $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in update.":"De earste update komt op woansdei 21 oktober.";
+// geheime doar: fiif kear flugge tikke op de fuottekst iepenet it beheer
+(()=>{let n=0,t=0;$("foot").addEventListener("click",()=>{const now=Date.now();n=now-t<800?n+1:1;t=now;if(n>=5){n=0;location.href="https://tifa1922.github.io/stoker-nei-100/admin.html"}})})();
 })();
 </script>
 
