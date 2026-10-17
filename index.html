@@ -63,6 +63,23 @@ h2.disp{font-size:26px;line-height:1}
 .ov polyline{fill:none;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .ov .halo{stroke:rgba(0,0,0,.55);stroke-width:4.5}
 .ov .ln{stroke:var(--accent);stroke-width:2.2;stroke-dasharray:7 5}
+.goals{display:grid;gap:8px}
+.goal{background:var(--band);border-radius:6px;border:1px solid var(--line)}
+.goal[open]{border-color:var(--accent)}
+.goal summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px}
+.goal summary::-webkit-details-marker{display:none}
+.goal summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.goal .kg{font-family:var(--f-display);font-size:28px;line-height:1;min-width:52px}
+.goal .what{display:grid;gap:2px;min-width:0}
+.goal .what b{font-weight:600;font-size:15px}
+.goal .what span{font-size:13px;color:var(--muted)}
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--empty);color:var(--soft);white-space:nowrap}
+.pill.ok{background:var(--accent);color:#06261e}
+.goal .more{padding:0 14px 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.goal .more div{display:grid;gap:2px}
+.goal .more b{font-family:var(--f-display);font-weight:400;font-size:22px}
+.goal .more span{font-size:12px;color:var(--muted)}
+.goal .tip{grid-column:1 / -1;font-size:14px;color:var(--soft);margin:0}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 </style>
 </head>
@@ -81,6 +98,11 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
     </div>
     <p class="ms-line" id="msLine"></p>
+  </section>
+
+  <section class="band">
+    <h2 class="disp">Doelen</h2>
+    <div class="goals" id="goals"></div>
   </section>
 
   <div class="stats">
@@ -137,6 +159,25 @@ const MSS=[{kg:120,goal:"ûnder de 120 kilo",when:"op myn jierdei (13 april)",do
 const msIdx=MSS.map(m=>Math.round((start-m.kg)/total*30)-1);
 $("ticks").innerHTML=Array.from({length:30},(_,i)=>{const c=[];if(i<on)c.push("on");if(msIdx.includes(i))c.push("ms");return '<i'+(c.length?' class="'+c.join(" ")+'"':'')+'></i>'}).join("");
 const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
+// klikbere doelen
+(()=>{
+  const ref=D.updated?pd(D.updated):new Date();
+  const G=[{kg:120,title:"Ûnder de 120",sub:"Op myn jierdei, 13 april",date:"2027-04-13",target:119.9,done:cur<120},
+           {kg:110,title:"110 kilo",sub:"Mei de bouwfak, 24 july",date:"2027-07-24",target:110,done:cur<=110},
+           {kg:goal,title:fmt(goal,0)+" kilo",sub:"It einddoel",date:null,target:goal,done:cur<=goal}];
+  const firstOpen=G.findIndex(g=>!g.done);
+  $("goals").innerHTML=G.map((g,i)=>{
+    const left=Math.max(0,cur-g.target), wks=g.date?Math.max(0,Math.ceil((pd(g.date)-ref)/(7*864e5))):null;
+    const per=wks?left/wks:null;
+    let tip;
+    if(g.done) tip="Helle! Op nei it folgjende doel.";
+    else if(wks===0) tip="De datum is foarby. Gjin punt: hâld it tempo fêst.";
+    else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
+    else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(left)+" wiken.";
+    const cells=g.done?'':'<div><b>'+fmt(left)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'');
+    return '<details class="goal"'+(i===firstOpen?' open':'')+'><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+'<p class="tip">'+tip+'</p></div></details>';
+  }).join("");
+})();
 $("msLine").innerHTML=(hit.length?'<b>Helle:</b> '+hit.map(m=>m.goal).join(", ")+'. ':'')+(next?'<b>Tuskendoel: '+next.goal+'</b> '+next.when+'. Noch '+fmt(Math.max(0,cur-(next.kg===120?119.9:next.kg)))+' kilo.':'');
 $("when").innerHTML=ws.length&&weekNo>0?"Wike "+weekNo+"<br>"+fd(ws[ws.length-1][0]):"Start<br>"+(ws.length?fd(ws[0][0]):"21 oktober");
 
