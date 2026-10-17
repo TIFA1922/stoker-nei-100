@@ -177,7 +177,7 @@ let mei=[];
 async function loadMei(){
   try{
     await fresh();
-    const r=await fetch(MEI+"?select=id,naam,datum,dagdiel,status,created_at&order=datum.asc&limit=5000",{headers:authH()});
+    const r=await fetch(MEI+"?select=id,naam,datum,dagdiel,status,wat,created_at&order=datum.asc&limit=5000",{headers:authH()});
     if(r.status===401){S=null;save();show();return}
     if(!r.ok) throw 0;
     mei=await r.json(); renderMei(); say("meiMsg","");
@@ -189,8 +189,8 @@ function renderMei(){
   const done=mei.filter(x=>x.status!=="wacht"&&x.datum>=today);
   const past=mei.filter(x=>x.datum<today).reverse();
   $("tabMei").textContent="Meisporten"+(open.length?" · "+open.length:"");
-  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
-  const row=x=>'<div class="row"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+'</small></div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span><button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
+  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.wat==='kuierje'?' · rûntsje kuierje':' · sporte')+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
+  const row=x=>'<div class="row"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.wat==='kuierje'?' · rûntsje kuierje':' · sporte')+'</small></div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span><button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
   $("meiDone").innerHTML=done.length?done.map(row).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets afgesproken.</div>';
   $("meiPast").innerHTML=past.length?past.slice(0,30).map(row).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets.</div>';
 }
