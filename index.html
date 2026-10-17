@@ -218,6 +218,8 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .days button[aria-pressed="true"] small{color:#06261e}
 .parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .parts.two-up{grid-template-columns:repeat(2,minmax(0,1fr))}
+.inp.tiid{-webkit-appearance:none;appearance:none;display:block;width:140px;max-width:100%;min-width:0;box-sizing:border-box;height:46px;text-align:left}
+.inp.tiid::-webkit-date-and-time-value{text-align:left}
 .parts button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
 .parts button{padding:9px 0;font-weight:600;font-size:14px}
 .offers{display:grid;gap:6px}
@@ -335,7 +337,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
         <span class="lbl" id="meiPartLbl">Wannear?</span>
         <div class="parts" id="meiParts" role="group" aria-labelledby="meiPartLbl"></div>
         <label for="meiTiid">Foarkar foar in tiid? <span style="text-transform:none;letter-spacing:0">(hoecht net)</span></label>
-        <input class="inp inp-s" id="meiTiid" type="time" step="900" min="06:00" max="22:00">
+        <input class="inp inp-s tiid" id="meiTiid" type="time" step="900" min="06:00" max="22:00">
         <button type="button" class="btn" id="meiSend">Ik bied my oan</button>
         <p class="ok-line" id="meiMsg" hidden></p>
       </div>
