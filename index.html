@@ -165,26 +165,60 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 /* Telefoan: ien kolom yn de oarspronklike folchoarder. Desktop: twa kolommen */
 .page{display:flex;flex-direction:column}
 .col{display:contents}
-.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}.o10{order:10}.o11{order:11}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}.o10{order:10}.o11{order:11}.o12{order:12}.o13{order:13}
 @media (min-width:1000px){
   .page{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "c c";align-items:start;padding:24px 32px 0}
   .col{display:flex;flex-direction:column;min-width:0}
   .col-a{grid-area:a;border-right:1px solid var(--line);padding-right:16px}
   .col-b{grid-area:b;padding-left:16px}
   .col-c{grid-area:c;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;border-top:1px solid var(--line)}
-  .col-c>.band:first-child{border-right:1px solid var(--line);padding-right:36px}
-  .col-c>.band:last-child{padding-left:36px}
-  .col .band:last-child,.col-c>.band{border-bottom:0}
-  #photoBand,footer{grid-column:1/-1}
-  #photoBand,footer{border-top:1px solid var(--line)}
+  .col-c>.band{border-bottom:0}
+  .col-c>.band:first-child{grid-row:span 2;border-right:1px solid var(--line);padding-right:36px}
+  .col-c>.band:not(:first-child){padding-left:36px}
+  .col-c>#storyBand{border-top:1px solid var(--line)}
+  .col .band:last-child{border-bottom:0}
+  #photoBand,footer{grid-column:1/-1;border-top:1px solid var(--line)}
 }
 @media (min-width:1200px){
   .page{max-width:1480px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"a b c"}
   .col-b{border-right:1px solid var(--line);padding-right:16px}
   .col-c{display:flex;flex-direction:column;border-top:0;padding-left:16px}
-  .col-c>.band:first-child{border-right:0;padding-right:max(20px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line)}
-  .col-c>.band:last-child{padding-left:max(20px,env(safe-area-inset-left,0px))}
+  .col-c>.band:first-child{border-right:0;padding-right:max(20px,env(safe-area-inset-right,0px))}
+  .col-c>.band:not(:first-child){padding-left:max(20px,env(safe-area-inset-left,0px))}
+  .col-c>.band:not(:last-child){border-bottom:1px solid var(--line)}
+  .col-c>#storyBand{border-top:0}
 }
+/* kachel */
+:root{--fire:#ff7a2f}
+.kachel{background:var(--band);border-radius:8px;padding:14px 12px 10px}
+.kachel svg{display:block;width:100%;height:auto}
+.kachel .flame{transform-origin:74px 188px;animation:kflikker var(--fs,1s) ease-in-out infinite}
+@keyframes kflikker{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.07)}}
+@media (prefers-reduced-motion:reduce){.kachel .flame{animation:none}}
+.kstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kstats div{background:var(--band);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.kstats b{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1}
+.kstats span{font-size:12px;color:var(--muted)}
+.kquip{margin:0;font-size:15px;color:var(--soft)}
+/* gean mei */
+.lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.days button,.parts button{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;cursor:pointer;font-family:var(--f-body);min-width:0}
+.days button{padding:6px 0;display:grid;gap:0;justify-items:center}
+.days button small{font-size:10px;text-transform:uppercase;color:var(--muted)}
+.days button b{font-family:var(--f-display);font-weight:400;font-size:18px;line-height:1.1}
+.days button[aria-pressed="true"],.parts button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#06261e}
+.days button[aria-pressed="true"] small{color:#06261e}
+.parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.parts button{padding:9px 0;font-weight:600;font-size:14px}
+.offers{display:grid;gap:6px}
+.offer{background:var(--band);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.offer.ja{border-color:var(--accent)}
+.offer b{font-weight:600;overflow-wrap:anywhere}
+.offer small{display:block;font-size:13px;color:var(--muted)}
+.offer em{font-style:normal;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;white-space:nowrap;background:var(--line);color:var(--soft)}
+.offer.ja em{background:var(--accent);color:#06261e}
+.offer.nee em{background:transparent;color:var(--up)}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 </style>
 </head>
@@ -219,33 +253,49 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <div class="goals" id="goals"></div>
     </section>
 
-    <section class="band o9" id="storyBand">
-      <h2 class="disp">Dizze wike</h2>
-      <p class="story" id="story"></p>
+    <section class="band o4" id="kachelBand">
+      <h2 class="disp">Stoker stookt de kilo's op</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)">Elke kilo kwyt is in blok yn 'e kachel. Hoe minder hout, hoe hurder it fjoer.</p>
+      <div class="kachel" id="kachel"></div>
+      <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">30</b><span>noch op 'e stapel</span></div></div>
+      <p class="kquip" id="kQuip"></p>
     </section>
+
   </div>
 
   <div class="col col-b">
-    <section class="band o4">
+    <section class="band o5">
       <h2 class="disp">Gewicht</h2>
       <div id="chart"></div>
       <p class="note" id="chartNote">Stippellyn: it plan fan sa'n 1 kilo yn 'e wike.</p>
     </section>
 
-    <section class="band o5">
+    <section class="band o6">
       <h2 class="disp">Alle wiken</h2>
       <div id="weeks"></div>
     </section>
 
-    <section class="band o6">
+    <section class="band o7">
       <h2 class="disp">Medaljes</h2>
       <div class="medals" id="medals"></div>
       <p class="note" id="medalNote"></p>
     </section>
+
+    <section class="band o10">
+      <h2 class="disp">Wat as...?</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)" id="watIntro">Skuif mei it tempo en sjoch wannear't Stoker by syn doelen is.</p>
+      <div class="box">
+        <div class="pace-top"><label for="tempo">Tempo</label><b id="paceLbl">0,8 kg / wike</b></div>
+        <input id="tempo" type="range" min="3" max="12" step="1" value="8" aria-describedby="paceLbl">
+        <div class="ends2"><span>0,3 rêstich</span><span>1,2 hurd</span></div>
+      </div>
+      <div style="display:grid;gap:8px" id="watRows"></div>
+      <p class="note">Allinne in skatting. Elke wike is oars.</p>
+    </section>
   </div>
 
   <div class="col col-c">
-    <section class="band o7">
+    <section class="band o8">
       <h2 class="disp">Rie it gewicht</h2>
       <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Fier dyn gok yn. Nei de update sjochst hoe tichtby do sitst.</p>
       <div id="rieWin"></div>
@@ -262,25 +312,37 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <p class="note">Dyn foarnamme en gok binne te sjen foar elkenien mei de link. De gokken komme pas yn byld nei de weging.</p>
     </section>
 
-    <section class="band o8">
-      <h2 class="disp">Wat as...?</h2>
-      <p class="note" style="font-size:14px;color:var(--soft)" id="watIntro">Skuif mei it tempo en sjoch wannear't Stoker by syn doelen is.</p>
+    <section class="band o9" id="meiBand">
+      <h2 class="disp">Gean in kear mei!</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)">Wolsto in kear mei Stoker sporte? Kies in dei, dan sjocht Stoker oft it past.</p>
       <div class="box">
-        <div class="pace-top"><label for="tempo">Tempo</label><b id="paceLbl">0,8 kg / wike</b></div>
-        <input id="tempo" type="range" min="3" max="12" step="1" value="8" aria-describedby="paceLbl">
-        <div class="ends2"><span>0,3 rêstich</span><span>1,2 hurd</span></div>
+        <label for="meiNaam">Dyn foarnamme</label>
+        <input class="inp inp-s" id="meiNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
+        <div class="hp" aria-hidden="true"><label for="meiWeb">Website</label><input id="meiWeb" type="text" tabindex="-1" autocomplete="off"></div>
+        <span class="lbl" id="meiDayLbl">Hokker dei?</span>
+        <div class="days" id="meiDays" role="group" aria-labelledby="meiDayLbl"></div>
+        <span class="lbl" id="meiPartLbl">Wannear?</span>
+        <div class="parts" id="meiParts" role="group" aria-labelledby="meiPartLbl"></div>
+        <button type="button" class="btn" id="meiSend">Ik bied my oan</button>
+        <p class="ok-line" id="meiMsg" hidden></p>
       </div>
-      <div style="display:grid;gap:8px" id="watRows"></div>
-      <p class="note">Allinne in skatting. Elke wike is oars.</p>
+      <div id="meiList"></div>
+      <div id="meiBoard"></div>
     </section>
+
+    <section class="band o11" id="storyBand">
+      <h2 class="disp">Dizze wike</h2>
+      <p class="story" id="story"></p>
+    </section>
+
   </div>
 
-  <section class="band o10" id="photoBand" hidden>
+  <section class="band o12" id="photoBand" hidden>
     <h2 class="disp">Begjin en no</h2>
     <div id="photos"></div>
   </section>
 
-  <footer class="o11">
+  <footer class="o13">
     <div class="swatches" id="swatches" role="group" aria-label="Kies in kleur"><span>Kleur:</span></div>
     <p id="foot">Elke woansdei in update.</p>
   </footer>
@@ -520,6 +582,79 @@ try{const key="stoker-helle",seen=JSON.parse(localStorage.getItem(key)||"[]"),no
         say("Bewarre: "+fmt(kg)+" kg. Nei de weging sjochst it antwurd."); load();})
       .catch(e=>say(/te_folle_namme/.test(e.message)?"Do hast dizze wike al trije kear gokt. Wachtsje op de weging!":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Wachtsje even en besykje it nochris.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
       .finally(()=>{busy=false;$("gokSave").disabled=false});
+  });
+})();
+
+// stoker stookt de kilo's op
+(()=>{
+  const N=Math.max(1,Math.round(total)), burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
+  let logs="";
+  for(let i=0;i<N;i++){
+    const r=Math.floor(i/6), c=i%6, x=158+c*30+(r%2?15:0), y=232-r*27, on=i<keep;
+    logs+='<g opacity="'+(on?1:0.08)+'"><circle cx="'+x+'" cy="'+y+'" r="15" fill="#8a5a33"/><circle cx="'+x+'" cy="'+y+'" r="10" fill="none" stroke="#c48a55" stroke-width="2"/><circle cx="'+x+'" cy="'+y+'" r="4" fill="#c48a55"/></g>';
+  }
+  const fs=(0.35+0.65*f).toFixed(2);
+  $("kachel").innerHTML='<svg viewBox="0 0 340 260" role="img" aria-label="Kachel: '+burned+' blokken opstookt, noch '+keep+' op de stapel">'+
+    '<rect x="62" y="0" width="22" height="70" fill="#3a3a3a"/><rect x="20" y="66" width="108" height="14" rx="3" fill="#4a4a4a"/>'+
+    '<rect x="26" y="80" width="96" height="150" rx="8" fill="#2f2f2f"/><rect x="38" y="98" width="72" height="92" rx="6" fill="#121212" stroke="#4a4a4a" stroke-width="3"/>'+
+    '<g transform="translate(74 188) scale('+fs+') translate(-74 -188)"><g class="flame" style="--fs:'+(1.2-0.6*f).toFixed(2)+'s" opacity="'+(burned?1:0.3)+'">'+
+    '<path d="M74 112c5 18 26 28 26 54a26 26 0 0 1-52 0c0-13 7-20 12-27 1 9 5 13 9 14-3-16 1-29 5-41z" fill="#ff7a2f"/>'+
+    '<path d="M74 142c3 10 15 17 15 31a15 15 0 0 1-30 0c0-8 4-12 7-16 1 5 3 8 5 8-1-10 1-17 3-23z" fill="#ffd23f"/></g></g>'+
+    '<rect x="30" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="106" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="0" y="248" width="340" height="2" fill="#2c2c2c"/>'+
+    logs+'</svg>';
+  $("kBurn").textContent=burned; $("kLeft").textContent=keep;
+  const Q=[[0,"De kachel is kâld. Woansdei giet it earste blok der yn."],[1,"It earste blok is der yn. Der giet in fjoerke!"],[5,"It fjoer komt op gong. Stoker stookt troch."],[10,"Tsien blokken. De kachel wurdt waarm, de broek wurdt rom."],[20,"De stapel slinkt hurd. Hjir is in echte stoker oan it wurk."],[N-1,"Noch ien blok..."],[N,"Stapel op, kachel gloeiend: Stoker is by de 100!"]];
+  $("kQuip").textContent=Q.filter(q=>burned>=q[0]).pop()[1];
+})();
+
+// gean in kear mei: oanbiedingen yn Supabase, Stoker seit ja of nee
+(()=>{
+  const SB="https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/meisporte", KEY="sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
+  const WD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], WS=["sn","mo","ti","wo","to","fr","so"];
+  const MS=["jan","feb","mrt","apr","maaie","jun","jul","aug","sep","okt","nov","des"];
+  const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const t=new Date(); t.setHours(0,0,0,0); const today=iso(t);
+  const days=[...Array(14)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
+  const PARTS=["moarns","middeis","jûns"];
+  const nice=s=>{const d=pd(s);return WD[d.getDay()]+" "+d.getDate()+" "+MS[d.getMonth()]};
+  const norm=n=>String(n||"").trim().replace(/\s+/g," ");
+  let day=null, part=null;
+  $("meiDays").innerHTML=days.map(d=>'<button type="button" data-d="'+iso(d)+'" aria-pressed="false" aria-label="'+WD[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+'"><small>'+WS[d.getDay()]+'</small><b>'+d.getDate()+'</b></button>').join("");
+  $("meiParts").innerHTML=PARTS.map(p=>'<button type="button" data-p="'+p+'" aria-pressed="false">'+p+'</button>').join("");
+  const pick=(box,attr,val)=>box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val)));
+  $("meiDays").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;day=b.dataset.d;pick($("meiDays"),"d",day)});
+  $("meiParts").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;part=b.dataset.p;pick($("meiParts"),"p",part)});
+  try{const n=localStorage.getItem("stoker-namme");if(n)$("meiNaam").value=n}catch(e){}
+  const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net"};
+  const render=rows=>{
+    const up=rows.filter(r=>r.datum>=today).slice(0,12);
+    $("meiList").innerHTML=up.length?'<span class="lbl">Wa giet der mei?</span><div class="offers" style="margin-top:8px">'+up.map(r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+esc(r.dagdiel)+'</small></div><em>'+(ST[r.status]||"")+'</em></div>').join("")+'</div>':'<div class="empty" style="font-size:14px">Noch gjinien. Wa is de earste?</div>';
+    const cnt={}; rows.filter(r=>r.status==="ja"&&r.datum<today).forEach(r=>{const k=norm(r.naam).toLowerCase();cnt[k]=cnt[k]||{n:norm(r.naam),c:0};cnt[k].c++});
+    const top=Object.values(cnt).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n)).slice(0,5);
+    $("meiBoard").innerHTML=top.length?'<div class="box"><span class="lbl">Sportmaatsjes</span><div class="board">'+top.map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+x.c+'× mei west</span></div>').join("")+'</div></div>':'';
+  };
+  const load=()=>fetch(SB+"?select=naam,datum,dagdiel,status&order=datum.asc,created_at.asc&limit=2000",{headers:{apikey:KEY}})
+    .then(r=>{if(!r.ok)throw 0;return r.json()}).then(render).catch(()=>{$("meiList").innerHTML=""});
+  load();
+  let busy=false, typed=false; const t0=Date.now();
+  $("meiNaam").addEventListener("input",()=>{typed=true});
+  ["meiDays","meiParts"].forEach(id=>$(id).addEventListener("click",()=>{typed=true}));
+  $("meiSend").addEventListener("click",()=>{
+    if(busy)return;
+    const say=m=>{$("meiMsg").hidden=false;$("meiMsg").textContent=m};
+    const naam=norm($("meiNaam").value);
+    if(!naam){say("Fier earst dyn foarnamme yn.");$("meiNaam").focus();return}
+    if(!day){say("Kies in dei.");return}
+    if(!part){say("Kies moarns, middeis of jûns.");return}
+    const ok="Ferstjoerd! Stoker lit hjir witte oft it past.";
+    if($("meiWeb").value||Date.now()-t0<3000||!typed){say(ok);return}
+    busy=true; $("meiSend").disabled=true; say("Even ferstjoere...");
+    fetch(SB,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({naam:naam,datum:day,dagdiel:part})})
+      .then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
+        try{localStorage.setItem("stoker-namme",naam)}catch(e){}
+        say(ok); load();})
+      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende twa wiken.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .finally(()=>{busy=false;$("meiSend").disabled=false});
   });
 })();
 

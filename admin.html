@@ -41,12 +41,21 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .del{background:transparent;border:1px solid var(--line);color:var(--danger);border-radius:6px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer}
 .del:hover{border-color:var(--danger)}
 .del svg{width:20px;height:20px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tabs button{background:var(--band);color:var(--muted);border:0;border-radius:6px;padding:11px 0;font:500 15px var(--f-body);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#06261e;font-weight:600}
+.offer{background:var(--band);border-radius:8px;padding:14px;display:grid;gap:10px}
+.offer b{font-size:17px;font-weight:600;overflow-wrap:anywhere}
+.offer span{display:block;font-size:14px;color:var(--soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st{font-size:12px;font-weight:600;white-space:nowrap}
+.st.ja{color:var(--accent)}.st.nee{color:#ffb27a}
 .empty{color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:16px}
 </style>
 </head>
 <body>
 <main>
-  <h1>Stoker beheer<small>Gokken van "Rie it gewicht" bekijken en verwijderen</small></h1>
+  <h1>Stoker beheer<small>Gokken en meisport-aanbiedingen beheren</small></h1>
 
   <form class="box" id="login" autocomplete="on">
     <label for="mail">E-mailadres</label>
@@ -59,6 +68,11 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 
   <section id="app" hidden style="display:grid;gap:18px">
     <div class="top"><span id="who"></span><button class="btn ghost" type="button" id="logout">Uitloggen</button></div>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabGok" aria-selected="true" aria-controls="panGok">Gokken</button>
+      <button type="button" role="tab" id="tabMei" aria-selected="false" aria-controls="panMei">Meisporten</button>
+    </div>
+    <div id="panGok" role="tabpanel" style="display:grid;gap:18px">
     <div class="stats">
       <div><b id="sTot">0</b><span>gokken</span></div>
       <div><b id="sPeople">0</b><span>deelnemers</span></div>
@@ -71,6 +85,16 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
       <p class="msg" id="appMsg" hidden></p>
     </div>
     <div id="list" style="display:grid;gap:12px"></div>
+    </div>
+    <div id="panMei" role="tabpanel" hidden style="display:grid;gap:12px">
+      <span class="lbl">Nieuwe aanbiedingen</span>
+      <div id="meiOpen" style="display:grid;gap:8px"></div>
+      <span class="lbl">Komende afspraken</span>
+      <div id="meiDone" class="box round"></div>
+      <span class="lbl">Geweest</span>
+      <div id="meiPast" class="box round"></div>
+      <p class="msg" id="meiMsg" hidden></p>
+    </div>
   </section>
 </main>
 <script>
@@ -144,9 +168,66 @@ $("list").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)re
 $("filter").addEventListener("input",render);
 $("delFiltered").addEventListener("click",()=>{const q=$("filter").value.trim().toLowerCase();const ids=rows.filter(r=>r.naam.toLowerCase().includes(q)).map(r=>r.id);del(ids,ids.length+" gokken met \""+$("filter").value.trim()+"\"")});
 
+// --- meisporten ---
+const MEI=SB+"/rest/v1/meisporte";
+const WD=["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"];
+const nice=s=>{const [y,m,d]=s.split("-").map(Number);const t=new Date(y,m-1,d);return WD[t.getDay()]+" "+d+" "+M[m-1]};
+const isoToday=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+let mei=[];
+async function loadMei(){
+  try{
+    await fresh();
+    const r=await fetch(MEI+"?select=id,naam,datum,dagdiel,status,created_at&order=datum.asc&limit=5000",{headers:authH()});
+    if(r.status===401){S=null;save();show();return}
+    if(!r.ok) throw 0;
+    mei=await r.json(); renderMei(); say("meiMsg","");
+  }catch(e){ say("meiMsg","Laden mislukt. Heb je de SQL voor meisporten uitgevoerd?"); }
+}
+function renderMei(){
+  const today=isoToday();
+  const open=mei.filter(x=>x.status==="wacht"&&x.datum>=today);
+  const done=mei.filter(x=>x.status!=="wacht"&&x.datum>=today);
+  const past=mei.filter(x=>x.datum<today).reverse();
+  $("tabMei").textContent="Meisporten"+(open.length?" · "+open.length:"");
+  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
+  const row=x=>'<div class="row"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+'</small></div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span><button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
+  $("meiDone").innerHTML=done.length?done.map(row).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets afgesproken.</div>';
+  $("meiPast").innerHTML=past.length?past.slice(0,30).map(row).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets.</div>';
+}
+async function setMei(id,status){
+  try{
+    await fresh();
+    const r=await fetch(MEI+"?id=eq."+id,{method:"PATCH",headers:Object.assign({"Content-Type":"application/json",Prefer:"return=representation"},authH()),body:JSON.stringify({status})});
+    if(!r.ok) throw 0;
+    const got=await r.json();
+    if(!got.length){say("meiMsg","Niets aangepast. Heb je de SQL voor meisporten uitgevoerd?");return}
+    mei=mei.map(x=>x.id===id?Object.assign({},x,{status}):x); renderMei();
+    say("meiMsg",status==="ja"?"Afgesproken! Staat nu op de volgpagina.":"Doorgegeven: past niet.",true);
+  }catch(e){ say("meiMsg","Aanpassen mislukt. Probeer het opnieuw."); }
+}
+async function delMei(id){
+  const x=mei.find(m=>m.id===id);
+  if(!confirm("Aanbod van "+(x?x.naam:"deze persoon")+" verwijderen?"))return;
+  try{
+    await fresh();
+    const r=await fetch(MEI+"?id=eq."+id,{method:"DELETE",headers:Object.assign({Prefer:"return=representation"},authH())});
+    if(!r.ok) throw 0;
+    const gone=await r.json(); if(!gone.length){say("meiMsg","Niets verwijderd.");return}
+    mei=mei.filter(m=>m.id!==id); renderMei(); say("meiMsg","Verwijderd.",true);
+  }catch(e){ say("meiMsg","Verwijderen mislukt."); }
+}
+$("panMei").addEventListener("click",e=>{
+  const s=e.target.closest("[data-set]"); if(s){setMei(s.dataset.id,s.dataset.set);return}
+  const d=e.target.closest("[data-mdel]"); if(d) delMei(d.dataset.mdel);
+});
+const tab=w=>{const g=w==="gok";$("tabGok").setAttribute("aria-selected",String(g));$("tabMei").setAttribute("aria-selected",String(!g));$("panGok").hidden=!g;$("panMei").hidden=g;try{sessionStorage.setItem("stoker-tab",w)}catch(e){}};
+$("tabGok").addEventListener("click",()=>tab("gok"));
+$("tabMei").addEventListener("click",()=>tab("mei"));
+try{if(sessionStorage.getItem("stoker-tab")==="mei")tab("mei")}catch(e){}
+
 function show(){
   $("login").hidden=!!S; $("app").hidden=!S;
-  if(S){ $("who").textContent="Ingelogd als "+(S.email||"beheerder"); load(); }
+  if(S){ $("who").textContent="Ingelogd als "+(S.email||"beheerder"); load(); loadMei(); }
 }
 show();
 </script>
