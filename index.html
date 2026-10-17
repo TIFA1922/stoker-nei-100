@@ -167,15 +167,23 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .col{display:contents}
 .o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}.o10{order:10}.o11{order:11}
 @media (min-width:1000px){
-  .page{max-width:1200px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start;padding:24px 32px 0}
+  .page{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "c c";align-items:start;padding:24px 32px 0}
   .col{display:flex;flex-direction:column;min-width:0}
-  .col-l{border-right:1px solid var(--line);padding-right:16px}
-  .col-r{padding-left:16px}
+  .col-a{grid-area:a;border-right:1px solid var(--line);padding-right:16px}
+  .col-b{grid-area:b;padding-left:16px}
+  .col-c{grid-area:c;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;border-top:1px solid var(--line)}
+  .col-c>.band:first-child{border-right:1px solid var(--line);padding-right:36px}
+  .col-c>.band:last-child{padding-left:36px}
+  .col .band:last-child,.col-c>.band{border-bottom:0}
   #photoBand,footer{grid-column:1/-1}
-  .col .band:last-child{border-bottom:0}
-  #photoBand{border-top:1px solid var(--line)}
-  footer{border-top:1px solid var(--line)}
-  .stats{border-top:0}
+  #photoBand,footer{border-top:1px solid var(--line)}
+}
+@media (min-width:1200px){
+  .page{max-width:1480px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"a b c"}
+  .col-b{border-right:1px solid var(--line);padding-right:16px}
+  .col-c{display:flex;flex-direction:column;border-top:0;padding-left:16px}
+  .col-c>.band:first-child{border-right:0;padding-right:max(20px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line)}
+  .col-c>.band:last-child{padding-left:max(20px,env(safe-area-inset-left,0px))}
 }
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 </style>
@@ -183,7 +191,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
 <body style="margin:0">
 
 <div class="page">
-  <div class="col col-l">
+  <div class="col col-a">
     <section class="band o1">
       <div class="top">
         <h1 class="disp" id="title">Stoker<br>nei 100</h1>
@@ -205,6 +213,19 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       <div class="stat"><b id="dl">–</b><span>kg deadlift</span></div>
     </div>
 
+    <section class="band o2">
+      <h2 class="disp">Doelen</h2>
+      <div class="count" id="count"></div>
+      <div class="goals" id="goals"></div>
+    </section>
+
+    <section class="band o9" id="storyBand">
+      <h2 class="disp">Dizze wike</h2>
+      <p class="story" id="story"></p>
+    </section>
+  </div>
+
+  <div class="col col-b">
     <section class="band o4">
       <h2 class="disp">Gewicht</h2>
       <div id="chart"></div>
@@ -223,13 +244,7 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
     </section>
   </div>
 
-  <div class="col col-r">
-    <section class="band o2">
-      <h2 class="disp">Doelen</h2>
-      <div class="count" id="count"></div>
-      <div class="goals" id="goals"></div>
-    </section>
-
+  <div class="col col-c">
     <section class="band o7">
       <h2 class="disp">Rie it gewicht</h2>
       <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Fier dyn gok yn. Nei de update sjochst hoe tichtby do sitst.</p>
@@ -257,11 +272,6 @@ footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;
       </div>
       <div style="display:grid;gap:8px" id="watRows"></div>
       <p class="note">Allinne in skatting. Elke wike is oars.</p>
-    </section>
-
-    <section class="band o9" id="storyBand">
-      <h2 class="disp">Dizze wike</h2>
-      <p class="story" id="story"></p>
     </section>
   </div>
 
