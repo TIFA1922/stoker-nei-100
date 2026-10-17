@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Stoker beheer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#121212;--band:#1e1e1e;--line:#2c2c2c;--fg:#fff;--soft:#ddd;--muted:#aaa;--accent:#3ef0c0;--danger:#ff6b5b;
+  --f-display:Anton,Impact,"Arial Narrow Bold",sans-serif;--f-body:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.45}
+main{max-width:640px;margin:0 auto;padding:28px 16px 48px;display:grid;gap:18px}
+h1{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:44px;line-height:.95;margin:0}
+h1 small{display:block;font-family:var(--f-body);font-size:14px;text-transform:none;color:var(--muted);margin-top:8px}
+.box{background:var(--band);border-radius:8px;padding:16px;display:grid;gap:10px;min-width:0}
+label,.lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+input{width:100%;min-width:0;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:11px 12px;font:inherit}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{background:var(--accent);color:#06261e;border:0;border-radius:6px;padding:12px 16px;font:600 15px var(--f-body);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--soft);border:1px solid var(--line)}
+.btn:disabled{opacity:.6;cursor:default}
+.msg{margin:0;font-size:14px;color:var(--danger)}
+.msg.ok{color:var(--accent)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top span{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stats div{background:var(--band);border-radius:8px;padding:12px}
+.stats b{display:block;font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1}
+.stats span{font-size:12px;color:var(--muted)}
+.round{display:grid;gap:0}
+.round h2{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;font-weight:500}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row b{font-weight:600;overflow-wrap:anywhere}
+.row small{display:block;color:var(--muted);font-size:12px}
+.row .kg{font-family:var(--f-display);font-size:22px}
+.del{background:transparent;border:1px solid var(--line);color:var(--danger);border-radius:6px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer}
+.del:hover{border-color:var(--danger)}
+.del svg{width:20px;height:20px}
+.empty{color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:16px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Stoker beheer<small>Gokken van "Rie it gewicht" bekijken en verwijderen</small></h1>
+
+  <form class="box" id="login" autocomplete="on">
+    <label for="mail">E-mailadres</label>
+    <input id="mail" type="email" autocomplete="username" required>
+    <label for="pw">Wachtwoord</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit" id="loginBtn">Inloggen</button>
+    <p class="msg" id="loginMsg" hidden></p>
+  </form>
+
+  <section id="app" hidden style="display:grid;gap:18px">
+    <div class="top"><span id="who"></span><button class="btn ghost" type="button" id="logout">Uitloggen</button></div>
+    <div class="stats">
+      <div><b id="sTot">0</b><span>gokken</span></div>
+      <div><b id="sPeople">0</b><span>deelnemers</span></div>
+      <div><b id="sRounds">0</b><span>rondes</span></div>
+    </div>
+    <div class="box">
+      <label for="filter">Zoek op naam</label>
+      <input id="filter" type="search" placeholder="bv. test" autocomplete="off">
+      <button class="btn ghost" type="button" id="delFiltered" hidden></button>
+      <p class="msg" id="appMsg" hidden></p>
+    </div>
+    <div id="list" style="display:grid;gap:12px"></div>
+  </section>
+</main>
+<script>
+const SB="https://cupcyeurvttyetfrhuoi.supabase.co", KEY="sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
+const $=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>Number(n).toLocaleString("nl-NL",{minimumFractionDigits:1,maximumFractionDigits:1});
+const M=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+const fdt=s=>{const d=new Date(s);return d.getDate()+" "+M[d.getMonth()]+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+const fd=s=>{const [y,m,d]=String(s).slice(0,10).split("-");return +d+" "+M[+m-1]+" "+y};
+const BIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+
+let S=null, rows=[];
+try{S=JSON.parse(sessionStorage.getItem("stoker-admin")||"null")}catch(e){}
+
+const say=(id,t,ok)=>{const m=$(id);m.hidden=!t;m.textContent=t||"";m.classList.toggle("ok",!!ok)};
+const authH=()=>({apikey:KEY,Authorization:"Bearer "+S.access_token});
+const save=()=>{try{S?sessionStorage.setItem("stoker-admin",JSON.stringify(S)):sessionStorage.removeItem("stoker-admin")}catch(e){}};
+
+async function token(body,grant){
+  const r=await fetch(SB+"/auth/v1/token?grant_type="+grant,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||j.message||"Inloggen mislukt");
+  S={access_token:j.access_token,refresh_token:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,email:j.user&&j.user.email};
+  save();
+}
+async function fresh(){ if(S&&Date.now()>S.exp-60000) await token({refresh_token:S.refresh_token},"refresh_token"); }
+
+$("login").addEventListener("submit",async e=>{
+  e.preventDefault(); $("loginBtn").disabled=true; say("loginMsg","");
+  try{ await token({email:$("mail").value.trim(),password:$("pw").value},"password"); $("pw").value=""; show(); }
+  catch(err){ say("loginMsg",/invalid/i.test(err.message)?"E-mailadres of wachtwoord klopt niet.":err.message); }
+  $("loginBtn").disabled=false;
+});
+$("logout").addEventListener("click",()=>{ if(S) fetch(SB+"/auth/v1/logout",{method:"POST",headers:authH()}).catch(()=>{}); S=null; save(); show(); });
+
+async function load(){
+  try{
+    await fresh();
+    const r=await fetch(SB+"/rest/v1/gokken?select=id,naam,gok,week,created_at&order=created_at.desc&limit=10000",{headers:authH()});
+    if(r.status===401){S=null;save();show();return}
+    if(!r.ok) throw 0;
+    rows=await r.json(); render(); say("appMsg","");
+  }catch(e){ say("appMsg","Laden mislukt. Ververs de pagina en probeer het opnieuw."); }
+}
+function render(){
+  const q=$("filter").value.trim().toLowerCase();
+  const vis=q?rows.filter(r=>r.naam.toLowerCase().includes(q)):rows;
+  $("sTot").textContent=rows.length;
+  $("sPeople").textContent=new Set(rows.map(r=>r.naam.trim().toLowerCase())).size;
+  $("sRounds").textContent=new Set(rows.map(r=>String(r.week).slice(0,10))).size;
+  const b=$("delFiltered"); b.hidden=!(q&&vis.length); b.textContent="Alle "+vis.length+" gevonden gokken verwijderen";
+  if(!vis.length){$("list").innerHTML='<div class="empty">'+(rows.length?"Geen gokken met deze naam.":"Nog geen gokken.")+'</div>';return}
+  const g={}; vis.forEach(r=>{const k=String(r.week).slice(0,10);(g[k]=g[k]||[]).push(r)});
+  $("list").innerHTML=Object.keys(g).sort().reverse().map(k=>'<div class="box round"><h2>Gegokt na stand van '+fd(k)+' · '+g[k].length+'</h2>'+
+    g[k].map(r=>'<div class="row"><div><b>'+esc(r.naam)+'</b><small>'+fdt(r.created_at)+'</small></div><span class="kg">'+fmt(r.gok)+'</span><button class="del" type="button" data-id="'+esc(r.id)+'" aria-label="Gok van '+esc(r.naam)+' verwijderen">'+BIN+'</button></div>').join("")+'</div>').join("");
+}
+async function del(ids,label){
+  if(!ids.length||!confirm(label+" verwijderen? Dit kan niet ongedaan worden."))return;
+  try{
+    await fresh();
+    const r=await fetch(SB+"/rest/v1/gokken?id=in.("+ids.join(",")+")",{method:"DELETE",headers:Object.assign({Prefer:"return=representation"},authH())});
+    if(!r.ok) throw 0;
+    const gone=await r.json();
+    if(!gone.length){ say("appMsg","Niets verwijderd. Heb je de SQL voor de beheerpagina uitgevoerd met jouw e-mailadres?"); return; }
+    const set=new Set(gone.map(x=>x.id)); rows=rows.filter(x=>!set.has(x.id)); render();
+    say("appMsg",gone.length===1?"Gok verwijderd.":gone.length+" gokken verwijderd.",true);
+  }catch(e){ say("appMsg","Verwijderen mislukt. Probeer het opnieuw."); }
+}
+$("list").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;const r=rows.find(x=>x.id===b.dataset.id);del([b.dataset.id],"De gok van "+(r?r.naam+" ("+fmt(r.gok)+")":"deze persoon"))});
+$("filter").addEventListener("input",render);
+$("delFiltered").addEventListener("click",()=>{const q=$("filter").value.trim().toLowerCase();const ids=rows.filter(r=>r.naam.toLowerCase().includes(q)).map(r=>r.id);del(ids,ids.length+" gokken met \""+$("filter").value.trim()+"\"")});
+
+function show(){
+  $("login").hidden=!!S; $("app").hidden=!S;
+  if(S){ $("who").textContent="Ingelogd als "+(S.email||"beheerder"); load(); }
+}
+show();
+</script>
+</body>
+</html>
