@@ -102,6 +102,9 @@ h2.disp{font-size:26px;line-height:1}
 .goal .ico{width:20px;height:20px;color:var(--accent);flex:none}
 .goal .what span{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .goal summary{min-height:72px}
+
+.goal.step .kg{font-size:22px;color:var(--soft)}
+.goal.step .what b{font-size:14px;font-weight:500}
 @media (max-width:380px){.goal summary{gap:10px;padding:12px}.goal .kg{font-size:24px;min-width:44px}.pill{padding:4px 8px;font-size:11px}}
 .pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--empty);color:var(--soft);white-space:nowrap}
 .pill.ok{background:var(--accent);color:#06261e}
@@ -427,6 +430,13 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
   const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Feest op 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it. Dan wol ik der stean op ûnder de 120!",date:"2027-04-13",target:119.9,done:cur<120},
            {kg:110,title:"110 kilo",icon:BEER,sub:"Bouwfak · 24 july",date:"2027-07-24",target:110,done:cur<=110},
            {kg:goal,title:fmt(goal,0)+" kilo",icon:PARTY,sub:"Feest · datum komt",extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",date:null,target:goal,done:cur<=goal}];
+  // tuskenstappen per 5 kilo (sûnder datum), tusken de echte doelen yn
+  for(let v=goal+5; v<start; v+=5){
+    if(G.some(g=>g.kg===v)) continue;
+    G.push({kg:v,title:v+" kilo",sub:"Stap: "+fmt(start-v,0)+" kilo kwyt",step:true,date:null,target:v,done:cur<=v,
+      extra:"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!"});
+  }
+  G.sort((a,b)=>b.kg-a.kg);
   const firstOpen=G.findIndex(g=>!g.done);
   $("goals").innerHTML=G.map((g,i)=>{
     const left=Math.max(0,cur-g.target), wks=g.date?Math.max(0,Math.ceil((pd(g.date)-ref)/(7*864e5))):null;
@@ -437,7 +447,7 @@ const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
     else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
     else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(left)+" wiken.";
     const cells=g.done?'':'<div><b>'+fmt(left)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'');
-    return '<details class="goal" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+(g.icon||'')+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+tip+'</p></div></details>';
+    return '<details class="goal'+(g.step?' step':'')+'" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+(g.icon||'')+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+tip+'</p></div></details>';
   }).join("");
 })();
 // ien doel tagelyk iepen
