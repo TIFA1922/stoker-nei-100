@@ -38,5 +38,24 @@
     rows.forEach(x=>{ if(x.wikedei&&x.wikedei>=grins&&x.wike!=null&&x.wike>0&&(!winer||x.wike>winer.wike)) winer=x; });
     return {rows, winer, woansdei:wo, oaren:(o||[]).length};
   }
-  window.StokerKomp={laad, woansdei};
+  // ---- motivaasje: medaljes en reeks (allinne prosinten en aktiviteit, nea kilo's) ----
+  const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const pdD=s=>{const [y,m,d]=String(s).slice(0,10).split("-").map(Number);return new Date(y,m-1,d)};
+  function medaljes(r){
+    const pc=r.pct||0, doel=Number(r.doel)||10, dagen=r.dagen||[];
+    const perWike={}; dagen.filter(x=>x[1]).forEach(x=>{const d=pdD(x[0]);d.setDate(d.getDate()-((d.getDay()+6)%7));const k=isoD(d);perWike[k]=(perWike[k]||0)+1});
+    const akt=new Set(dagen.filter(x=>x[1]||x[2]).map(x=>x[0])); let rige=0,beste=0;
+    if(akt.size){const ks=[...akt].sort();for(let d=pdD(ks[0]);d<=pdD(ks[ks.length-1]);d.setDate(d.getDate()+1)){if(akt.has(isoD(d))){rige++;beste=Math.max(beste,rige)}else rige=0}}
+    return [["Begûn!",!!r.start],["1% kwyt",pc>=1],["3% kwyt",pc>=3],["5% kwyt",pc>=5],["Healwei it doel",pc>=doel/2],["10% kwyt",pc>=10],
+      ["Earste training",(r.trainingen||0)>=1],["10 trainingen",(r.trainingen||0)>=10],["Perfekte wike",Object.values(perWike).some(n=>n>=5)],
+      ["7 dagen op rige",beste>=7],["10× 10.000 stappen",(r.stappen||0)>=10],["Doel helle!",pc>=doel&&pc>0]];
+  }
+  // hjoeddeiske reeks: dagen op rige aktyf (sporte of 10.000 stappen), oant hjoed of juster
+  function reeks(dagen){
+    const akt=new Set((dagen||[]).filter(x=>x[1]||x[2]).map(x=>x[0]));
+    const t=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Amsterdam"})); t.setHours(0,0,0,0);
+    if(!akt.has(isoD(t))) t.setDate(t.getDate()-1);
+    let n=0; while(akt.has(isoD(t))){n++;t.setDate(t.getDate()-1)} return n;
+  }
+  window.StokerKomp={laad, woansdei, medaljes, reeks};
 })();

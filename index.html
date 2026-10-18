@@ -381,6 +381,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 .klas .kp{font-family:var(--f-display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .klas .kp small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);margin-top:3px}
 .kregels{margin-top:12px;font-size:13px;color:var(--muted)}
+.klas .kfire{font-size:13px;font-weight:600;color:#ff7a2f;white-space:nowrap}
 .kfol{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;min-height:50px;border-radius:8px;background:var(--accent);color:#06261e;font:600 16px var(--f-body);text-decoration:none}
 .kfol svg{width:20px;height:20px}
 </style></head><body style="margin:0">
@@ -1212,7 +1213,7 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
       const href=x.stoker?"#":"side.html?n="+encodeURIComponent(x.slug);
       return '<li class="'+(x.stoker?"ik":"")+'"><a href="'+href+'"'+(x.stoker?' data-top="1"':'')+' aria-label="'+E(x.namme)+(p!=null?", plak "+n+", "+nl1(p)+" prosint kwyt":", noch net begûn")+'">'+
         '<span class="pl">'+(p!=null?n:"–")+'</span><span class="kav" style="background:'+E(x.kleur)+'">'+E(x.namme[0].toUpperCase())+'</span>'+
-        '<span class="nm"><b>'+E(x.namme)+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k stappen':'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
+        '<span class="nm"><b>'+E(x.namme)+((n2=>n2>=2?' <span class="kfire" title="'+n2+' dagen op rige aktyf">🔥'+n2+'</span>':'')(StokerKomp.reeks?StokerKomp.reeks(x.dagen):0))+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k'+((m=>m?' · 🏅 '+m:'')(StokerKomp.medaljes?StokerKomp.medaljes(x).filter(q=>q[1]).length:0)):'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
         '<span class="kp">'+(p==null?"–":(p<0?"+":p>0?"−":"")+nl1(Math.abs(p))+"%")+'<small>kwyt</small></span></a></li>'}).join("");
     $("kLijst").addEventListener("click",e=>{const a=e.target.closest('[data-top]');if(a){e.preventDefault();scrollTo({top:0,behavior:"smooth"})}});
     $("kompetysje").hidden=false;
