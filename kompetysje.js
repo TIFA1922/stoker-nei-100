@@ -14,11 +14,12 @@
     const w=(D.weights||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1), st=Number(D.start)||(w[0]&&w[0][1]);
     let stap=[]; try{ stap=await (await fetch(SB+"/rest/v1/stappen?select=dei,stappen&order=dei.asc",{headers:{apikey:KEY}})).json(); }catch(e){}
     const dm={}; (D.sport||[]).forEach(d=>dm[d]=[d,true,false]); (Array.isArray(stap)?stap:[]).forEach(s=>{ if(s.stappen>=10000){ dm[s.dei]=dm[s.dei]||[s.dei,false,false]; dm[s.dei][2]=true; } });
+    const stapJier={}; (Array.isArray(stap)?stap:[]).forEach(s=>{const j=String(s.dei).slice(0,4);stapJier[j]=(stapJier[j]||0)+(Number(s.stappen)||0)});
     const last=w[w.length-1], prev=w[w.length-2];
     return {slug:"stoker",namme:"Stoker",kleur:"#3ef0c0",doel:r1((st-Number(D.goal||100))/st*100),stoker:true,
       start:w[0]?w[0][0]:null, pct:last?r1((st-last[1])/st*100):null, wike:last&&prev?r1((prev[1]-last[1])/st*100):null, wikedei:last?last[0]:null,
       wiken:w.map(x=>[x[0],r1((st-x[1])/st*100)]), trainingen:(D.sport||[]).length, stappen:Object.values(dm).filter(x=>x[2]).length,
-      dagen:Object.values(dm).sort((a,b)=>a[0]<b[0]?-1:1)};
+      dagen:Object.values(dm).sort((a,b)=>a[0]<b[0]?-1:1), stapJier};
   }
   async function oaren(){
     const r=await fetch(SB+"/rest/v1/rpc/dn_klassemint",{method:"POST",headers:H,body:"{}"});

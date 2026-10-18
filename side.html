@@ -107,6 +107,7 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
   <a class="terug" href="https://stokernei100.nl/#kompetysje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Werom nei it klassemint</a>
 </main>
 <script src="kompetysje.js"></script>
+<script src="wrapped.js"></script>
 <script>
 (()=>{
   const $=id=>document.getElementById(id);
@@ -125,6 +126,7 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
     const mei=k.rows.filter(x=>x.pct!=null), plak=mei.findIndex(x=>x.slug===sl)+1;
     const prizen=(r.skoen?" · 👟 gouden skoen":"")+(r.lantearne?" · 🏮 reade lantearne":"");
     $("meta").textContent=(r.start?("Docht mei sûnt "+pd(r.start).getDate()+" "+FL[pd(r.start).getMonth()]+(plak?" · plak "+plak+" fan "+mei.length:"")):"Begjint by de earste weging")+prizen;
+    if(window.StokerWrapped){const wb=StokerWrapped.knop(r,k,null,true); if(wb) document.querySelector(".held").after(wb);}
     const p=r.pct||0; $("pct").textContent=(r.pct==null?"0":(p<0?"+":"")+nl(Math.abs(p)))+"%";
     $("balk").style.width=Math.max(0,Math.min(100,p/r.doel*100))+"%"; $("doel").textContent="doel: "+nl(r.doel,r.doel%1?1:0)+"% kwyt";
     $("tT").textContent=r.trainingen; $("tS").textContent=r.stappen; $("tW").textContent=r.wiken.length;

@@ -573,6 +573,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 </div>
 
 <script src="kompetysje.js"></script>
+<script src="wrapped.js"></script>
 <script type="application/json" id="data">{"updated":null,"start":130,"goal":100,"weights":[],"weeks":[],"deadlift":[],"note":"","photos":[],"contour":null}</script>
 <script>
 (() => {
@@ -1233,6 +1234,8 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
   const nl1=n=>Number(n).toLocaleString("nl-NL",{minimumFractionDigits:1,maximumFractionDigits:1});
   const E=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   StokerKomp.laad(D).then(k=>{
+    const stk=k.rows.find(x=>x.stoker);
+    if(stk&&window.StokerWrapped){ const wb=StokerWrapped.knop(stk,k,"🎁 Stoker syn jier "+StokerWrapped.finster(),false); if(wb){ wb.style.margin="0 0 14px"; $("kWin").before(wb); } }
     if(!k.oaren){ // noch gjin oare meidwaners: lit allinne de útnoeging sjen
       $("kLijst").innerHTML=""; $("kWin").innerHTML="";
       $("kLijst").insertAdjacentHTML("beforebegin",'<div class="empty" id="kLeech" style="font-size:15px">Noch gjin meidwaners. Doch as earste mei en strij tsjin Stoker!</div>');

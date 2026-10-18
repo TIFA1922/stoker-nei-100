@@ -150,6 +150,7 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
   </div>
 </main>
 <script src="kompetysje.js"></script>
+<script src="wrapped.js"></script>
 <script>
 (()=>{
 const SB="https://cupcyeurvttyetfrhuoi.supabase.co", KEY="sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
@@ -216,7 +217,8 @@ async function laad(){
   try{ MY=await rpc("dn_my",{sesje:SES}); }
   catch(err){ if(err.code==="net_ynlogd"){ bewarSes(null); toon("vYn"); say("ynMsg",err.message); return; } toon("vYn"); say("ynMsg",err.message); return; }
   toon("vMy"); teken(); medaljeKontrole();
-  if(window.StokerKomp) StokerKomp.laad().then(k=>{ const r=k.rows.filter(x=>x.pct!=null), i=r.findIndex(x=>x.slug===MY.slug); if(i>=0){ plak=i+1; $("myPlak").textContent="Plak "+plak+" fan "+r.length; } }).catch(()=>{});
+  if(window.StokerKomp) StokerKomp.laad().then(k=>{ const r=k.rows.filter(x=>x.pct!=null), i=r.findIndex(x=>x.slug===MY.slug); if(i>=0){ plak=i+1; $("myPlak").textContent="Plak "+plak+" fan "+r.length; }
+    const me=k.rows.find(x=>x.slug===MY.slug); if(me&&window.StokerWrapped&&!document.querySelector(".swr-knop")){ const wb=StokerWrapped.knop(me,k,"🎁 Besjoch dyn jier "+StokerWrapped.finster(),true); if(wb){ wb.style.margin="0"; $("myPlak").closest(".kop").after(wb); } } }).catch(()=>{});
 }
 function pct(){ const w=MY.wegingen; if(w.length<1) return null; return (w[0][1]-w[w.length-1][1])/w[0][1]*100; }
 function teken(){
