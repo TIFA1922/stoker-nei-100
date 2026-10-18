@@ -208,7 +208,7 @@ function waText(x,kind){
   const n=String(x.naam).trim().split(" ")[0], hm=x.tiid?String(x.tiid).slice(0,5):"", when=fryDate(x.datum)+" "+(hm?"om "+hm:x.dagdiel);
   if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+(x.wat==="kuierje"?"geane wy in rûntsje kuierje 👟":"geane wy sporte 💪")+". Oant dan!\nStoker";
   if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+(x.wat==="kuierje"?"wy geane in rûntsje kuierje! 👟":"wy geane sporte! 💪")+"\nStoker";
-  return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://tifa1922.github.io/stoker-nei-100/\nStoker";
+  return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://stokernei100.nl/\nStoker";
 }
 const waUrl=(x,kind)=>"https://wa.me/?text="+encodeURIComponent(waText(x,kind));
 // agenda: tiden per dieldei (oan te passen yn Outlook)
