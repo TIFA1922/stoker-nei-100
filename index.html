@@ -847,9 +847,11 @@ function stokerFig(kwyt, total){
     $("weachdei").hidden=false;
   }
   // 5. net oan 'e taart komme
+  const TQ=["Ho! Dy is foar 18 april! 🎂","Ien punt. Gjin twa. Mei slagroom? Nou, fooruit.","Fan taart bliuwe ôf, oars wurdt it 130 kearsen.","De kearsen binne al oan… Noch even blaze wachtsje!","Op it feest mei ik in grut stik, ik haw der hurd foar wurke! 🍰"];
+  let ti=0;
   document.querySelectorAll('#goals svg[aria-label="Jierdei"]').forEach(c=>{
     c.classList.add("cake-tap");
-    c.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();pop(c,"Ho! Dy is foar 18 april! 🎂")});
+    c.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();pop(c,TQ[ti++%TQ.length])});
   });
   // 6. it pilske fan 'e bouwfak: elke tik in oare tekst
   const BQ=["Ien pilske mei wol. Mei mate, hè! 🍺","Proost! Mar by ien bliuwt it, Stoker…","Ien bier is in kertier ekstra op 'e loopbân.","Sneon in pilske, moandei wer sporte. 💪","By de bouwfak mei it in grut glês wêze! 🍻"];
