@@ -266,6 +266,9 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .wknav b small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
 .wknav button{height:40px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:20px;cursor:pointer}
 .wknav button:disabled{opacity:.3;cursor:default}
+.wkslider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:8px;overscroll-behavior-x:contain}
+.wkslider::-webkit-scrollbar{display:none}
+.wkslide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
 #meiWat button{display:grid;justify-items:center;align-content:center;gap:3px;padding:10px 4px;font-size:13px;line-height:1.2;min-height:64px}
 #meiWat button span{font-size:22px;line-height:1}
 .inp.tiid{-webkit-appearance:none;appearance:none;display:block;width:140px;max-width:100%;min-width:0;box-sizing:border-box;height:46px;text-align:left}
@@ -1080,17 +1083,25 @@ function stokerFig(kwyt, total){
     tekenWike();
   };
   let meiWiken=[], meiRows=[], meiWk=0, meiKeazen=false;
+  const kopFan=i=>{const w0=meiWiken[i],a=pd(w0),z=new Date(a);z.setDate(a.getDate()+6);const nx=iso(new Date(pd(mo2(today)).getTime()+7*864e5));
+    return [w0===mo2(today)?"Dizze wike":w0===nx?"Folgjende wike":"Wike fan "+a.getDate()+" "+MS[a.getMonth()], a.getDate()+(a.getMonth()!==z.getMonth()?' '+MS[a.getMonth()]:'')+'–'+z.getDate()+' '+MS[z.getMonth()]]};
+  const offerRij=r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+(r.tiid?esc(String(r.tiid).slice(0,5)):esc(r.dagdiel))+' · '+esc(watTekst(r))+'</small></div><em>'+(ST[r.status]||"")+'</em></div>';
   const tekenWike=()=>{
     if(!meiWiken.length){ $("meiList").innerHTML=""; return; }
-    const w0=meiWiken[meiWk], a=pd(w0), z=new Date(a); z.setDate(a.getDate()+6);
-    const yn=meiRows.filter(r=>mo2(r.datum)===w0);
-    const kop=meiWk===0?"Dizze wike":meiWk===1&&mo2(iso(new Date(pd(meiWiken[0]).getTime()+7*864e5)))===w0?"Folgjende wike":"Wike fan "+a.getDate()+" "+MS[a.getMonth()];
-    $("meiList").innerHTML='<span class="lbl">Wa giet der mei?</span><div class="wknav"><button type="button" id="meiWkPrev" aria-label="Eardere wike"'+(meiWk===0?" disabled":"")+'>‹</button><b>'+kop+'<small>'+a.getDate()+(a.getMonth()!==z.getMonth()?' '+MS[a.getMonth()]:'')+'–'+z.getDate()+' '+MS[z.getMonth()]+'</small></b><button type="button" id="meiWkNext" aria-label="Folgjende wike mei ôfspraken"'+(meiWk>=meiWiken.length-1?" disabled":"")+'>›</button></div>'+
-      (yn.length?'<div class="offers" style="margin-top:8px">'+yn.map(r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+(r.tiid?esc(String(r.tiid).slice(0,5)):esc(r.dagdiel))+' · '+esc(watTekst(r))+'</small></div><em>'+(ST[r.status]||"")+'</em></div>').join("")+'</div>':'<div class="empty" style="font-size:14px;margin-top:8px">'+(meiWk===0?"Noch gjinien dizze wike. Wa is de earste?":"Noch neat dizze wike.")+'</div>')+
-      ((t,w)=>w>1&&t?'<p class="note" style="margin-top:8px">'+t+(t===1?" ôfspraak":" ôfspraken")+' yn '+w+(w===1?" wike":" wiken")+'. Blêdzje mei ‹ ›.</p>':'')(meiRows.filter(r=>r.status!=="nee").length, new Set(meiRows.filter(r=>r.status!=="nee").map(r=>mo2(r.datum))).size);
+    const slides=meiWiken.map((w0,i)=>{const yn=meiRows.filter(r=>mo2(r.datum)===w0);
+      return '<div class="wkslide" aria-label="'+kopFan(i).join(" ")+'">'+(yn.length?'<div class="offers">'+yn.map(offerRij).join("")+'</div>':'<div class="empty" style="font-size:14px">'+(i===0?"Noch gjinien dizze wike. Wa is de earste?":"Noch neat dizze wike.")+'</div>')+'</div>'}).join("");
+    const t=meiRows.filter(r=>r.status!=="nee").length, w=new Set(meiRows.filter(r=>r.status!=="nee").map(r=>mo2(r.datum))).size;
+    $("meiList").innerHTML='<span class="lbl">Wa giet der mei?</span><div class="wknav"><button type="button" id="meiWkPrev" aria-label="Eardere wike">‹</button><b id="meiWkKop"></b><button type="button" id="meiWkNext" aria-label="Folgjende wike">›</button></div>'+
+      '<div class="wkslider" id="meiSlider">'+slides+'</div>'+
+      (w>1&&t?'<p class="note" style="margin-top:8px">'+t+(t===1?" ôfspraak":" ôfspraken")+' yn '+w+' wiken. Skow opsij of tik op ‹ ›.</p>':'');
+    const sl=$("meiSlider"); sl.scrollLeft=meiWk*sl.clientWidth; kopBij();
+    sl.addEventListener("scroll",()=>{const i=Math.round(sl.scrollLeft/Math.max(1,sl.clientWidth));if(i!==meiWk){meiWk=i;meiKeazen=true;kopBij()}},{passive:true});
   };
+  const kopBij=()=>{const k=kopFan(meiWk);$("meiWkKop").innerHTML=k[0]+'<small>'+k[1]+'</small>';$("meiWkPrev").disabled=meiWk===0;$("meiWkNext").disabled=meiWk>=meiWiken.length-1};
   const mo2=s=>{const d=pd(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)};
-  $("meiList").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;meiKeazen=true;if(b.id==="meiWkPrev"&&meiWk>0){meiWk--;tekenWike()}if(b.id==="meiWkNext"&&meiWk<meiWiken.length-1){meiWk++;tekenWike()}});
+  $("meiList").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const sl=$("meiSlider");if(!sl)return;meiKeazen=true;
+    const n=b.id==="meiWkPrev"?meiWk-1:b.id==="meiWkNext"?meiWk+1:null; if(n==null||n<0||n>=meiWiken.length)return;
+    sl.scrollTo({left:n*sl.clientWidth,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})});
   const renderBoard=rows=>{
     const cnt={}; rows.filter(r=>r.status==="ja"&&r.datum<today).forEach(r=>{const k=norm(r.naam).toLowerCase();cnt[k]=cnt[k]||{n:norm(r.naam),c:0};cnt[k].c++});
     const top=Object.values(cnt).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n)).slice(0,5);
