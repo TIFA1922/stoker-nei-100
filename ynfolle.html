@@ -53,6 +53,9 @@ input:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible{ou
 select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 16px var(--f-body)}
 .rij{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .kleuren{display:flex;flex-wrap:wrap;gap:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:var(--bg);color:var(--soft);border:0;padding:8px 12px;font:600 13px var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--c);color:#121212}
 .kleuren button{width:36px;height:36px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 3px var(--band);cursor:pointer;padding:0}
 .kleuren button[aria-pressed="true"]{border-color:var(--fg)}
 </style>
@@ -120,8 +123,15 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
       <h2>Myn wegingen</h2>
       <div class="box" id="wegingen" style="gap:0"></div>
       <div class="rij" style="align-items:flex-start;flex-direction:column"><span style="font-size:15px;color:var(--soft)">Myn kleur</span><div class="kleuren" id="myKleur" role="group" aria-label="Myn kleur"></div></div>
-      <div class="rij"><label for="doel" style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--soft)">Myn doel</label>
-        <select id="doel"></select></div>
+      <div class="box" style="gap:10px">
+        <div class="rij"><span style="font-size:15px;color:var(--soft)">Myn doel</span>
+          <div class="seg" role="group" aria-label="Soarte doel"><button type="button" id="dsPct" aria-pressed="true">Prosint</button><button type="button" id="dsKg" aria-pressed="false">Doelgewicht</button></div></div>
+        <div class="rij" id="doelPct"><label for="doel" style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--muted)">Hoefolle kwyt?</label><select id="doel"></select></div>
+        <form class="rij" id="doelKg" hidden><label for="doelKgIn" style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--muted)">Doel (kg)</label>
+          <span style="display:flex;gap:8px"><input id="doelKgIn" inputmode="decimal" placeholder="bv. 80" style="width:110px;font-size:16px;padding:8px 10px"><button class="tg" type="submit" id="doelKgBtn">Bewarje</button></span></form>
+        <p style="margin:0;font-size:13px;color:var(--muted)" id="doelInfo"></p>
+        <p class="msg" id="doelMsg" hidden></p>
+      </div>
     </section>
 
     <div class="links">
@@ -144,7 +154,7 @@ const say=(id,t,ok)=>{const m=$(id);m.hidden=!t;m.textContent=t||"";m.classList.
 const FOUT={ferkeard:"Namme of wachtwurd klopt net.",te_folle_besykjen:"Te folle besykjen. Wachtsje in kertier en besykje it opnij.",
   "utnoeging_ferrûn":"Dizze link docht it net mear. Freegje Stoker om in nije.",wachtwurd_te_koart:"Nim in wachtwurd fan minimaal 6 tekens.",
   ferkeard_gewicht:"Dat gewicht klopt net. Fol in getal yn lykas 84,6.",te_grut_ferskil:"Dat is mear as 15 kilo ferskil mei dyn foarige weging. Klopt it wol?",
-  net_ynlogd:"Do bist útlogd. Log opnij yn.",ferkearde_dei:"Dy dei kin net mear oanpast wurde."};
+  net_ynlogd:"Do bist útlogd. Log opnij yn.",doel_te_heech:"Dyn doelgewicht moat leger wêze as dyn startgewicht.",ferkeard_doel:"Dat doel kin net.",ferkearde_dei:"Dy dei kin net mear oanpast wurde."};
 async function rpc(f,body){
   let r; try{ r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body||{})}); }
   catch(e){ throw new Error("Gjin ferbining. Besykje it opnij."); }
@@ -226,6 +236,7 @@ function teken(){
   $("wegingen").innerHTML=w.length?w.map(x=>{const d=pd(x[0]);const q=(st-x[1])/st*100;return '<div class="wg"><b>'+d.getDate()+" "+FM[d.getMonth()]+'</b><span>'+nl(x[1])+' kg</span><em>'+(x[0]===MY.wegingen[0][0]?"start":(q>0?"−":q<0?"+":"")+nl(Math.abs(q))+"%")+'</em>'+((pd(MY.hjoed)-d)/864e5<=7?'<button type="button" class="wis" data-fuort="'+x[0]+'" aria-label="Weging fan '+d.getDate()+" "+FM[d.getMonth()]+' wiskje">✕</button>':'<span></span>')+'</div>'}).join(""):'<p style="margin:0;color:var(--muted);font-size:14px">Noch gjin wegingen. Dyn earste gewicht is dyn start.</p>';
   kleurKnoppen("myKleur",MY.kleur);
   $("doel").innerHTML=[5,7.5,10,12.5,15,20,25].map(v=>'<option value="'+v+'"'+(Number(MY.doel)===v?" selected":"")+'>'+nl(v,v%1?1:0)+'% kwyt</option>').join("");
+  doelTeken(MY.doel_kg!=null);
 }
 function kgVeld(){
   const k=$("kgDei").value, al=MY.wegingen.find(w=>w[0]===k);
@@ -262,7 +273,28 @@ $("dagen").addEventListener("click",async e=>{
 $("tipWei").addEventListener("click",()=>{$("tip").hidden=true});
 $("myKleur").addEventListener("click",async e=>{const b=e.target.closest("[data-k]");if(!b)return;const foar=MY.kleur;MY.kleur=b.dataset.k;teken();
   try{ await rpc("dn_kleur",{sesje:SES,kleur:MY.kleur}); }catch(err){ MY.kleur=foar; teken(); }});
-$("doel").addEventListener("change",async()=>{ try{ await rpc("dn_doel",{sesje:SES,doel:Number($("doel").value)}); MY.doel=Number($("doel").value); }catch(err){} });
+// doel: prosint of doelgewicht (it gewicht sjochst allinne do; oaren sjogge it as prosint)
+function doelTeken(kgModus){
+  $("dsPct").setAttribute("aria-pressed",String(!kgModus)); $("dsKg").setAttribute("aria-pressed",String(kgModus));
+  $("doelPct").hidden=kgModus; $("doelKg").hidden=!kgModus;
+  const w=MY.wegingen, st=w.length?w[0][1]:null, nu=w.length?w[w.length-1][1]:null;
+  if(kgModus){
+    if(MY.doel_kg!=null && document.activeElement!==$("doelKgIn")) $("doelKgIn").value=nl(MY.doel_kg);
+    $("doelInfo").textContent=MY.doel_kg!=null&&nu!=null?(nu<=MY.doel_kg?"Doel helle! 🎉":"Noch "+nl(nu-MY.doel_kg)+" kg nei "+nl(MY.doel_kg)+" kg."+(st?" Oaren sjogge dit as "+nl((st-MY.doel_kg)/st*100)+"% kwyt.":"")):"Dyn doelgewicht sjochst allinne do.";
+  } else {
+    $("doelInfo").textContent=st?"Dat is sa'n "+nl(st*(1-Number(MY.doel)/100))+" kg (allinne foar dy te sjen).":"";
+  }
+}
+$("dsPct").addEventListener("click",()=>{ if(MY.doel_kg!=null){ rpc("dn_doel",{sesje:SES,doel:Number($("doel").value)}).then(()=>{MY.doel_kg=null;MY.doel=Number($("doel").value);doelTeken(false)}).catch(err=>say("doelMsg",err.message)); } else doelTeken(false); });
+$("dsKg").addEventListener("click",()=>{ doelTeken(true); $("doelKgIn").focus(); });
+$("doel").addEventListener("change",async()=>{ try{ await rpc("dn_doel",{sesje:SES,doel:Number($("doel").value)}); MY.doel=Number($("doel").value); MY.doel_kg=null; doelTeken(false); }catch(err){ say("doelMsg",err.message); } });
+$("doelKg").addEventListener("submit",async e=>{
+  e.preventDefault(); say("doelMsg","");
+  const kg=parseFloat($("doelKgIn").value.replace(",",".").replace(/[^0-9.]/g,""));
+  if(!(kg>=30&&kg<=300)){ say("doelMsg",FOUT.ferkeard_gewicht); return; }
+  try{ MY=await rpc("dn_doel_kg",{sesje:SES,kg:Math.round(kg*10)/10}); $("doelKgIn").blur(); teken(); say("doelMsg","Doel bewarre! 🎯",true); }
+  catch(err){ say("doelMsg",err.message); }
+});
 })();
 </script>
 </body>
