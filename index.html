@@ -277,6 +277,20 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .offer.ja em{background:var(--accent);color:#06261e}
 .offer.nee em{background:transparent;color:var(--up)}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
+/* ===== Koppen (styl B) ===== */
+h2.disp{display:flex;align-items:center;gap:10px;font-size:24px}
+h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:var(--accent);flex:none}
+.band{padding-top:30px;padding-bottom:30px;border-bottom:2px solid #2a2a2a}
+#kachelBand h2.disp{font-size:22px}
+/* ===== mini-kop ===== */
+.minikop{position:fixed;left:0;right:0;top:0;z-index:40;display:flex;align-items:center;gap:10px;padding:8px max(14px,env(safe-area-inset-left,0px));padding-top:calc(8px + env(safe-area-inset-top,0px));background:rgba(18,18,18,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #262626;transform:translateY(-110%);transition:transform .25s ease;cursor:pointer}
+.minikop.on{transform:none}
+.minikop svg{width:30px;height:auto;flex:none;transform-origin:50% 100%}
+.minikop svg.sport{animation:joggen .7s ease-in-out 3}
+@keyframes joggen{0%,100%{transform:translateY(0) scaleY(1) rotate(-3deg)}25%{transform:translateY(-4px) scaleY(1.03) rotate(0)}50%{transform:translateY(0) scaleY(.94) rotate(3deg)}75%{transform:translateY(-4px) scaleY(1.03) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.minikop svg.sport{animation:none}}
+.minikop b{font-family:var(--f-display);font-weight:400;font-size:20px;text-transform:uppercase;letter-spacing:.01em}
+.minikop em{margin-left:auto;font-style:normal;font-family:var(--f-display);font-size:22px;color:var(--accent)}
 </style>
 </head>
 <body style="margin:0">
@@ -803,6 +817,19 @@ function stokerFig(kwyt, total){
   });
 })();
 
+// ===== mini-kop by it skowen, mei in sportsjend poppe =====
+(()=>{
+  const mk=document.createElement("div"); mk.className="minikop"; mk.setAttribute("role","button"); mk.setAttribute("aria-label","Nei boppen"); mk.tabIndex=0;
+  mk.innerHTML=stokerFig(lost,total)+'<b>Stoker nei 100</b><em>'+(lost>0?"−":"")+fmt(lost)+' kg</em>';
+  document.body.appendChild(mk);
+  mk.addEventListener("click",()=>scrollTo({top:0,behavior:"smooth"}));
+  // sa no en dan even sporte: 2 sekonden joggen, dan wer in skoftsje stil
+  const fig=mk.querySelector("svg");
+  const sport=()=>{if(!mk.classList.contains("on"))return; fig.classList.remove("sport"); void fig.getBoundingClientRect(); fig.classList.add("sport")};
+  fig.addEventListener("animationend",()=>fig.classList.remove("sport"));
+  setInterval(sport,9000); setTimeout(sport,1500);
+  new IntersectionObserver(([e])=>mk.classList.toggle("on",!e.isIntersecting),{threshold:0,rootMargin:"-60px 0px 0px 0px"}).observe(document.querySelector("section.o1"));
+})();
 // stoker stookt de kilo's op
 (()=>{
   const N=Math.max(1,Math.round(total)), burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
