@@ -895,8 +895,9 @@ function stokerFig(kwyt, total){
       const DOEL=10000, lijn=Math.round(DOEL/max*100);
       $("stapBalken").innerHTML=days.map((d,i)=>{const v=vals[i], ok=v!=null&&v>=DOEL;return '<div><b class="'+(ok?"helle":"")+'">'+(v==null?"–":(ok?"✓ ":"")+k(v))+'</b><span><em style="bottom:'+lijn+'%"></em><i class="'+(v==null?"leech":ok?"helle":"")+'" style="height:'+(v==null?3:Math.max(3,Math.round(v/max*100)))+'%"></i></span><small>'+(i===6?"hjoed":WS[d.getDay()])+'</small></div>'}).join("");
       const got=vals.filter(v=>v!=null), tot=got.reduce((a,b)=>a+b,0), gem=Math.round(tot/got.length);
-      const helle=got.filter(v=>v>=DOEL).length, hj=vals[6];
-      $("stapScore").textContent=helle+" fan "+got.length+" dagen helle";
+      const hj=vals[6], tel=vals.filter((v,i)=>v!=null&&(i<6||v>=DOEL)); // hjoed telt pas mei as it doel al helle is
+      const helle=tel.filter(v=>v>=DOEL).length;
+      $("stapScore").textContent=tel.length?helle+" fan "+tel.length+(tel.length===1?" dei":" dagen")+" helle":"";
       const hjT=hj==null?"":hj>=DOEL?" Hjoed is de 10.000 al helle!":" Hjoed noch "+(DOEL-hj).toLocaleString("nl-NL")+" te gean.";
       $("stapBalken").setAttribute("aria-label","Stappen de lêste 7 dagen, gemiddeld "+gem+" deis, doel 10.000, "+helle+" dagen helle");
       $("stapNote").textContent="Gemiddeld "+gem.toLocaleString("nl-NL")+" stappen deis."+hjT+" Komt automatysk fan Stoker syn iPhone.";
