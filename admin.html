@@ -115,13 +115,12 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
       <form class="box" id="dnForm" style="display:grid;gap:10px">
         <label for="dnNaam">Nieuwe deelnemer</label>
         <input id="dnNaam" maxlength="30" placeholder="Voornaam, bv. Anne" autocomplete="off" required>
-        <div class="kleuren" id="dnKleur" role="group" aria-label="Kleur"></div>
         <button class="btn" type="submit" id="dnAdd">Toevoegen en uitnodigen</button>
       </form>
       <div id="dnWa"></div>
       <div id="dnList" class="box round"></div>
       <p class="msg" id="dnMsg" hidden></p>
-      <p style="font-size:13px;color:var(--muted);margin:0">Een deelnemer kiest zelf een wachtwoord via de link. De link werkt 14 dagen en maar één keer. Wachtwoord vergeten? Stuur een nieuwe link.</p>
+      <p style="font-size:13px;color:var(--muted);margin:0">Een deelnemer kiest zelf een wachtwoord en kleur via de link. De link werkt 14 dagen en maar één keer. Wachtwoord vergeten? Stuur een nieuwe link.</p>
     </div>
     <div id="panMei" role="tabpanel" hidden style="display:grid;gap:12px">
       <div id="meiWaTop"></div>
@@ -297,14 +296,11 @@ $("tabDn").addEventListener("click",()=>tab("dn"));
 try{const t=sessionStorage.getItem("stoker-tab");if(t==="mei"||t==="dn")tab(t)}catch(e){}
 
 // ===== deelnemers kompetysje =====
-const KLEUREN=["#ff8fb1","#4da3ff","#ffd23f","#ff7a2f","#b48cff","#9be15d","#5fe0e6"];
+const KLEUREN=["#ff8fb1","#4da3ff","#ffd23f","#ff7a2f","#b48cff","#9be15d","#5fe0e6","#ff5f5f","#f0e6d2","#c58b5a"]; // dielnimmers kieze sels; dit is allinne de begjinkleur
 let dn=[], dnKleur=KLEUREN[0];
 const rpc=async(f,body)=>{await fresh();const r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authH()),body:JSON.stringify(body||{})});
   const j=await r.json().catch(()=>null); if(r.status===401){S=null;save();show();throw new Error("uit")} if(!r.ok) throw new Error((j&&j.message)||"fout"); return j};
-const drawKleur=()=>{$("dnKleur").innerHTML=KLEUREN.map(c=>'<button type="button" data-k="'+c+'" style="background:'+c+'" aria-label="Kleur '+c+'" aria-pressed="'+(c===dnKleur)+'"></button>').join("")};
-drawKleur();
-$("dnKleur").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b){dnKleur=b.dataset.k;drawKleur()}});
-const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Elke woansdei weegje en ynfolle!\nStoker";
+const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Dêrnei folst elke woansdei dyn gewicht yn op stokernei100.nl/ynfolle (ynlogge mei dyn namme en wachtwurd).\nStoker";
 const toonWa=(naam,tok)=>{$("dnWa").innerHTML='<div class="box" style="display:grid;gap:10px"><span style="color:var(--accent);font-size:14px">Uitnodiging voor '+esc(naam)+' klaar.</span><a class="wabtn" href="https://wa.me/?text='+encodeURIComponent(uitnodiging(naam,tok))+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(naam)+' de link via WhatsApp</a></div>'};
 async function loadDn(){
   try{ dn=await rpc("dn_beheer_list"); renderDn(); say("dnMsg",""); }
@@ -321,7 +317,8 @@ function renderDn(){
 }
 $("dnForm").addEventListener("submit",async e=>{
   e.preventDefault(); const naam=$("dnNaam").value.trim(); if(!naam)return; $("dnAdd").disabled=true;
-  try{ const r=await rpc("dn_beheer_nij",{namme:naam,kleur:dnKleur}); $("dnNaam").value=""; toonWa(naam,r.token); await loadDn(); }
+  try{ const fr=KLEUREN.filter(c=>!dn.some(x=>x.kleur===c)); dnKleur=fr.length?fr[0]:KLEUREN[dn.length%KLEUREN.length];
+    const r=await rpc("dn_beheer_nij",{namme:naam,kleur:dnKleur}); $("dnNaam").value=""; toonWa(naam,r.token); await loadDn(); }
   catch(err){ if(err.message!=="uit") say("dnMsg","Toevoegen mislukt."); }
   $("dnAdd").disabled=false;
 });

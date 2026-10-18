@@ -51,6 +51,9 @@ input:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible{ou
 .links button{color:var(--muted)}
 select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 16px var(--f-body)}
 .rij{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.kleuren{display:flex;flex-wrap:wrap;gap:8px}
+.kleuren button{width:36px;height:36px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 3px var(--band);cursor:pointer;padding:0}
+.kleuren button[aria-pressed="true"]{border-color:var(--fg)}
 </style>
 </head>
 <body>
@@ -66,6 +69,8 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
     <input id="pw1" type="password" autocomplete="new-password" minlength="6" required>
     <label for="pw2">Nochris</label>
     <input id="pw2" type="password" autocomplete="new-password" minlength="6" required>
+    <span class="lbl">Kies dyn kleur</span>
+    <div class="kleuren" id="kiesKleur" role="group" aria-label="Kies dyn kleur"></div>
     <button class="btn" type="submit" id="kiesBtn">Bewarje en begjinne</button>
     <p class="msg" id="kiesMsg" hidden></p>
   </form>
@@ -83,6 +88,12 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
 
   <!-- myn wike -->
   <div id="vMy" hidden style="display:grid;gap:18px">
+    <div class="box" id="tip" hidden style="border-color:var(--c)">
+      <b style="font-size:16px">Tip: set dizze side op dyn thússkerm 📌</b>
+      <span style="font-size:14px;color:var(--soft)">Dan fynst him elke woansdei maklik werom. Op in iPhone: tik ûnderyn op <b>Diel</b> <span aria-hidden="true">(□↑)</span> en kies <b>Zet op beginscherm</b>. Op Android: menu <b>⋮</b> en <b>Toevoegen aan startscherm</b>.</span>
+      <span style="font-size:14px;color:var(--soft)">It adres is altyd: <b>stokernei100.nl/ynfolle</b></span>
+      <button type="button" class="tg" id="tipWei" style="justify-self:start">Begrepen</button>
+    </div>
     <div class="kop">
       <span class="av" id="myAv">?</span>
       <div><b id="myNamme"></b><small id="myPlak"></small></div>
@@ -107,6 +118,7 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
     <section style="display:grid;gap:10px">
       <h2>Myn wegingen</h2>
       <div class="box" id="wegingen" style="gap:0"></div>
+      <div class="rij" style="align-items:flex-start;flex-direction:column"><span style="font-size:15px;color:var(--soft)">Myn kleur</span><div class="kleuren" id="myKleur" role="group" aria-label="Myn kleur"></div></div>
       <div class="rij"><label for="doel" style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--soft)">Myn doel</label>
         <select id="doel"></select></div>
     </section>
@@ -141,6 +153,9 @@ async function rpc(f,body){
 }
 let SES=null; try{SES=localStorage.getItem("dn-sesje")}catch(e){}
 const bewarSes=t=>{SES=t;try{t?localStorage.setItem("dn-sesje",t):localStorage.removeItem("dn-sesje")}catch(e){}};
+const KLEUREN=["#ff8fb1","#4da3ff","#ffd23f","#ff7a2f","#b48cff","#9be15d","#5fe0e6","#ff5f5f","#f0e6d2","#c58b5a"];
+const kleurKnoppen=(id,akt)=>{$(id).innerHTML=KLEUREN.map(c=>'<button type="button" data-k="'+c+'" style="background:'+c+'" aria-label="Kleur" aria-pressed="'+(c===String(akt).toLowerCase())+'"></button>').join("")};
+let kies=null;
 const toon=v=>{["vKies","vYn","vMy"].forEach(k=>$(k).hidden=k!==v)};
 let MY=null, plak=null;
 
@@ -151,13 +166,15 @@ if(u){
   rpc("dn_utnoeging",{token:u}).then(p=>{
     if(!p){ toon("vYn"); say("ynMsg",FOUT["utnoeging_ferrûn"]); return; }
     document.documentElement.style.setProperty("--c",p.kleur);
+    kies=p.kleur; kleurKnoppen("kiesKleur",kies);
+    $("kiesKleur").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;kies=b.dataset.k;kleurKnoppen("kiesKleur",kies);document.documentElement.style.setProperty("--c",kies)});
     $("kiesWolkom").textContent="Wolkom "+p.namme+"! 👋"; $("kiesNamme").value=p.namme; $("ynNamme").value=p.namme;
     toon("vKies");
     $("vKies").addEventListener("submit",async e=>{
       e.preventDefault(); say("kiesMsg","");
       if($("pw1").value!==$("pw2").value){ say("kiesMsg","De twa wachtwurden binne net itselde."); return; }
       $("kiesBtn").disabled=true;
-      try{ const r=await rpc("dn_wachtwurd",{token:u,wachtwurd:$("pw1").value}); bewarSes(r.sesje); await laad(); }
+      try{ const r=await rpc("dn_wachtwurd",{token:u,wachtwurd:$("pw1").value}); bewarSes(r.sesje); if(kies&&kies!==p.kleur){ await rpc("dn_kleur",{sesje:r.sesje,kleur:kies}).catch(()=>{}); } await laad(); $("tip").hidden=false; }
       catch(err){ say("kiesMsg",err.message); }
       $("kiesBtn").disabled=false;
     });
@@ -205,6 +222,7 @@ function teken(){
   // wegingen
   const w=MY.wegingen.slice().reverse(), st=MY.wegingen.length?MY.wegingen[0][1]:null;
   $("wegingen").innerHTML=w.length?w.map(x=>{const d=pd(x[0]);const q=(st-x[1])/st*100;return '<div class="wg"><b>'+d.getDate()+" "+FM[d.getMonth()]+'</b><span>'+nl(x[1])+' kg</span><em>'+(x[0]===MY.wegingen[0][0]?"start":(q>0?"−":q<0?"+":"")+nl(Math.abs(q))+"%")+'</em></div>'}).join(""):'<p style="margin:0;color:var(--muted);font-size:14px">Noch gjin wegingen. Dyn earste gewicht is dyn start.</p>';
+  kleurKnoppen("myKleur",MY.kleur);
   $("doel").innerHTML=[5,7.5,10,12.5,15,20,25].map(v=>'<option value="'+v+'"'+(Number(MY.doel)===v?" selected":"")+'>'+nl(v,v%1?1:0)+'% kwyt</option>').join("");
 }
 $("wForm").addEventListener("submit",async e=>{
@@ -226,6 +244,9 @@ $("dagen").addEventListener("click",async e=>{
     MY.dagen=MY.dagen.filter(d=>d[0]!==k); if(sp||stp) MY.dagen.push([k,sp,stp]); }
   catch(err){ b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true")); say("dMsg",err.message); }
 });
+$("tipWei").addEventListener("click",()=>{$("tip").hidden=true});
+$("myKleur").addEventListener("click",async e=>{const b=e.target.closest("[data-k]");if(!b)return;const foar=MY.kleur;MY.kleur=b.dataset.k;teken();
+  try{ await rpc("dn_kleur",{sesje:SES,kleur:MY.kleur}); }catch(err){ MY.kleur=foar; teken(); }});
 $("doel").addEventListener("change",async()=>{ try{ await rpc("dn_doel",{sesje:SES,doel:Number($("doel").value)}); MY.doel=Number($("doel").value); }catch(err){} });
 })();
 </script>
