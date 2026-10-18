@@ -343,6 +343,15 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 .kal-g i.hj{box-shadow:0 0 0 1.5px var(--fg)}
 .kal-g em{font-style:normal;font-size:10px;color:var(--muted);white-space:nowrap;line-height:14px;overflow:visible;width:0}
 .kal-g b{font-weight:400;font-size:10px;color:var(--muted);align-self:center}
+.mkal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.mkal b{font-size:11px;font-weight:600;color:var(--muted);text-align:center;text-transform:uppercase;padding-bottom:2px}
+.mkal i{position:relative;display:grid;place-items:center;aspect-ratio:1;border-radius:6px;background:var(--empty);font-style:normal;font-size:14px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums}
+.mkal i small{position:absolute;right:2px;bottom:1px;font-size:9px;line-height:1}
+.mkal i.l1{background:color-mix(in srgb,var(--accent) 35%,var(--empty));color:var(--fg)}
+.mkal i.l2{background:color-mix(in srgb,var(--accent) 70%,var(--empty));color:#06261e}
+.mkal i.l3{background:var(--accent);color:#06261e}
+.mkal i.tak{background:transparent;outline:1px dashed var(--line);outline-offset:-1px;color:var(--dim)}
+.mkal i.hj{box-shadow:0 0 0 2px var(--fg)}
 .kal-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:10px}
 .kal-leg span{display:inline-flex;align-items:center;gap:6px}
 .kal-leg i{display:inline-block;width:12px;height:12px;border-radius:3px}
@@ -452,9 +461,10 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
     <section class="band o13" id="kalBand">
       <h2 class="disp">Kalinder</h2>
       <div class="kal-tal"><div><b id="kalSport">0</b><span>dagen sporte</span></div><div><b id="kalStap">0</b><span>dagen 10.000 stappen</span></div><div><b id="kalRige">0</b><span>langste rige</span></div></div>
-      <div class="kal" id="kal"><div class="kal-g" id="kalG" role="img"></div></div>
+      <div class="wknav"><button type="button" id="kalPrev" aria-label="Foarige moanne">‹</button><b id="kalKop"></b><button type="button" id="kalNext" aria-label="Folgjende moanne">›</button></div>
+      <div class="wkslider" id="kalSlider"></div>
       <div class="kal-leg"><span><i style="background:var(--empty)"></i>neat</span><span><i style="background:color-mix(in srgb,var(--accent) 35%,var(--empty))"></i>10.000 stappen</span><span><i style="background:color-mix(in srgb,var(--accent) 70%,var(--empty))"></i>sporte</span><span><i style="background:var(--accent)"></i>allebeide</span></div>
-      <p class="note">Elk fakje is in dei. Hoe griener, hoe better.</p>
+      <p class="note">Hoe griener, hoe better. Skow opsij foar oare moannen.</p>
     </section>
     <section class="band o10">
       <h2 class="disp">Wat as...?</h2>
@@ -957,38 +967,40 @@ function stokerFig(kwyt, total){
     }
   });
 })();
-// kalinder: sportdagen (út de tracker, woansdeis bywurke) en dagen mei 10.000 stappen (iPhone)
+// kalinder: moanneoersjoch mei sportdagen (út de tracker) en dagen mei 10.000 stappen (iPhone)
 (()=>{
   const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   const sport=new Set(D.sport||[]), stap={};
-  const MN=["jan","feb","mrt","apr","mai","jun","jul","aug","sep","okt","nov","des"];
+  const ML=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
+  let mI=-1, moannen=[];
   const draw=()=>{
-    const t=new Date(); t.setHours(0,0,0,0);
+    const t=new Date(); t.setHours(0,0,0,0); const hj=iso(t);
     const keys=[...sport,...Object.keys(stap),"2026-10-21"].sort();
-    const b=new Date(keys[0]+"T00:00:00"); b.setDate(b.getDate()-((b.getDay()+6)%7)); // moandei
-    const e=new Date(Math.max(t,b)); e.setDate(e.getDate()+(6-(e.getDay()+6)%7));      // snein fan dizze wike
-    const nW=Math.round((e-b)/864e5+1)/7, k0=$("kal"), cw=Math.max(14,Math.min(24,Math.floor(((k0.clientWidth||340)-22)/nW)-4));
-    $("kalG").style.gridTemplateColumns="18px repeat("+nW+","+cw+"px)";
-    let h="", d=new Date(b), lastM=-1, nS=0, nT=0, run=0, best=0;
-    const dg=["mo","","wo","","fr","",""];
-    h+='<em></em>'+dg.map(x=>'<b>'+x+'</b>').join("");
-    while(d<=e){
-      const m=d.getMonth(); h+='<em>'+(m!==lastM?MN[m]:"")+'</em>'; lastM=m;
-      for(let i=0;i<7;i++){
-        const k=iso(d), sp=sport.has(k), st=(stap[k]||0)>=10000, fut=d>t;
-        const l=fut?0:(sp?2:0)+(st?1:0);
-        if(!fut){ if(sp)nS++; if(st)nT++; if(l){run++;best=Math.max(best,run)}else if(d<t)run=0; }
-        h+='<i class="'+(fut?"tak":l?"l"+l:"")+(k===iso(t)?" hj":"")+'" title="'+d.getDate()+" "+MN[d.getMonth()]+(sp?" · sporte":"")+(stap[k]!=null?" · "+stap[k].toLocaleString("nl-NL")+" stappen":"")+'"></i>';
-        d.setDate(d.getDate()+1);
-      }
-    }
-    $("kalG").innerHTML=h;
-    $("kalG").setAttribute("aria-label","Kalinder: "+nS+" dagen sporte, "+nT+" dagen 10.000 stappen, langste rige "+best+" dagen");
+    const b=new Date(keys[0]+"T00:00:00"); b.setDate(1);
+    moannen=[]; for(let d=new Date(b); d<=t || (d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()); d.setMonth(d.getMonth()+1)) moannen.push(new Date(d));
+    // tellers oer alles
+    let nS=0,nT=0,run=0,best=0;
+    for(let d=new Date(keys[0]+"T00:00:00"); d<=t; d.setDate(d.getDate()+1)){const k=iso(d),sp=sport.has(k),st=(stap[k]||0)>=10000; if(sp)nS++; if(st)nT++; if(sp||st){run++;best=Math.max(best,run)}else if(k!==hj)run=0;}
     $("kalSport").textContent=nS; $("kalStap").textContent=nT; $("kalRige").textContent=best;
-    const k=$("kal"); k.scrollLeft=k.scrollWidth;
+    $("kalSlider").innerHTML=moannen.map(m=>{
+      let h='<div class="wkslide"><div class="mkal">'+["mo","ti","wo","to","fr","so","sn"].map(x=>'<b>'+x+'</b>').join("");
+      const lead=(m.getDay()+6)%7; for(let i=0;i<lead;i++) h+='<span></span>';
+      const n=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
+      for(let dd=1; dd<=n; dd++){const d=new Date(m.getFullYear(),m.getMonth(),dd),k=iso(d),sp=sport.has(k),st=(stap[k]||0)>=10000,fut=d>t,l=fut?0:(sp?2:0)+(st?1:0);
+        h+='<i class="'+(fut?"tak":l?"l"+l:"")+(k===hj?" hj":"")+'" title="'+dd+" "+ML[m.getMonth()]+(sp?" · sporte":"")+(stap[k]!=null?" · "+stap[k].toLocaleString("nl-NL")+" stappen":"")+'">'+dd+(sp?'<small>💪</small>':'')+'</i>';}
+      return h+'</div></div>'}).join("");
+    $("kalSlider").setAttribute("aria-label","Kalinder: "+nS+" dagen sporte, "+nT+" dagen 10.000 stappen, langste rige "+best+" dagen");
+    if(mI<0||mI>=moannen.length) mI=moannen.length-1;
+    ga(mI,false);
   };
+  const kop=()=>{const m=moannen[mI];$("kalKop").innerHTML=ML[m.getMonth()]+'<small>'+m.getFullYear()+'</small>';$("kalPrev").disabled=mI===0;$("kalNext").disabled=mI>=moannen.length-1};
+  const ga=(i,glad)=>{const sl=$("kalSlider");mI=i;kop();sl.scrollTo({left:i*sl.clientWidth,behavior:glad&&!matchMedia("(prefers-reduced-motion: reduce)").matches?"smooth":"auto"})};
+  $("kalSlider").addEventListener("scroll",()=>{const sl=$("kalSlider"),i=Math.round(sl.scrollLeft/Math.max(1,sl.clientWidth));if(i!==mI&&moannen[i]){mI=i;kop()}},{passive:true});
+  $("kalPrev").addEventListener("click",()=>{if(mI>0)ga(mI-1,true)});
+  $("kalNext").addEventListener("click",()=>{if(mI<moannen.length-1)ga(mI+1,true)});
   draw();
-  $("kalBand").querySelector("h2").addEventListener("click",()=>setTimeout(()=>{const k=$("kal");k.scrollLeft=k.scrollWidth},0));
+  // by it iepenklappen stiet de slider op 0 breed: dan opnij op de goede moanne sette
+  $("kalBand").querySelector("h2").addEventListener("click",()=>setTimeout(()=>ga(mI,false),0));
   fetch("https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/stappen?select=dei,stappen&order=dei.asc",{headers:{apikey:"sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h"}})
     .then(r=>{if(!r.ok)throw 0;return r.json()}).then(rows=>{rows.forEach(r=>stap[r.dei]=r.stappen);draw()}).catch(()=>{});
 })();
