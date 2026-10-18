@@ -226,7 +226,7 @@ const FWD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"],
 const fryDate=s=>{const [y,m,d]=s.split("-").map(Number);const t=new Date(y,m-1,d);return FWD[t.getDay()]+" "+d+" "+FM[m-1]};
 const dayWord=s=>{const t=new Date();t.setHours(0,0,0,0);const [y,m,d]=s.split("-").map(Number);const diff=Math.round((new Date(y,m-1,d)-t)/864e5);return diff===0?"hjoed":diff===1?"moarn":fryDate(s)};
 // wat dogge wy: emoji, namme, "wy geane ..."
-const WAT={sporte:["🏋️","Sportskoalle","nei de sportskoalle"],hurdrinne:["🏃","Hurdrinne","hurdrinne"],mtb:["🚵","Mountainbike","mountainbiken"],kuierje:["🚶","Rûntsje kuierje","in rûntsje kuierje"],padel:["🎾","Padel / tennis","padelje"],oars:["✨","Oars","wat oars dwaan"]};
+const WAT={sporte:["🏋️","Sportskoalle","nei de sportskoalle"],hurdrinne:["🏃","Hurdrinne","hurdrinne"],mtb:["🚵","Mountainbike","mountainbiken"],kuierje:["🚶","Rûntsje kuierje","in rûntsje kuierje"],padel:["🎾","Padel","padelje"],oars:["✨","Oars","wat oars dwaan"]};
 const watFan=x=>WAT[x.wat]||WAT.sporte;
 const watNamme=x=>x.wat==="oars"&&x.wat_oars?String(x.wat_oars):watFan(x)[1];
 const watDwaan=x=>x.wat==="oars"&&x.wat_oars?String(x.wat_oars).toLowerCase():watFan(x)[2];

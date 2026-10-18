@@ -1041,7 +1041,7 @@ function stokerFig(kwyt, total){
   const WEEKS=6, days=[...Array(WEEKS*7)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
   const PARTS=["moarns","middeis","jûns"];
   // wat dogge wy: kaai yn 'e database, emoji, namme
-  const WAT={sporte:["🏋️","Sportskoalle"],hurdrinne:["🏃","Hurdrinne"],mtb:["🚵","Mountainbike"],kuierje:["🚶","Kuierje"],padel:["🎾","Padel/tennis"],oars:["✨","Oars"]};
+  const WAT={sporte:["🏋️","Sportskoalle"],hurdrinne:["🏃","Hurdrinne"],mtb:["🚵","Mountainbike"],kuierje:["🚶","Kuierje"],padel:["🎾","Padel"],oars:["✨","Oars"]};
   const watTekst=r=>{const w=WAT[r.wat]||WAT.sporte;return w[0]+" "+(r.wat==="oars"&&r.wat_oars?r.wat_oars:w[1])};
   let wat="sporte";
   const nice=s=>{const d=pd(s);return WD[d.getDay()]+" "+d.getDate()+" "+MS[d.getMonth()]};
