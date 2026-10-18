@@ -339,6 +339,28 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 .kal-tal div{background:var(--band);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
 .kal-tal b{display:block;font-family:var(--f-display);font-size:26px;line-height:1;color:var(--accent)}
 .kal-tal span{font-size:12px;color:var(--muted)}
+/* kompetysje */
+.o14{order:4}
+#kompetysje{scroll-margin-top:70px}
+.kwin{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--band);border:1px solid #ffd23f;border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.kwin span{display:block;font-size:12px;color:#ffd23f;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.kwin b{font-size:17px;font-weight:600}
+.kwin em{font-style:normal;font-family:var(--f-display);font-size:26px;color:#ffd23f}
+.kwin svg{width:30px;height:30px}
+.klas{display:grid;gap:8px;list-style:none;margin:0;padding:0}
+.klas a{display:grid;grid-template-columns:22px 40px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--band);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--fg);text-decoration:none}
+.klas li.ik a{border-color:var(--accent)}
+.klas .pl{font-family:var(--f-display);font-size:20px;color:var(--muted);text-align:center}
+.klas li:first-child .pl{color:#ffd23f}
+.klas .kav{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:15px;color:#121212}
+.klas .nm{min-width:0}
+.klas .nm b{display:block;font-weight:600;line-height:1.2}
+.klas .nm small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.klas .kbar{display:block;height:4px;background:var(--empty);border-radius:2px;margin-top:6px;overflow:hidden}
+.klas .kbar i{display:block;height:100%;border-radius:2px}
+.klas .kp{font-family:var(--f-display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
+.klas .kp small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);margin-top:3px}
+.kregels{margin-top:12px;font-size:13px;color:var(--muted)}
 </style></head><body style="margin:0">
 
 <div class="page">
@@ -435,6 +457,13 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
   </div>
 
   <div class="col col-c">
+    <section class="band o14" id="kompetysje" hidden>
+      <h2 class="disp">Kompetysje</h2>
+      <p class="note" style="font-size:14px;color:var(--soft)">Wa rekket it measte kwyt? Alles yn prosinten fan it eigen startgewicht. Kilo's sjocht nimmen.</p>
+      <div id="kWin"></div>
+      <ol class="klas" id="kLijst"></ol>
+      <p class="kregels">Allinne de weging fan woansdei telt. Trainingen en stappen stean derby, mar telle net mei foar it plak. Ek meidwaan? Freegje Stoker. Al mei? <a href="ynfolle.html" style="color:var(--accent)">Fol dyn wike yn</a>.</p>
+    </section>
     <section class="band o8">
       <h2 class="disp">Rie it gewicht</h2>
       <p class="note" style="font-size:14px;color:var(--soft)">Wat weacht Stoker kommende woansdei? Doch dyn gok! Nei de update sjochst hoe tichtby do sitst.</p>
@@ -489,6 +518,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
   </footer>
 </div>
 
+<script src="kompetysje.js"></script>
 <script type="application/json" id="data">{"updated":null,"start":130,"goal":100,"weights":[],"weeks":[],"deadlift":[],"note":"","photos":[],"contour":null}</script>
 <script>
 (() => {
@@ -1108,6 +1138,28 @@ setCol(COLS.some(x=>x[1]===saved)?saved:COLS[0][1]);
 $("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;setCol(b.dataset.c);try{localStorage.setItem("stoker-kleur",b.dataset.c)}catch(x){}});
 
 $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in update.":"De earste update komt op woansdei 21 oktober.";
+// kompetysje: klassemint (allinne as der oare dielnimmers binne)
+(()=>{
+  if(!window.StokerKomp) return;
+  const nl1=n=>Number(n).toLocaleString("nl-NL",{minimumFractionDigits:1,maximumFractionDigits:1});
+  const E=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  StokerKomp.laad(D).then(k=>{
+    if(!k.oaren) return;
+    const mx=Math.max(10,...k.rows.map(x=>x.pct||0));
+    const CUP='<svg viewBox="0 0 24 24" fill="none" stroke="#ffd23f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
+    $("kWin").innerHTML=k.winer?'<div class="kwin">'+CUP+'<div><span>Grutste ôffaller fan \'e wike</span><b>'+E(k.winer.namme)+'</b></div><em>−'+nl1(k.winer.wike)+'%</em></div>':'';
+    let n=0;
+    $("kLijst").innerHTML=k.rows.map(x=>{const p=x.pct; if(p!=null)n++;
+      const href=x.stoker?"#":"side.html?n="+encodeURIComponent(x.slug);
+      return '<li class="'+(x.stoker?"ik":"")+'"><a href="'+href+'"'+(x.stoker?' data-top="1"':'')+' aria-label="'+E(x.namme)+(p!=null?", plak "+n+", "+nl1(p)+" prosint kwyt":", noch net begûn")+'">'+
+        '<span class="pl">'+(p!=null?n:"–")+'</span><span class="kav" style="background:'+E(x.kleur)+'">'+E(x.namme[0].toUpperCase())+'</span>'+
+        '<span class="nm"><b>'+E(x.namme)+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k stappen':'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
+        '<span class="kp">'+(p==null?"–":(p<0?"+":p>0?"−":"")+nl1(Math.abs(p))+"%")+'<small>kwyt</small></span></a></li>'}).join("");
+    $("kLijst").addEventListener("click",e=>{const a=e.target.closest('[data-top]');if(a){e.preventDefault();scrollTo({top:0,behavior:"smooth"})}});
+    $("kompetysje").hidden=false;
+    if(location.hash==="#kompetysje") setTimeout(()=>$("kompetysje").scrollIntoView(),50);
+  }).catch(()=>{});
+})();
 // geheime doar: fiif kear flugge tikke op de fuottekst iepenet it beheer
 (()=>{let n=0,t=0;$("foot").addEventListener("click",()=>{const now=Date.now();n=now-t<800?n+1:1;t=now;if(n>=5){n=0;location.href="https://stokernei100.nl/admin.html"}})})();
 })();

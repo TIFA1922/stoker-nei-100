@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Myn wike · Stoker nei 100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#121212;--band:#1e1e1e;--line:#2c2c2c;--fg:#fff;--soft:#ddd;--muted:#aaa;--accent:#3ef0c0;--c:#3ef0c0;--danger:#ff6b5b;--empty:#2a2a2a;
+  --f-display:Anton,Impact,"Arial Narrow",sans-serif;--f-body:"Work Sans",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.45}
+main{max-width:480px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(48px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:18px}
+h1{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:44px;line-height:.95;margin:0}
+h1 small{display:block;font-family:var(--f-body);font-size:14px;text-transform:none;color:var(--muted);margin-top:8px;line-height:1.4}
+h2{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:24px;line-height:1;margin:0;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:4px;height:20px;border-radius:2px;background:var(--c);flex:none}
+.box{background:var(--band);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px}
+label,.lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+input{width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:11px 12px;font:500 17px var(--f-body)}
+input.kg{font-family:var(--f-display);font-size:32px;padding:8px 12px}
+input:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:#06261e;border:0;border-radius:6px;min-height:48px;font:600 16px var(--f-body);cursor:pointer;width:100%}
+.btn:disabled{opacity:.6}
+.msg{margin:0;font-size:14px;color:var(--danger)}
+.msg.ok{color:var(--accent)}
+.kop{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#121212;font-weight:600;font-size:20px}
+.kop b{font-size:20px;display:block}
+.kop small{color:var(--muted);font-size:13px}
+.pct{font-family:var(--f-display);font-size:34px;color:var(--c);line-height:1;text-align:right}
+.pct small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);margin-top:3px}
+.privee{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted)}
+.privee svg{width:16px;height:16px;flex:none;margin-top:2px}
+.dei{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.dei:first-of-type{border-top:0}
+.dei span{font-size:15px}
+.dei span em{font-style:normal;color:var(--muted);font-size:13px;margin-left:4px}
+.tg{background:var(--bg);color:var(--soft);border:1px solid var(--line);border-radius:6px;min-height:40px;padding:0 10px;font:600 13px var(--f-body);cursor:pointer;white-space:nowrap}
+.tg[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#121212}
+.wg{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.wg:first-of-type{border-top:0}
+.wg span{color:var(--muted)}
+.wg em{font-style:normal;color:var(--c);font-weight:600;min-width:58px;text-align:right}
+.links{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:15px}
+.links a,.links button{color:var(--accent);background:none;border:0;padding:0;font:600 15px var(--f-body);cursor:pointer;text-decoration:none}
+.links button{color:var(--muted)}
+select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 16px var(--f-body)}
+.rij{display:flex;align-items:center;justify-content:space-between;gap:10px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Myn wike<small>Stoker nei 100 · kompetysje</small></h1>
+
+  <!-- wachtwurd kieze -->
+  <form class="box" id="vKies" hidden autocomplete="on">
+    <p style="margin:0;font-size:17px" id="kiesWolkom">Wolkom!</p>
+    <p style="margin:0;font-size:14px;color:var(--soft)">Kies in wachtwurd. Dêrmei logst letter yn mei dyn namme.</p>
+    <input type="text" id="kiesNamme" autocomplete="username" hidden>
+    <label for="pw1">Wachtwurd (minimaal 6 tekens)</label>
+    <input id="pw1" type="password" autocomplete="new-password" minlength="6" required>
+    <label for="pw2">Nochris</label>
+    <input id="pw2" type="password" autocomplete="new-password" minlength="6" required>
+    <button class="btn" type="submit" id="kiesBtn">Bewarje en begjinne</button>
+    <p class="msg" id="kiesMsg" hidden></p>
+  </form>
+
+  <!-- ynlogge -->
+  <form class="box" id="vYn" hidden autocomplete="on">
+    <label for="ynNamme">Namme</label>
+    <input id="ynNamme" autocomplete="username" required>
+    <label for="ynPw">Wachtwurd</label>
+    <input id="ynPw" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit" id="ynBtn">Ynlogge</button>
+    <p class="msg" id="ynMsg" hidden></p>
+    <p style="margin:0;font-size:13px;color:var(--muted)">Wachtwurd ferjitten? Freegje Stoker om in nije link.</p>
+  </form>
+
+  <!-- myn wike -->
+  <div id="vMy" hidden style="display:grid;gap:18px">
+    <div class="kop">
+      <span class="av" id="myAv">?</span>
+      <div><b id="myNamme"></b><small id="myPlak"></small></div>
+      <div class="pct" id="myPct">0%<small>kwyt</small></div>
+    </div>
+
+    <form class="box" id="wForm">
+      <label for="kg" id="kgLbl">Gewicht fan woansdei</label>
+      <input class="kg" id="kg" inputmode="decimal" autocomplete="off" placeholder="bv. 84,6" required>
+      <div class="privee"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Dyn kilo's sjochst allinne do. Oaren sjogge allinne it prosint.</span></div>
+      <button class="btn" type="submit" id="kgBtn">Bewarje</button>
+      <p class="msg" id="kgMsg" hidden></p>
+    </form>
+
+    <section style="display:grid;gap:10px">
+      <h2>Myn dagen</h2>
+      <p style="margin:0;font-size:14px;color:var(--muted)">Tik oan wat do dien hast. It wurdt direkt bewarre.</p>
+      <div class="box" id="dagen" style="gap:0"></div>
+      <p class="msg" id="dMsg" hidden></p>
+    </section>
+
+    <section style="display:grid;gap:10px">
+      <h2>Myn wegingen</h2>
+      <div class="box" id="wegingen" style="gap:0"></div>
+      <div class="rij"><label for="doel" style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--soft)">Myn doel</label>
+        <select id="doel"></select></div>
+    </section>
+
+    <div class="links">
+      <a id="mySide" href="#">Myn side</a>
+      <a href="https://stokernei100.nl/#kompetysje">Klassemint</a>
+      <button type="button" id="utBtn">Utlogge</button>
+    </div>
+  </div>
+</main>
+<script src="kompetysje.js"></script>
+<script>
+(()=>{
+const SB="https://cupcyeurvttyetfrhuoi.supabase.co", KEY="sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
+const $=id=>document.getElementById(id);
+const nl=(n,d=1)=>Number(n).toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
+const FWD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], FK=["sn","mo","ti","wo","to","fr","so"], FM=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
+const pd=s=>{const [y,m,d]=String(s).slice(0,10).split("-").map(Number);return new Date(y,m-1,d)};
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const say=(id,t,ok)=>{const m=$(id);m.hidden=!t;m.textContent=t||"";m.classList.toggle("ok",!!ok)};
+const FOUT={ferkeard:"Namme of wachtwurd klopt net.",te_folle_besykjen:"Te folle besykjen. Wachtsje in kertier en besykje it opnij.",
+  "utnoeging_ferrûn":"Dizze link docht it net mear. Freegje Stoker om in nije.",wachtwurd_te_koart:"Nim in wachtwurd fan minimaal 6 tekens.",
+  ferkeard_gewicht:"Dat gewicht klopt net. Fol in getal yn lykas 84,6.",te_grut_ferskil:"Dat is mear as 15 kilo ferskil mei ferline wike. Klopt it wol?",
+  net_ynlogd:"Do bist útlogd. Log opnij yn.",ferkearde_dei:"Dy dei kin net mear oanpast wurde."};
+async function rpc(f,body){
+  let r; try{ r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body||{})}); }
+  catch(e){ throw new Error("Gjin ferbining. Besykje it opnij."); }
+  const j=await r.json().catch(()=>null);
+  if(!r.ok){ const k=j&&j.message; const e=new Error(FOUT[k]||"Der gie wat mis. Besykje it opnij."); e.code=k; throw e; }
+  return j;
+}
+let SES=null; try{SES=localStorage.getItem("dn-sesje")}catch(e){}
+const bewarSes=t=>{SES=t;try{t?localStorage.setItem("dn-sesje",t):localStorage.removeItem("dn-sesje")}catch(e){}};
+const toon=v=>{["vKies","vYn","vMy"].forEach(k=>$(k).hidden=k!==v)};
+let MY=null, plak=null;
+
+// ===== start =====
+const u=(location.hash.match(/^#u=([0-9a-f]{20,})$/)||[])[1];
+if(u){
+  history.replaceState(null,"",location.pathname);   // token net yn 'e skiednis litte
+  rpc("dn_utnoeging",{token:u}).then(p=>{
+    if(!p){ toon("vYn"); say("ynMsg",FOUT["utnoeging_ferrûn"]); return; }
+    document.documentElement.style.setProperty("--c",p.kleur);
+    $("kiesWolkom").textContent="Wolkom "+p.namme+"! 👋"; $("kiesNamme").value=p.namme; $("ynNamme").value=p.namme;
+    toon("vKies");
+    $("vKies").addEventListener("submit",async e=>{
+      e.preventDefault(); say("kiesMsg","");
+      if($("pw1").value!==$("pw2").value){ say("kiesMsg","De twa wachtwurden binne net itselde."); return; }
+      $("kiesBtn").disabled=true;
+      try{ const r=await rpc("dn_wachtwurd",{token:u,wachtwurd:$("pw1").value}); bewarSes(r.sesje); await laad(); }
+      catch(err){ say("kiesMsg",err.message); }
+      $("kiesBtn").disabled=false;
+    });
+  }).catch(err=>{ toon("vYn"); say("ynMsg",err.message); });
+} else if(SES){ laad().catch(()=>{}); }
+else toon("vYn");
+
+$("vYn").addEventListener("submit",async e=>{
+  e.preventDefault(); say("ynMsg",""); $("ynBtn").disabled=true;
+  try{
+    const r=await rpc("dn_ynlogge",{namme:$("ynNamme").value.trim(),wachtwurd:$("ynPw").value});
+    if(r.fout){ say("ynMsg",FOUT[r.fout]||FOUT.ferkeard); }
+    else { bewarSes(r.sesje); $("ynPw").value=""; await laad(); }
+  }catch(err){ say("ynMsg",err.message); }
+  $("ynBtn").disabled=false;
+});
+$("utBtn").addEventListener("click",()=>{ rpc("dn_utlogge",{sesje:SES}).catch(()=>{}); bewarSes(null); MY=null; toon("vYn"); });
+
+async function laad(){
+  try{ MY=await rpc("dn_my",{sesje:SES}); }
+  catch(err){ if(err.code==="net_ynlogd"){ bewarSes(null); toon("vYn"); say("ynMsg",err.message); return; } toon("vYn"); say("ynMsg",err.message); return; }
+  toon("vMy"); teken();
+  if(window.StokerKomp) StokerKomp.laad().then(k=>{ const r=k.rows.filter(x=>x.pct!=null), i=r.findIndex(x=>x.slug===MY.slug); if(i>=0){ plak=i+1; $("myPlak").textContent="Plak "+plak+" fan "+r.length; } }).catch(()=>{});
+}
+function pct(){ const w=MY.wegingen; if(w.length<1) return null; return (w[0][1]-w[w.length-1][1])/w[0][1]*100; }
+function teken(){
+  document.documentElement.style.setProperty("--c",MY.kleur);
+  $("myAv").textContent=MY.namme[0].toUpperCase(); $("myNamme").textContent="Hoi "+MY.namme+"!";
+  const p=pct(); $("myPct").innerHTML=(p==null?"–":(p>0?"−":p<0?"+":"")+nl(Math.abs(p))+"%")+"<small>kwyt</small>";
+  if(!plak) $("myPlak").textContent=MY.wegingen.length?"":"Fol dyn earste gewicht yn om te begjinnen";
+  $("mySide").href="side.html?n="+encodeURIComponent(MY.slug);
+  // gewicht
+  const wo=pd(MY.woansdei), al=MY.wegingen.find(w=>w[0]===MY.woansdei);
+  $("kgLbl").textContent="Gewicht fan "+(MY.woansdei===MY.hjoed?"hjoed (woansdei)":FWD[wo.getDay()]+" "+wo.getDate()+" "+FM[wo.getMonth()]);
+  if(al && document.activeElement!==$("kg")) $("kg").value=nl(al[1]);
+  $("kgBtn").textContent=al?"Feroarje":"Bewarje";
+  // dagen: lêste 10
+  const dm={}; MY.dagen.forEach(d=>dm[d[0]]=d);
+  const hj=pd(MY.hjoed); let h="";
+  for(let i=0;i<10;i++){ const d=new Date(hj); d.setDate(hj.getDate()-i); const k=iso(d), x=dm[k]||[k,false,false];
+    h+='<div class="dei"><span>'+(i===0?"Hjoed":i===1?"Juster":FK[d.getDay()]+" "+d.getDate()+" "+FM[d.getMonth()].slice(0,3))+(i<2?'<em>'+d.getDate()+" "+FM[d.getMonth()].slice(0,3)+'</em>':'')+'</span>'+
+      '<button type="button" class="tg" data-d="'+k+'" data-s="1" aria-pressed="'+x[1]+'">💪 Sporte</button>'+
+      '<button type="button" class="tg" data-d="'+k+'" data-s="2" aria-pressed="'+x[2]+'">👟 10.000</button></div>'; }
+  $("dagen").innerHTML=h;
+  // wegingen
+  const w=MY.wegingen.slice().reverse(), st=MY.wegingen.length?MY.wegingen[0][1]:null;
+  $("wegingen").innerHTML=w.length?w.map(x=>{const d=pd(x[0]);const q=(st-x[1])/st*100;return '<div class="wg"><b>'+d.getDate()+" "+FM[d.getMonth()]+'</b><span>'+nl(x[1])+' kg</span><em>'+(x[0]===MY.wegingen[0][0]?"start":(q>0?"−":q<0?"+":"")+nl(Math.abs(q))+"%")+'</em></div>'}).join(""):'<p style="margin:0;color:var(--muted);font-size:14px">Noch gjin wegingen. Dyn earste gewicht is dyn start.</p>';
+  $("doel").innerHTML=[5,7.5,10,12.5,15,20,25].map(v=>'<option value="'+v+'"'+(Number(MY.doel)===v?" selected":"")+'>'+nl(v,v%1?1:0)+'% kwyt</option>').join("");
+}
+$("wForm").addEventListener("submit",async e=>{
+  e.preventDefault(); say("kgMsg","");
+  const kg=parseFloat($("kg").value.replace(",",".").replace(/[^0-9.]/g,""));
+  if(!(kg>=30&&kg<=300)){ say("kgMsg",FOUT.ferkeard_gewicht); return; }
+  $("kgBtn").disabled=true;
+  try{ MY=await rpc("dn_weging",{sesje:SES,kg:Math.round(kg*10)/10}); $("kg").blur(); teken(); say("kgMsg","Bewarre! 💪",true); }
+  catch(err){ say("kgMsg",err.message); if(err.code==="net_ynlogd"){bewarSes(null);toon("vYn");} }
+  $("kgBtn").disabled=false;
+});
+$("dagen").addEventListener("click",async e=>{
+  const b=e.target.closest(".tg"); if(!b) return;
+  const k=b.dataset.d, rij=[...$("dagen").querySelectorAll('[data-d="'+k+'"]')];
+  b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));
+  const sp=rij[0].getAttribute("aria-pressed")==="true", stp=rij[1].getAttribute("aria-pressed")==="true";
+  say("dMsg","");
+  try{ await rpc("dn_dei",{sesje:SES,dei:k,sporte:sp,stappen:stp});
+    MY.dagen=MY.dagen.filter(d=>d[0]!==k); if(sp||stp) MY.dagen.push([k,sp,stp]); }
+  catch(err){ b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true")); say("dMsg",err.message); }
+});
+$("doel").addEventListener("change",async()=>{ try{ await rpc("dn_doel",{sesje:SES,doel:Number($("doel").value)}); MY.doel=Number($("doel").value); }catch(err){} });
+})();
+</script>
+</body>
+</html>

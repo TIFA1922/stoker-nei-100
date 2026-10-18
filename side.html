@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Kompetysje · Stoker nei 100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#121212;--band:#1e1e1e;--line:#2c2c2c;--fg:#fff;--soft:#ddd;--muted:#aaa;--accent:#3ef0c0;--c:#3ef0c0;--empty:#2a2a2a;--gold:#ffd23f;
+  --f-display:Anton,Impact,"Arial Narrow",sans-serif;--f-body:"Work Sans",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.45}
+main{max-width:520px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(48px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+section{padding-block:24px;border-bottom:1px solid var(--line)}
+h2{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:28px;line-height:1;margin:0 0 14px;display:flex;align-items:center;gap:12px}
+h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c);flex:none}
+.held{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.held h1{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:clamp(44px,14vw,64px);line-height:.92;margin:0;overflow-wrap:anywhere}
+.av{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#121212;font-weight:600;font-size:30px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0 0}
+.grut{display:flex;align-items:baseline;gap:12px;margin-top:18px}
+.grut b{font-family:var(--f-display);font-weight:400;font-size:clamp(72px,26vw,110px);line-height:.9;color:var(--c)}
+.grut span{font-size:16px;color:var(--soft);line-height:1.2}
+.bar{height:8px;background:var(--empty);border-radius:4px;overflow:hidden;margin-top:18px}
+.bar i{display:block;height:100%;background:var(--c);border-radius:4px}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.tal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tal div{background:var(--band);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.tal b{display:block;font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1}
+.tal span{font-size:12px;color:var(--muted)}
+.wk{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.wk span{color:var(--muted)}
+.wk em{font-style:normal;font-weight:600;color:var(--c);min-width:56px;text-align:right}
+.wk small{color:var(--muted);font-size:13px;min-width:56px;text-align:right}
+.kal{overflow-x:auto;padding-bottom:4px}
+.kal-g{display:grid;grid-auto-flow:column;grid-template-rows:14px repeat(7,auto);gap:4px;width:max-content}
+.kal-g i{display:block;width:100%;aspect-ratio:1;border-radius:3px;background:var(--empty)}
+.kal-g em{font-style:normal;font-size:10px;color:var(--muted);white-space:nowrap;width:0;line-height:14px}
+.kal-g b{font-weight:400;font-size:10px;color:var(--muted);align-self:center}
+.note{font-size:14px;color:var(--muted);margin:12px 0 0}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:14px;color:var(--muted);font-size:15px}
+.terug{display:inline-block;margin-top:22px;color:var(--accent);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+  <div id="laden" class="empty" style="margin-top:20px">Even laden…</div>
+  <div id="side" hidden>
+    <div class="held"><div><h1 id="namme"></h1><p class="meta" id="meta"></p></div><div class="av" id="av"></div></div>
+    <div class="grut"><b id="pct">0%</b><span>kwyt sûnt<br>de start</span></div>
+    <div class="bar"><i id="balk" style="width:0"></i></div>
+    <div class="ends"><span>start</span><span id="doel"></span></div>
+    <section>
+      <div class="tal">
+        <div><b id="tT">0</b><span>trainingen</span></div>
+        <div><b id="tS">0</b><span>dagen 10.000 stappen</span></div>
+        <div><b id="tW">0</b><span>wegingen</span></div>
+      </div>
+    </section>
+    <section><h2>Alle wiken</h2><div id="wiken"></div></section>
+    <section><h2>Kalinder</h2><div class="kal"><div class="kal-g" id="kal" role="img"></div></div>
+      <p class="note">Hoe griener, hoe better: sporte, 10.000 stappen of allebeide.</p></section>
+  </div>
+  <a class="terug" href="https://stokernei100.nl/#kompetysje">← Nei it klassemint</a>
+</main>
+<script src="kompetysje.js"></script>
+<script>
+(()=>{
+  const $=id=>document.getElementById(id);
+  const nl=(n,d=1)=>Number(n).toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
+  const FM=["jan","feb","mrt","apr","mai","jun","jul","aug","sep","okt","nov","des"], FL=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
+  const pd=s=>{const [y,m,d]=String(s).slice(0,10).split("-").map(Number);return new Date(y,m-1,d)};
+  const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const sl=new URLSearchParams(location.search).get("n")||"";
+  if(sl==="stoker"){ location.replace("https://stokernei100.nl/"); return; }
+  StokerKomp.laad().then(k=>{
+    const r=k.rows.find(x=>x.slug===sl);
+    if(!r){ $("laden").textContent="Dizze dielnimmer bestiet net (mear)."; return; }
+    document.documentElement.style.setProperty("--c",r.kleur);
+    document.title=r.namme+" · Stoker nei 100";
+    $("namme").textContent=r.namme; $("av").textContent=r.namme[0].toUpperCase();
+    const mei=k.rows.filter(x=>x.pct!=null), plak=mei.findIndex(x=>x.slug===sl)+1;
+    $("meta").textContent=r.start?("Docht mei sûnt "+pd(r.start).getDate()+" "+FL[pd(r.start).getMonth()]+(plak?" · plak "+plak+" fan "+mei.length:"")):"Begjint by de earste weging";
+    const p=r.pct||0; $("pct").textContent=(r.pct==null?"0":(p<0?"+":"")+nl(Math.abs(p)))+"%";
+    $("balk").style.width=Math.max(0,Math.min(100,p/r.doel*100))+"%"; $("doel").textContent="doel: "+nl(r.doel,r.doel%1?1:0)+"% kwyt";
+    $("tT").textContent=r.trainingen; $("tS").textContent=r.stappen; $("tW").textContent=r.wiken.length;
+    // wiken (nijste boppe)
+    const w=r.wiken.slice();
+    $("wiken").innerHTML=w.length?w.map((x,i)=>{const d=pd(x[0]);const v=i?r1(x[1]-w[i-1][1]):null;return '<div class="wk"><b>'+(i?"Wike "+Math.round((d-pd(w[0][0]))/6048e5):"Start")+'</b><span>'+d.getDate()+" "+FM[d.getMonth()]+'</span><small>'+(v==null?"":(v>0?"−":v<0?"+":"±")+nl(Math.abs(v))+"%")+'</small><em>'+(i?(x[1]>0?"−":x[1]<0?"+":"")+nl(Math.abs(x[1]))+"%":"0%")+'</em></div>'}).reverse().join(""):'<div class="empty">Noch gjin wegingen.</div>';
+    // kalinder fan start (of earste aktive dei) oant dizze wike
+    const dm={}; r.dagen.forEach(x=>dm[x[0]]=x);
+    const t=new Date(); t.setHours(0,0,0,0);
+    const keys=[r.start,...r.dagen.map(x=>x[0])].filter(Boolean).sort();
+    const b=keys.length?pd(keys[0]):new Date(t); b.setDate(b.getDate()-((b.getDay()+6)%7));
+    const e=new Date(Math.max(t,b)); e.setDate(e.getDate()+(6-(e.getDay()+6)%7));
+    const nW=Math.round((e-b)/864e5+1)/7, cw=Math.max(14,Math.min(24,Math.floor((($("kal").parentNode.clientWidth||340)-22)/nW)-4));
+    $("kal").style.gridTemplateColumns="18px repeat("+nW+","+cw+"px)";
+    const lv=["var(--empty)","color-mix(in srgb,var(--c) 35%,var(--empty))","color-mix(in srgb,var(--c) 70%,var(--empty))","var(--c)"];
+    let h='<em></em>'+["mo","","wo","","fr","",""].map(x=>'<b>'+x+'</b>').join(""), d=new Date(b), lm=-1;
+    while(d<=e){ const m=d.getMonth(); h+='<em>'+(m!==lm?FM[m]:"")+'</em>'; lm=m;
+      for(let i=0;i<7;i++){ const k2=iso(d), x=dm[k2], fut=d>t, l=fut||!x?0:(x[1]?2:0)+(x[2]?1:0);
+        h+='<i style="'+(fut?'background:transparent;outline:1px dashed var(--line);outline-offset:-1px':'background:'+lv[l])+'"></i>'; d.setDate(d.getDate()+1); } }
+    $("kal").innerHTML=h; $("kal").setAttribute("aria-label","Kalinder fan "+r.namme+": "+r.trainingen+" trainingen, "+r.stappen+" dagen 10.000 stappen");
+    $("kal").parentNode.scrollLeft=1e6;
+    $("laden").hidden=true; $("side").hidden=false;
+  }).catch(()=>{ $("laden").textContent="Laden mislearre. Ferfarskje de side."; });
+  function r1(n){return Math.round(n*10)/10}
+})();
+</script>
+</body>
+</html>

@@ -44,7 +44,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .calbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .calbtns a{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:11px 8px;color:var(--soft);font:600 14px var(--f-body);text-decoration:none}
 .calbtns a svg{width:18px;height:18px;color:#4da3ff}
-.wa{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:6px;color:#25d366}
+.wa{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:6px;color:#25d366;background:transparent;cursor:pointer;padding:0}
 .wa:hover{border-color:#25d366}
 .wa svg{width:20px;height:20px}
 .wabtn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;color:#062b14;border-radius:6px;padding:12px 16px;font:600 15px var(--f-body);text-decoration:none}
@@ -56,7 +56,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .del{background:transparent;border:1px solid var(--line);color:var(--danger);border-radius:6px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer}
 .del:hover{border-color:var(--danger)}
 .del svg{width:20px;height:20px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 .tabs button{background:var(--band);color:var(--muted);border:0;border-radius:6px;padding:11px 0;font:500 15px var(--f-body);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--accent);color:#06261e;font-weight:600}
 .offer{background:var(--band);border-radius:8px;padding:14px;display:grid;gap:10px}
@@ -66,11 +66,20 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .st{font-size:12px;font-weight:600;white-space:nowrap}
 .st.ja{color:var(--accent)}.st.nee{color:#ffb27a}
 .empty{color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:16px}
+.kleuren{display:flex;gap:8px;flex-wrap:wrap}
+.kleuren button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 3px var(--bg);cursor:pointer;padding:0}
+.kleuren button[aria-pressed="true"]{border-color:var(--fg)}
+.dn{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.dn:first-child{border-top:0}
+.dn .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#121212;font-weight:600;font-size:13px}
+.dn small{display:block;color:var(--muted);font-size:12px}
+.dn.uit{opacity:.5}
+.mini{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:6px;height:44px;padding:0 10px;font:600 13px var(--f-body);cursor:pointer}
 </style>
 </head>
 <body>
 <main>
-  <h1>Stoker beheer<small>Gokken en meisport-aanbiedingen beheren</small></h1>
+  <h1>Stoker beheer<small>Gokken, meisporten en deelnemers beheren</small></h1>
 
   <form class="box" id="login" autocomplete="on">
     <label for="mail">E-mailadres</label>
@@ -86,6 +95,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
     <div class="tabs" role="tablist">
       <button type="button" role="tab" id="tabGok" aria-selected="true" aria-controls="panGok">Gokken</button>
       <button type="button" role="tab" id="tabMei" aria-selected="false" aria-controls="panMei">Meisporten</button>
+      <button type="button" role="tab" id="tabDn" aria-selected="false" aria-controls="panDn">Deelnemers</button>
     </div>
     <div id="panGok" role="tabpanel" style="display:grid;gap:18px">
     <div class="stats">
@@ -100,6 +110,18 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
       <p class="msg" id="appMsg" hidden></p>
     </div>
     <div id="list" style="display:grid;gap:12px"></div>
+    </div>
+    <div id="panDn" role="tabpanel" hidden style="display:grid;gap:14px">
+      <form class="box" id="dnForm" style="display:grid;gap:10px">
+        <label for="dnNaam">Nieuwe deelnemer</label>
+        <input id="dnNaam" maxlength="30" placeholder="Voornaam, bv. Anne" autocomplete="off" required>
+        <div class="kleuren" id="dnKleur" role="group" aria-label="Kleur"></div>
+        <button class="btn" type="submit" id="dnAdd">Toevoegen en uitnodigen</button>
+      </form>
+      <div id="dnWa"></div>
+      <div id="dnList" class="box round"></div>
+      <p class="msg" id="dnMsg" hidden></p>
+      <p style="font-size:13px;color:var(--muted);margin:0">Een deelnemer kiest zelf een wachtwoord via de link. De link werkt 14 dagen en maar één keer. Wachtwoord vergeten? Stuur een nieuwe link.</p>
     </div>
     <div id="panMei" role="tabpanel" hidden style="display:grid;gap:12px">
       <div id="meiWaTop"></div>
@@ -268,14 +290,54 @@ $("panMei").addEventListener("click",e=>{
   const s=e.target.closest("[data-set]"); if(s){setMei(s.dataset.id,s.dataset.set);return}
   const d=e.target.closest("[data-mdel]"); if(d) delMei(d.dataset.mdel);
 });
-const tab=w=>{const g=w==="gok";$("tabGok").setAttribute("aria-selected",String(g));$("tabMei").setAttribute("aria-selected",String(!g));$("panGok").hidden=!g;$("panMei").hidden=g;try{sessionStorage.setItem("stoker-tab",w)}catch(e){}};
+const tab=w=>{[["gok","Gok"],["mei","Mei"],["dn","Dn"]].forEach(([k,id])=>{$("tab"+id).setAttribute("aria-selected",String(k===w));$("pan"+id).hidden=k!==w});try{sessionStorage.setItem("stoker-tab",w)}catch(e){}};
 $("tabGok").addEventListener("click",()=>tab("gok"));
 $("tabMei").addEventListener("click",()=>tab("mei"));
-try{if(sessionStorage.getItem("stoker-tab")==="mei")tab("mei")}catch(e){}
+$("tabDn").addEventListener("click",()=>tab("dn"));
+try{const t=sessionStorage.getItem("stoker-tab");if(t==="mei"||t==="dn")tab(t)}catch(e){}
+
+// ===== deelnemers kompetysje =====
+const KLEUREN=["#ff8fb1","#4da3ff","#ffd23f","#ff7a2f","#b48cff","#9be15d","#5fe0e6"];
+let dn=[], dnKleur=KLEUREN[0];
+const rpc=async(f,body)=>{await fresh();const r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authH()),body:JSON.stringify(body||{})});
+  const j=await r.json().catch(()=>null); if(r.status===401){S=null;save();show();throw new Error("uit")} if(!r.ok) throw new Error((j&&j.message)||"fout"); return j};
+const drawKleur=()=>{$("dnKleur").innerHTML=KLEUREN.map(c=>'<button type="button" data-k="'+c+'" style="background:'+c+'" aria-label="Kleur '+c+'" aria-pressed="'+(c===dnKleur)+'"></button>').join("")};
+drawKleur();
+$("dnKleur").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b){dnKleur=b.dataset.k;drawKleur()}});
+const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Elke woansdei weegje en ynfolle!\nStoker";
+const toonWa=(naam,tok)=>{$("dnWa").innerHTML='<div class="box" style="display:grid;gap:10px"><span style="color:var(--accent);font-size:14px">Uitnodiging voor '+esc(naam)+' klaar.</span><a class="wabtn" href="https://wa.me/?text='+encodeURIComponent(uitnodiging(naam,tok))+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(naam)+' de link via WhatsApp</a></div>'};
+async function loadDn(){
+  try{ dn=await rpc("dn_beheer_list"); renderDn(); say("dnMsg",""); }
+  catch(e){ if(e.message!=="uit") say("dnMsg","Laden mislukt. Heb je de SQL voor de kompetysje uitgevoerd?"); }
+}
+function renderDn(){
+  $("tabDn").textContent="Deelnemers"+(dn.length?" · "+dn.length:"");
+  $("dnList").innerHTML=dn.length?dn.map(x=>{
+    const st=!x.aktyf?"Gepauzeerd":x.wachtwurd?(x.wegingen?x.wegingen+(x.wegingen===1?" weging":" wegingen")+" · laatste "+fd(x["lêste"]):"Doet mee, nog geen weging"):x.utnoege?"Uitgenodigd, nog geen wachtwoord":"Link verlopen";
+    return '<div class="dn'+(x.aktyf?'':' uit')+'"><span class="dot" style="background:'+esc(x.kleur)+'">'+esc(String(x.namme)[0].toUpperCase())+'</span><div><b>'+esc(x.namme)+'</b><small>'+esc(st)+'</small></div>'+
+      '<button type="button" class="wa" data-link="'+esc(x.id)+'" aria-label="Nieuwe link voor '+esc(x.namme)+'" title="Nieuwe link / wachtwoord vergeten">'+WAI+'</button>'+
+      '<button type="button" class="mini" data-aktyf="'+esc(x.id)+'" data-aan="'+(!x.aktyf)+'">'+(x.aktyf?"Pauze":"Actief")+'</button>'+
+      '<button type="button" class="del" data-dndel="'+esc(x.id)+'" aria-label="'+esc(x.namme)+' verwijderen">'+BIN+'</button></div>'}).join(""):'<div class="empty">Nog geen deelnemers. Voeg hierboven iemand toe.</div>';
+}
+$("dnForm").addEventListener("submit",async e=>{
+  e.preventDefault(); const naam=$("dnNaam").value.trim(); if(!naam)return; $("dnAdd").disabled=true;
+  try{ const r=await rpc("dn_beheer_nij",{namme:naam,kleur:dnKleur}); $("dnNaam").value=""; toonWa(naam,r.token); await loadDn(); }
+  catch(err){ if(err.message!=="uit") say("dnMsg","Toevoegen mislukt."); }
+  $("dnAdd").disabled=false;
+});
+$("dnList").addEventListener("click",async e=>{
+  const l=e.target.closest("[data-link]"), a=e.target.closest("[data-aktyf]"), d=e.target.closest("[data-dndel]");
+  try{
+    if(l){const x=dn.find(y=>y.id===l.dataset.link); if(x.wachtwurd&&!confirm("Nieuwe link voor "+x.namme+"? Het oude wachtwoord blijft werken tot "+x.namme+" een nieuw kiest, maar ingelogde telefoons worden uitgelogd."))return;
+      const t=await rpc("dn_beheer_utnoegje",{id:x.id}); toonWa(x.namme,t); scrollTo({top:0,behavior:"smooth"}); await loadDn();}
+    if(a){await rpc("dn_beheer_aktyf",{id:a.dataset.aktyf,aan:a.dataset.aan==="true"}); await loadDn();}
+    if(d){const x=dn.find(y=>y.id===d.dataset.dndel); if(!confirm(x.namme+" en al zijn gegevens verwijderen?"))return; await rpc("dn_beheer_wiskje",{id:x.id}); $("dnWa").innerHTML=""; await loadDn(); say("dnMsg","Verwijderd.",true);}
+  }catch(err){ if(err.message!=="uit") say("dnMsg","Dat lukte niet. Probeer het opnieuw."); }
+});
 
 function show(){
   $("login").hidden=!!S; $("app").hidden=!S;
-  if(S){ $("who").textContent="Ingelogd als "+(S.email||"beheerder"); load(); loadMei(); }
+  if(S){ $("who").textContent="Ingelogd als "+(S.email||"beheerder"); load(); loadMei(); loadDn(); }
 }
 show();
 </script>
