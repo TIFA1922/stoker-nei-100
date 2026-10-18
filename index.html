@@ -716,11 +716,12 @@ function stokerFig(kwyt, total){
   const k=1-kg/total, m=kg/total;            // k: dikte, m: spieren
   const A='style="fill:var(--accent,#3ef0c0)"', skin="#f2c9a0", skinD="#d9a77e", dark="#121212";
   const cx=60, top=64, hip=136;
-  const sw=20+16*m, hw=16+8*k, bulge=30*k;     // skouders, heupen, bûk
+  const kd=k*0.65;                           // hoe dik (wat minder as earst)
+  const sw=20+16*m, hw=16+8*kd, bulge=30*kd;     // skouders, heupen, bûk
   const goal=kg>=total;
   let s='<svg viewBox="-14 -4 148 178" class="stoker-fig" role="img" aria-label="Stoker-poppe: '+kg+' kilo kwyt">';
   // skonken
-  const lw=12+3*m, lx=8+6*k;
+  const lw=12+3*m, lx=8+6*kd;
   s+='<rect x="'+(cx-lx-lw)+'" y="'+(hip-6)+'" width="'+lw+'" height="32" rx="6" fill="#2b2b2b"/>';
   s+='<rect x="'+(cx+lx)+'" y="'+(hip-6)+'" width="'+lw+'" height="32" rx="6" fill="#2b2b2b"/>';
   s+='<ellipse cx="'+(cx-lx-lw/2)+'" cy="166" rx="10" ry="4" fill="#444"/><ellipse cx="'+(cx+lx+lw/2)+'" cy="166" rx="10" ry="4" fill="#444"/>';
@@ -763,7 +764,7 @@ function stokerFig(kwyt, total){
   }
   // bûk dy't ûnder it shirt útkomt
   if(k>0.04){
-    const bx=6+22*k, by=2+10*k;
+    const bx=6+22*kd, by=2+10*kd;
     s+='<ellipse cx="'+cx+'" cy="'+(hip-1)+'" rx="'+bx+'" ry="'+by+'" fill="'+skin+'"/>';
     s+='<ellipse cx="'+cx+'" cy="'+(hip+by*0.2)+'" rx="1.8" ry="2.3" fill="'+skinD+'"/>';
   }
