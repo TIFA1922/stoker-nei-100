@@ -542,7 +542,7 @@ if(ph.length){
 (()=>{
   const today=new Date(); today.setHours(0,0,0,0);
   const days=s=>Math.ceil((pd(s)-today)/864e5);
-  const C=[["2027-04-18","dagen oant it feest"],["2027-07-24","dagen oant de bouwfak"]].map(([d,l])=>[days(d),l]).filter(x=>x[0]>=0);
+  const C=[["2027-04-13","dagen oant myn jierdei"],["2027-07-24","dagen oant de bouwfak"]].map(([d,l])=>[days(d),l]).filter(x=>x[0]>=0);
   $("count").innerHTML=C.map(([n,l])=>'<div><b>'+(n===0?"Hjoed!":n)+'</b><span>'+(n===0?l.replace("dagen oant ",""):l)+'</span></div>').join("");
   if(!C.length)$("count").hidden=true;
 })();
