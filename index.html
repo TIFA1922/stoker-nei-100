@@ -270,6 +270,7 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .days button.bz::after{content:"ôfpraat";position:absolute;left:0;right:0;bottom:2px;font-size:8px;line-height:1;color:#ffb27a;text-transform:uppercase;letter-spacing:.02em}
 .days button:disabled,.parts button:disabled{opacity:.35;cursor:not-allowed}
 .parts button small{display:block;font-size:11px;font-weight:400;color:#ffb27a}
+.kalsl{align-items:flex-start;overflow-y:hidden;transition:height .25s}
 .wkslider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:8px;overscroll-behavior-x:contain}
 .wkslider::-webkit-scrollbar{display:none}
 .wkslide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
@@ -474,7 +475,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
       <h2 class="disp">Kalinder</h2>
       <div class="kal-tal"><div><b id="kalSport">0</b><span>dagen sporte</span></div><div><b id="kalStap">0</b><span>dagen 10.000 stappen</span></div><div><b id="kalRige">0</b><span>langste rige</span></div></div>
       <div class="wknav"><button type="button" id="kalPrev" aria-label="Foarige moanne">‹</button><b id="kalKop"></b><button type="button" id="kalNext" aria-label="Folgjende moanne">›</button></div>
-      <div class="wkslider" id="kalSlider"></div>
+      <div class="wkslider kalsl" id="kalSlider"></div>
       <div class="kal-leg"><span><i style="background:var(--empty)"></i>neat</span><span><i style="background:color-mix(in srgb,var(--accent) 35%,var(--empty))"></i>10.000 stappen</span><span><i style="background:color-mix(in srgb,var(--accent) 70%,var(--empty))"></i>sporte</span><span><i style="background:var(--accent)"></i>allebeide</span></div>
       <p class="note">Hoe griener, hoe better. Skow opsij foar oare moannen.</p>
     </section>
@@ -1029,7 +1030,8 @@ function stokerFig(kwyt, total){
     if(mI<0||mI>=moannen.length) mI=Math.max(0,nu);
     ga(mI,false);
   };
-  const kop=()=>{const m=moannen[mI];$("kalKop").innerHTML=ML[m.getMonth()]+'<small>'+m.getFullYear()+'</small>';$("kalPrev").disabled=mI===0;$("kalNext").disabled=mI>=moannen.length-1};
+  const kop=()=>{const m=moannen[mI];$("kalKop").innerHTML=ML[m.getMonth()]+'<small>'+m.getFullYear()+'</small>';$("kalPrev").disabled=mI===0;$("kalNext").disabled=mI>=moannen.length-1;const sl=$("kalSlider"),c=sl.children[mI];sl.style.height=c&&c.offsetHeight?c.offsetHeight+"px":""};
+  if(window.ResizeObserver) new ResizeObserver(()=>{if($("kalSlider").clientWidth)kop()}).observe($("kalSlider"));
   const ga=(i,glad)=>{const sl=$("kalSlider");mI=i;kop();sl.scrollTo({left:i*sl.clientWidth,behavior:glad&&!matchMedia("(prefers-reduced-motion: reduce)").matches?"smooth":"auto"})};
   $("kalSlider").addEventListener("scroll",()=>{const sl=$("kalSlider"),i=Math.round(sl.scrollLeft/Math.max(1,sl.clientWidth));if(i!==mI&&moannen[i]){mI=i;kop()}},{passive:true});
   $("kalPrev").addEventListener("click",()=>{if(mI>0)ga(mI-1,true)});
