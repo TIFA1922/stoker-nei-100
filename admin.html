@@ -112,6 +112,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
     <div id="list" style="display:grid;gap:12px"></div>
     </div>
     <div id="panDn" role="tabpanel" hidden style="display:grid;gap:14px">
+      <div id="dnOan"></div>
       <form class="box" id="dnForm" style="display:grid;gap:10px">
         <label for="dnNaam">Nieuwe deelnemer</label>
         <input id="dnNaam" maxlength="30" placeholder="Voornaam, bv. Anne" autocomplete="off" required>
@@ -311,13 +312,20 @@ let dn=[], dnKleur=KLEUREN[0];
 const rpc=async(f,body)=>{await fresh();const r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authH()),body:JSON.stringify(body||{})});
   const j=await r.json().catch(()=>null); if(r.status===401){S=null;save();show();throw new Error("uit")} if(!r.ok) throw new Error((j&&j.message)||"fout"); return j};
 const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Dêrnei folst dyn gewicht yn wannear't it dy útkomt, op stokernei100.nl/ynfolle (ynlogge mei dyn namme en wachtwurd).\nStoker";
-const toonWa=(naam,tok)=>{$("dnWa").innerHTML='<div class="box" style="display:grid;gap:10px"><span style="color:var(--accent);font-size:14px">Uitnodiging voor '+esc(naam)+' klaar.</span><a class="wabtn" href="https://wa.me/?text='+encodeURIComponent(uitnodiging(naam,tok))+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(naam)+' de link via WhatsApp</a></div>'};
+// telefoannûmer nei wa.me-formaat (06… → 316…)
+const waNr=t=>{if(!t)return "";let n=String(t).replace(/[^0-9+]/g,"");if(n.startsWith("+"))n=n.slice(1);else if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="31"+n.slice(1);return n};
+const toonWa=(naam,tok,tel)=>{$("dnWa").innerHTML='<div class="box" style="display:grid;gap:10px"><span style="color:var(--accent);font-size:14px">Uitnodiging voor '+esc(naam)+' klaar.</span><a class="wabtn" href="https://wa.me/'+waNr(tel)+'?text='+encodeURIComponent(uitnodiging(naam,tok))+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(naam)+' de link via WhatsApp</a></div>'};
+let oan=[];
+const renderOan=()=>{
+  $("dnOan").innerHTML=oan.length?'<div class="box" style="display:grid;gap:10px;border-color:var(--accent)"><b style="font-size:15px">Nieuwe aanmeldingen</b>'+oan.map(x=>'<div class="offer"><div><b>'+esc(x.namme)+'</b><span>'+(x.telefoan?esc(x.telefoan)+' · ':'')+fdt(x.makke)+'</span>'+(x.berjocht?'<span style="color:var(--soft);font-style:italic">“'+esc(x.berjocht)+'”</span>':'')+'</div><div class="two"><button class="btn" type="button" data-goed="'+esc(x.id)+'">Uitnodigen</button><button class="btn ghost" type="button" data-of="'+esc(x.id)+'">Afwijzen</button></div></div>').join("")+'</div>':'';
+};
 async function loadDn(){
+  try{ oan=await rpc("dn_beheer_oanfragen"); renderOan(); }catch(e){ oan=[]; renderOan(); }
   try{ dn=await rpc("dn_beheer_list"); renderDn(); say("dnMsg",""); }
   catch(e){ if(e.message!=="uit") say("dnMsg","Laden mislukt. Heb je de SQL voor de kompetysje uitgevoerd?"); }
 }
 function renderDn(){
-  $("tabDn").textContent="Deelnemers"+(dn.length?" · "+dn.length:"");
+  $("tabDn").textContent="Deelnemers"+(oan.length?" · "+oan.length+" nieuw":dn.length?" · "+dn.length:"");
   $("dnList").innerHTML=dn.length?dn.map(x=>{
     const st=!x.aktyf?"Gepauzeerd":x.wachtwurd?(x.wegingen?x.wegingen+(x.wegingen===1?" weging":" wegingen")+" · laatste "+fd(x["lêste"]):"Doet mee, nog geen weging"):x.utnoege?"Uitgenodigd, nog geen wachtwoord":"Link verlopen";
     return '<div class="dn'+(x.aktyf?'':' uit')+'"><span class="dot" style="background:'+esc(x.kleur)+'">'+esc(String(x.namme)[0].toUpperCase())+'</span><div><b>'+esc(x.namme)+'</b><small>'+esc(st)+'</small></div>'+
@@ -331,6 +339,13 @@ $("dnForm").addEventListener("submit",async e=>{
     const r=await rpc("dn_beheer_nij",{namme:naam,kleur:dnKleur}); $("dnNaam").value=""; toonWa(naam,r.token); await loadDn(); }
   catch(err){ if(err.message!=="uit") say("dnMsg","Toevoegen mislukt."); }
   $("dnAdd").disabled=false;
+});
+$("dnOan").addEventListener("click",async e=>{
+  const g=e.target.closest("[data-goed]"), o=e.target.closest("[data-of]");
+  try{
+    if(g){ const fr=KLEUREN.filter(c=>!dn.some(x=>x.kleur===c)); const r=await rpc("dn_beheer_goedkarre",{id:g.dataset.goed,kleur:fr.length?fr[0]:KLEUREN[dn.length%KLEUREN.length]}); toonWa(r.namme,r.token,r.telefoan); await loadDn(); }
+    if(o){ const x=oan.find(y=>y.id===o.dataset.of); if(!confirm("Aanmelding van "+x.namme+" afwijzen?"))return; await rpc("dn_beheer_ofwize",{id:x.id}); await loadDn(); }
+  }catch(err){ if(err.message!=="uit") say("dnMsg","Dat lukte niet. Heb je de SQL voor aanmelden uitgevoerd?"); }
 });
 $("dnList").addEventListener("click",async e=>{
   const l=e.target.closest("[data-link]"), a=e.target.closest("[data-aktyf]"), d=e.target.closest("[data-dndel]");
