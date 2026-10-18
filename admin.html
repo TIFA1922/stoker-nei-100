@@ -306,7 +306,7 @@ const KLEUREN=["#ff8fb1","#4da3ff","#ffd23f","#ff7a2f","#b48cff","#9be15d","#5fe
 let dn=[], dnKleur=KLEUREN[0];
 const rpc=async(f,body)=>{await fresh();const r=await fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authH()),body:JSON.stringify(body||{})});
   const j=await r.json().catch(()=>null); if(r.status===401){S=null;save();show();throw new Error("uit")} if(!r.ok) throw new Error((j&&j.message)||"fout"); return j};
-const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Dêrnei folst elke woansdei dyn gewicht yn op stokernei100.nl/ynfolle (ynlogge mei dyn namme en wachtwurd).\nStoker";
+const uitnodiging=(naam,tok)=>"Hoi "+naam+"! Doch mei oan de Stoker-kompetysje 💪 Wa rekket it measte kwyt (yn prosinten, kilo's sjocht nimmen)?\n\nKies hjir dyn wachtwurd:\nhttps://stokernei100.nl/ynfolle.html#u="+tok+"\n\nDe link wurket 14 dagen. Dêrnei folst dyn gewicht yn wannear't it dy útkomt, op stokernei100.nl/ynfolle (ynlogge mei dyn namme en wachtwurd).\nStoker";
 const toonWa=(naam,tok)=>{$("dnWa").innerHTML='<div class="box" style="display:grid;gap:10px"><span style="color:var(--accent);font-size:14px">Uitnodiging voor '+esc(naam)+' klaar.</span><a class="wabtn" href="https://wa.me/?text='+encodeURIComponent(uitnodiging(naam,tok))+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(naam)+' de link via WhatsApp</a></div>'};
 async function loadDn(){
   try{ dn=await rpc("dn_beheer_list"); renderDn(); say("dnMsg",""); }

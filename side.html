@@ -68,7 +68,7 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
         <div><b id="tW">0</b><span>wegingen</span></div>
       </div>
     </section>
-    <section><h2>Alle wiken</h2><div id="wiken"></div></section>
+    <section><h2>Alle wegingen</h2><div id="wiken"></div></section>
     <section><h2>Kalinder</h2><div class="kal"><div class="kal-g" id="kal" role="img"></div></div>
       <p class="note">Hoe griener, hoe better: sporte, 10.000 stappen of allebeide.</p></section>
   </div>
@@ -97,7 +97,7 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
     $("tT").textContent=r.trainingen; $("tS").textContent=r.stappen; $("tW").textContent=r.wiken.length;
     // wiken (nijste boppe)
     const w=r.wiken.slice();
-    $("wiken").innerHTML=w.length?w.map((x,i)=>{const d=pd(x[0]);const v=i?r1(x[1]-w[i-1][1]):null;return '<div class="wk"><b>'+(i?"Wike "+Math.round((d-pd(w[0][0]))/6048e5):"Start")+'</b><span>'+d.getDate()+" "+FM[d.getMonth()]+'</span><small>'+(v==null?"":(v>0?"−":v<0?"+":"±")+nl(Math.abs(v))+"%")+'</small><em>'+(i?(x[1]>0?"−":x[1]<0?"+":"")+nl(Math.abs(x[1]))+"%":"0%")+'</em></div>'}).reverse().join(""):'<div class="empty">Noch gjin wegingen.</div>';
+    $("wiken").innerHTML=w.length?w.map((x,i)=>{const d=pd(x[0]);const v=i?r1(x[1]-w[i-1][1]):null;return '<div class="wk"><b>'+(i?"Weging "+(i+1):"Start")+'</b><span>'+d.getDate()+" "+FM[d.getMonth()]+'</span><small>'+(v==null?"":(v>0?"−":v<0?"+":"±")+nl(Math.abs(v))+"%")+'</small><em>'+(i?(x[1]>0?"−":x[1]<0?"+":"")+nl(Math.abs(x[1]))+"%":"0%")+'</em></div>'}).reverse().join(""):'<div class="empty">Noch gjin wegingen.</div>';
     // kalinder fan start (of earste aktive dei) oant dizze wike
     const dm={}; r.dagen.forEach(x=>dm[x[0]]=x);
     const t=new Date(); t.setHours(0,0,0,0);

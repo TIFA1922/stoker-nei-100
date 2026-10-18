@@ -32,7 +32,10 @@
     const rows=(s?[s]:[]).concat(o||[]);
     rows.sort((a,b)=>(a.pct==null)-(b.pct==null)||(b.pct||0)-(a.pct||0)||a.namme.localeCompare(b.namme));
     const wo=woansdei(); let winer=null;
-    rows.forEach(x=>{ if(x.wikedei===wo&&x.wike!=null&&x.wike>0&&(!winer||x.wike>winer.wike)) winer=x; });
+    // grutste ôffaller: wa't de lêste 7 dagen woegen hat en it measte kwyt rekke is
+    const wk=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Amsterdam"})); wk.setHours(0,0,0,0); wk.setDate(wk.getDate()-6);
+    const grins=wk.getFullYear()+"-"+String(wk.getMonth()+1).padStart(2,"0")+"-"+String(wk.getDate()).padStart(2,"0");
+    rows.forEach(x=>{ if(x.wikedei&&x.wikedei>=grins&&x.wike!=null&&x.wike>0&&(!winer||x.wike>winer.wike)) winer=x; });
     return {rows, winer, woansdei:wo, oaren:(o||[]).length};
   }
   window.StokerKomp={laad, woansdei};
