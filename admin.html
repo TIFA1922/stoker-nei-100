@@ -204,10 +204,11 @@ const WAI='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path
 const FWD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], FM=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
 const fryDate=s=>{const [y,m,d]=s.split("-").map(Number);const t=new Date(y,m-1,d);return FWD[t.getDay()]+" "+d+" "+FM[m-1]};
 const dayWord=s=>{const t=new Date();t.setHours(0,0,0,0);const [y,m,d]=s.split("-").map(Number);const diff=Math.round((new Date(y,m-1,d)-t)/864e5);return diff===0?"hjoed":diff===1?"moarn":fryDate(s)};
+const agindaUrl=x=>{const [a]=slot(x);return "https://stokernei100.nl/aginda.html?d="+x.datum+"&t="+a+"&w="+(x.wat==="kuierje"?"kuierje":"sporte")+(x.tiid?"":"&p="+encodeURIComponent(x.dagdiel))};
 function waText(x,kind){
   const n=String(x.naam).trim().split(" ")[0], hm=x.tiid?String(x.tiid).slice(0,5):"", when=fryDate(x.datum)+" "+(hm?"om "+hm:x.dagdiel);
-  if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+(x.wat==="kuierje"?"geane wy in rûntsje kuierje 👟":"geane wy sporte 💪")+". Oant dan!\nStoker";
-  if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+(x.wat==="kuierje"?"wy geane in rûntsje kuierje! 👟":"wy geane sporte! 💪")+"\nStoker";
+  if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+(x.wat==="kuierje"?"geane wy in rûntsje kuierje 👟":"geane wy sporte 💪")+". Oant dan!\nStoker\n\nYn dyn aginda: "+agindaUrl(x);
+  if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+(x.wat==="kuierje"?"wy geane in rûntsje kuierje! 👟":"wy geane sporte! 💪")+"\nStoker\n\nSet it yn dyn aginda: "+agindaUrl(x);
   return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://stokernei100.nl/\nStoker";
 }
 const waUrl=(x,kind)=>"https://wa.me/?text="+encodeURIComponent(waText(x,kind));
