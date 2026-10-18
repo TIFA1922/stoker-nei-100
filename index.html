@@ -1083,8 +1083,10 @@ function stokerFig(kwyt, total){
     tekenWike();
   };
   let meiWiken=[], meiRows=[], meiWk=0, meiKeazen=false;
+  // ISO-wikenûmer (moandei as begjin)
+  const wikeNr=d=>{const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));t.setUTCDate(t.getUTCDate()+4-(t.getUTCDay()||7));const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)};
   const kopFan=i=>{const w0=meiWiken[i],a=pd(w0),z=new Date(a);z.setDate(a.getDate()+6);const nx=iso(new Date(pd(mo2(today)).getTime()+7*864e5));
-    return [w0===mo2(today)?"Dizze wike":w0===nx?"Folgjende wike":"Wike fan "+a.getDate()+" "+MS[a.getMonth()], a.getDate()+(a.getMonth()!==z.getMonth()?' '+MS[a.getMonth()]:'')+'–'+z.getDate()+' '+MS[z.getMonth()]]};
+    return [w0===mo2(today)?"Dizze wike":w0===nx?"Folgjende wike":"Wike fan "+a.getDate()+" "+MS[a.getMonth()], 'wike '+wikeNr(a)+' · '+a.getDate()+(a.getMonth()!==z.getMonth()?' '+MS[a.getMonth()]:'')+'–'+z.getDate()+' '+MS[z.getMonth()]]};
   const offerRij=r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+(r.tiid?esc(String(r.tiid).slice(0,5)):esc(r.dagdiel))+' · '+esc(watTekst(r))+'</small></div><em>'+(ST[r.status]||"")+'</em></div>';
   const tekenWike=()=>{
     if(!meiWiken.length){ $("meiList").innerHTML=""; return; }
