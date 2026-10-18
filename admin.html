@@ -225,17 +225,23 @@ const WAI='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path
 const FWD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], FM=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
 const fryDate=s=>{const [y,m,d]=s.split("-").map(Number);const t=new Date(y,m-1,d);return FWD[t.getDay()]+" "+d+" "+FM[m-1]};
 const dayWord=s=>{const t=new Date();t.setHours(0,0,0,0);const [y,m,d]=s.split("-").map(Number);const diff=Math.round((new Date(y,m-1,d)-t)/864e5);return diff===0?"hjoed":diff===1?"moarn":fryDate(s)};
-const agindaUrl=x=>{const [a]=slot(x);return "https://stokernei100.nl/aginda.html?d="+x.datum+"&t="+a+"&w="+(x.wat==="kuierje"?"kuierje":"sporte")+(x.tiid?"":"&p="+encodeURIComponent(x.dagdiel))};
+// wat dogge wy: emoji, namme, "wy geane ..."
+const WAT={sporte:["🏋️","Sportskoalle","nei de sportskoalle"],hurdrinne:["🏃","Hurdrinne","hurdrinne"],mtb:["🚵","Mountainbike","mountainbiken"],kuierje:["🚶","Rûntsje kuierje","in rûntsje kuierje"],padel:["🎾","Padel / tennis","padelje"],oars:["✨","Oars","wat oars dwaan"]};
+const watFan=x=>WAT[x.wat]||WAT.sporte;
+const watNamme=x=>x.wat==="oars"&&x.wat_oars?String(x.wat_oars):watFan(x)[1];
+const watDwaan=x=>x.wat==="oars"&&x.wat_oars?String(x.wat_oars).toLowerCase():watFan(x)[2];
+const watKoart=x=>watFan(x)[0]+" "+watNamme(x).toLowerCase();
+const agindaUrl=x=>{const [a]=slot(x);return "https://stokernei100.nl/aginda.html?d="+x.datum+"&t="+a+"&w="+encodeURIComponent(WAT[x.wat]?x.wat:"sporte")+(x.wat==="oars"&&x.wat_oars?"&o="+encodeURIComponent(x.wat_oars):"")+(x.tiid?"":"&p="+encodeURIComponent(x.dagdiel))};
 function waText(x,kind){
   const n=String(x.naam).trim().split(" ")[0], hm=x.tiid?String(x.tiid).slice(0,5):"", when=fryDate(x.datum)+" "+(hm?"om "+hm:x.dagdiel);
-  if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+(x.wat==="kuierje"?"geane wy in rûntsje kuierje 👟":"geane wy sporte 💪")+". Oant dan!\nStoker\n\nYn dyn aginda: "+agindaUrl(x);
-  if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+(x.wat==="kuierje"?"wy geane in rûntsje kuierje! 👟":"wy geane sporte! 💪")+"\nStoker\n\nSet it yn dyn aginda: "+agindaUrl(x);
+  if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+"geane wy "+watDwaan(x)+" "+watFan(x)[0]+". Oant dan!\nStoker\n\nYn dyn aginda: "+agindaUrl(x);
+  if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+"wy geane "+watDwaan(x)+"! "+watFan(x)[0]+"\nStoker\n\nSet it yn dyn aginda: "+agindaUrl(x);
   return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://stokernei100.nl/\nStoker";
 }
 const waUrl=(x,kind)=>"https://wa.me/?text="+encodeURIComponent(waText(x,kind));
 // agenda: tiden per dieldei (oan te passen yn Outlook)
 const SLOT={moarns:["08:00","09:00"],middeis:["13:00","14:00"],"jûns":["19:00","20:00"]};
-const calTitle=x=>(x.wat==="kuierje"?"Rûntsje kuierje mei ":"Sporte mei ")+String(x.naam).trim();
+const calTitle=x=>watNamme(x)+" mei "+String(x.naam).trim();
 const plus1=t=>{const [h,m]=t.split(":").map(Number);return String(Math.min(23,h+1)).padStart(2,"0")+":"+String(m).padStart(2,"0")};
 const slot=x=>x.tiid?[String(x.tiid).slice(0,5),plus1(String(x.tiid).slice(0,5))]:(SLOT[x.dagdiel]||SLOT["jûns"]);
 const outlookUrl=x=>{const [a,b]=slot(x);return "https://outlook.office.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent"+
@@ -256,8 +262,8 @@ function renderMei(){
   const done=mei.filter(x=>x.status!=="wacht"&&x.datum>=today);
   const past=mei.filter(x=>x.datum<today).reverse();
   $("tabMei").textContent="Meisporten"+(open.length?" · "+open.length:"");
-  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+(x.wat==='kuierje'?' · rûntsje kuierje':' · sporte')+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
-  const row=(x,wa)=>'<div class="row'+(wa?(x.status==="ja"?' r5':' r4'):'')+'"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+(x.wat==='kuierje'?' · rûntsje kuierje':' · sporte')+'</small>'+(wa?'<button type="button" class="flip" data-set="'+(x.status==='ja'?'nee':'ja')+'" data-id="'+esc(x.id)+'">'+(x.status==='ja'?'Toch niet':'Past toch wel')+'</button>':'')+'</div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span>'+(wa&&x.status==="ja"?'<a class="cal" href="'+outlookUrl(x)+'" target="_blank" rel="noopener" aria-label="Zet in Outlook" title="Zet in Outlook">'+CAL+'</a>':'')+(wa?'<a class="wa" href="'+waUrl(x,x.status==="ja"?"remind":"")+'" target="_blank" rel="noopener" aria-label="'+(x.status==="ja"?"Herinnering":"WhatsApp")+' naar '+esc(x.naam)+'" title="'+(x.status==="ja"?"Stuur herinnering":"Stuur WhatsApp")+'">'+WAI+'</a>':'')+'<button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
+  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
+  const row=(x,wa)=>'<div class="row'+(wa?(x.status==="ja"?' r5':' r4'):'')+'"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</small>'+(wa?'<button type="button" class="flip" data-set="'+(x.status==='ja'?'nee':'ja')+'" data-id="'+esc(x.id)+'">'+(x.status==='ja'?'Toch niet':'Past toch wel')+'</button>':'')+'</div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span>'+(wa&&x.status==="ja"?'<a class="cal" href="'+outlookUrl(x)+'" target="_blank" rel="noopener" aria-label="Zet in Outlook" title="Zet in Outlook">'+CAL+'</a>':'')+(wa?'<a class="wa" href="'+waUrl(x,x.status==="ja"?"remind":"")+'" target="_blank" rel="noopener" aria-label="'+(x.status==="ja"?"Herinnering":"WhatsApp")+' naar '+esc(x.naam)+'" title="'+(x.status==="ja"?"Stuur herinnering":"Stuur WhatsApp")+'">'+WAI+'</a>':'')+'<button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
   $("meiDone").innerHTML=done.length?done.map(x=>row(x,true)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets afgesproken.</div>';
   $("meiPast").innerHTML=past.length?past.slice(0,30).map(x=>row(x,false)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets.</div>';
 }

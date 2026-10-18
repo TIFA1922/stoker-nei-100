@@ -264,6 +264,8 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .dn button{width:36px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:18px;line-height:1;cursor:pointer}
 .dn button:disabled{opacity:.3;cursor:default}
 .parts.two-up{grid-template-columns:repeat(2,minmax(0,1fr))}
+#meiWat button{display:grid;justify-items:center;align-content:center;gap:3px;padding:10px 4px;font-size:13px;line-height:1.2;min-height:64px}
+#meiWat button span{font-size:22px;line-height:1}
 .inp.tiid{-webkit-appearance:none;appearance:none;display:block;width:140px;max-width:100%;min-width:0;box-sizing:border-box;height:46px;text-align:left}
 .inp.tiid::-webkit-date-and-time-value{text-align:left}
 .parts button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
@@ -486,13 +488,14 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 
     <section class="band o9" id="meiBand">
       <h2 class="disp">Gean in kear mei!</h2>
-      <p class="note" style="font-size:14px;color:var(--soft)">Wolsto in kear mei nei de sportskoalle, of gewoan in rûntsje kuierje foar de stappen? Kies wat en wannear, dan sjocht Stoker oft it past.</p>
+      <p class="note" style="font-size:14px;color:var(--soft)">Wolsto in kear mei nei de sportskoalle, te hurdrinnen, te mountainbiken of gewoan in rûntsje kuierje foar de stappen? Kies wat en wannear, dan sjocht Stoker oft it past.</p>
       <div class="box">
         <label for="meiNaam">Dyn foarnamme</label>
         <input class="inp inp-s" id="meiNaam" type="text" maxlength="30" placeholder="bv. Jan" autocomplete="given-name">
         <div class="hp" aria-hidden="true"><label for="meiWeb">Website</label><input id="meiWeb" type="text" tabindex="-1" autocomplete="off"></div>
         <span class="lbl" id="meiWatLbl">Wat dogge wy?</span>
-        <div class="parts two-up" id="meiWat" role="group" aria-labelledby="meiWatLbl"></div>
+        <div class="parts" id="meiWat" role="group" aria-labelledby="meiWatLbl"></div>
+        <div id="meiOarsBox" hidden style="display:grid;gap:6px"><label for="meiOars">Wat dan?</label><input class="inp inp-s" id="meiOars" type="text" maxlength="30" placeholder="bv. boksen" autocomplete="off"></div>
         <div class="daynav"><span class="lbl" id="meiDayLbl">Hokker dei?</span><span class="dn"><button type="button" id="meiPrev" aria-label="Eardere wiken">‹</button><span id="meiRange"></span><button type="button" id="meiNext" aria-label="Letter wiken">›</button></span></div>
         <div class="days" id="meiDays" role="group" aria-labelledby="meiDayLbl"></div>
         <span class="lbl" id="meiPartLbl">Wannear?</span>
@@ -1037,9 +1040,9 @@ function stokerFig(kwyt, total){
   const t=new Date(); t.setHours(0,0,0,0); const today=iso(t);
   const WEEKS=6, days=[...Array(WEEKS*7)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
   const PARTS=["moarns","middeis","jûns"];
-  const WAT={sporte:"Sporte",kuierje:"Rûntsje kuierje"};
-  const ICO={sporte:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>',
-    kuierje:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M11 21l2-6-2-3 1-4 3 3 3 1M9 12l-2 3M13 15l3 6"/></svg>'};
+  // wat dogge wy: kaai yn 'e database, emoji, namme
+  const WAT={sporte:["🏋️","Sportskoalle"],hurdrinne:["🏃","Hurdrinne"],mtb:["🚵","Mountainbike"],kuierje:["🚶","Kuierje"],padel:["🎾","Padel/tennis"],oars:["✨","Oars"]};
+  const watTekst=r=>{const w=WAT[r.wat]||WAT.sporte;return w[0]+" "+(r.wat==="oars"&&r.wat_oars?r.wat_oars:w[1])};
   let wat="sporte";
   const nice=s=>{const d=pd(s);return WD[d.getDay()]+" "+d.getDate()+" "+MS[d.getMonth()]};
   const norm=n=>String(n||"").trim().replace(/\s+/g," ");
@@ -1055,8 +1058,8 @@ function stokerFig(kwyt, total){
   };
   $("meiPrev").addEventListener("click",()=>{if(pg>0){pg--;drawDays()}});
   $("meiNext").addEventListener("click",()=>{if(pg<PAGES-1){pg++;drawDays()}});
-  $("meiWat").innerHTML=Object.keys(WAT).map(k=>'<button type="button" data-w="'+k+'" aria-pressed="'+(k===wat)+'">'+ICO[k]+WAT[k]+'</button>').join("");
-  $("meiWat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;wat=b.dataset.w;pick($("meiWat"),"w",wat)});
+  $("meiWat").innerHTML=Object.keys(WAT).map(k=>'<button type="button" data-w="'+k+'" aria-pressed="'+(k===wat)+'"><span aria-hidden="true">'+WAT[k][0]+'</span>'+WAT[k][1]+'</button>').join("");
+  $("meiWat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;wat=b.dataset.w;pick($("meiWat"),"w",wat);$("meiOarsBox").hidden=wat!=="oars";if(wat==="oars")$("meiOars").focus()});
   $("meiParts").innerHTML=PARTS.map(p=>'<button type="button" data-p="'+p+'" aria-pressed="false">'+p+'</button>').join("");
   const pick=(box,attr,val)=>box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val)));
   $("meiDays").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;day=b.dataset.d;pick($("meiDays"),"d",day)});
@@ -1068,7 +1071,7 @@ function stokerFig(kwyt, total){
   const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net"};
   const render=rows=>{
     const up=rows.filter(r=>r.datum>=today).slice(0,12);
-    $("meiList").innerHTML=up.length?'<span class="lbl">Wa giet der mei?</span><div class="offers" style="margin-top:8px">'+up.map(r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+(r.tiid?esc(String(r.tiid).slice(0,5)):esc(r.dagdiel))+(r.wat==='kuierje'?' · kuierje':'')+'</small></div><em>'+(ST[r.status]||"")+'</em></div>').join("")+'</div>':'<div class="empty" style="font-size:14px">Noch gjinien. Wa is de earste?</div>';
+    $("meiList").innerHTML=up.length?'<span class="lbl">Wa giet der mei?</span><div class="offers" style="margin-top:8px">'+up.map(r=>'<div class="offer '+esc(r.status)+'"><div><b>'+esc(norm(r.naam))+'</b><small>'+nice(r.datum)+' · '+(r.tiid?esc(String(r.tiid).slice(0,5)):esc(r.dagdiel))+' · '+esc(watTekst(r))+'</small></div><em>'+(ST[r.status]||"")+'</em></div>').join("")+'</div>':'<div class="empty" style="font-size:14px">Noch gjinien. Wa is de earste?</div>';
     const cnt={}; rows.filter(r=>r.status==="ja"&&r.datum<today).forEach(r=>{const k=norm(r.naam).toLowerCase();cnt[k]=cnt[k]||{n:norm(r.naam),c:0};cnt[k].c++});
     const top=Object.values(cnt).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n)).slice(0,5);
     $("meiBoard").innerHTML=top.length?'<div class="box"><span class="lbl">Sportmaatsjes</span><div class="board">'+top.map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+x.c+'× mei west</span></div>').join("")+'</div></div>':'';
@@ -1086,17 +1089,19 @@ function stokerFig(kwyt, total){
     if(!naam){say("Fier earst dyn foarnamme yn.");$("meiNaam").focus();return}
     if(!day){say("Kies in dei.");return}
     if(!part){say("Kies moarns, middeis of jûns.");return}
+    const oars=norm($("meiOars").value).slice(0,30);
+    if(wat==="oars"&&!oars){say("Fier yn wat jim dogge.");$("meiOars").focus();return}
     const ok="Ferstjoerd! Stoker lit hjir witte oft it past.";
     if($("meiWeb").value||Date.now()-t0<3000||!typed){say(ok);return}
     busy=true; $("meiSend").disabled=true; say("Even ferstjoere...");
     const post=body=>fetch(SB,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(body)});
     // as de kolom 'wat' der (noch) net is, stjoer it dan sûnder
-    const tiid=$("meiTiid").value||null, full={naam:naam,datum:day,dagdiel:part,wat:wat}; if(tiid)full.tiid=tiid;
+    const tiid=$("meiTiid").value||null, full={naam:naam,datum:day,dagdiel:part,wat:wat}; if(tiid)full.tiid=tiid; if(wat==="oars")full.wat_oars=oars;
     post(full).then(r=>r.status===400?r.clone().json().then(j=>/column/.test(j.message||"")?post({naam:naam,datum:day,dagdiel:part}):r).catch(()=>r):r)
       .then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
         try{localStorage.setItem("stoker-namme",naam)}catch(e){}
         say(ok); load();})
-      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende seis wiken.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende seis wiken.":/oars_leech/.test(e.message)?"Fier yn wat jim dogge.":/wat_check/.test(e.message)?"Dy sport kin noch net. Kies in oare.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
       .finally(()=>{busy=false;$("meiSend").disabled=false});
   });
 })();

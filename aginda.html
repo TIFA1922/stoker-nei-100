@@ -33,13 +33,14 @@ a.terug{color:var(--accent)}
 <script>
 (()=>{
   const q=new URLSearchParams(location.search), el=document.getElementById("ynhald");
-  const d=q.get("d")||"", t=q.get("t")||"", w=q.get("w")==="kuierje"?"kuierje":"sporte", p=q.get("p")||"";
+  const WAT={sporte:["🏋️","Sportskoalle"],hurdrinne:["🏃","Hurdrinne"],mtb:["🚵","Mountainbike"],kuierje:["🚶","Rûntsje kuierje"],padel:["🎾","Padel / tennis"],oars:["✨","Sporte"]};
+  const d=q.get("d")||"", t=q.get("t")||"", w=WAT[q.get("w")]?q.get("w"):"sporte", p=q.get("p")||"", o=(q.get("o")||"").replace(/\s+/g," ").trim().slice(0,30);
   const ok=/^\d{4}-\d{2}-\d{2}$/.test(d)&&/^\d{2}:\d{2}$/.test(t);
   if(!ok){el.innerHTML='<div class="kaart"><b>Dizze link docht it net</b><span>Freegje Stoker om in nije.</span></div><a class="terug" href="https://stokernei100.nl/">Nei Stoker nei 100</a>';return}
   const FWD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], FM=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
   const [y,m,dd]=d.split("-").map(Number), [h,mi]=t.split(":").map(Number);
   const start=new Date(y,m-1,dd,h,mi), end=new Date(start.getTime()+60*60*1000);
-  const titel=w==="kuierje"?"Rûntsje kuierje mei Stoker":"Sporte mei Stoker";
+  const titel=(w==="oars"&&o?o:WAT[w][1])+" mei Stoker";
   const skatting=["moarns","middeis","jûns"].includes(p);
   const oms="Ôfpraat fia stokernei100.nl"+(skatting?" (tiid is in skatting: "+p+")":"");
   const pad=n=>String(n).padStart(2,"0");
@@ -47,7 +48,7 @@ a.terug{color:var(--accent)}
   const utc=x=>x.toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
   // kaartsje
   const k=document.createElement("div"); k.className="kaart";
-  const b=document.createElement("b"); b.textContent=titel+(w==="kuierje"?" 👟":" 💪");
+  const b=document.createElement("b"); b.textContent=titel+" "+WAT[w][0];
   const s=document.createElement("span"); s.textContent=FWD[start.getDay()]+" "+dd+" "+FM[m-1]+" · "+t+(skatting?" (sa'n "+p+")":"");
   k.append(b,s);
   if(skatting){const sm=document.createElement("small"); sm.textContent="De krekte tiid sprekke jim noch ôf. Pas him oan yn dyn aginda as it nedich is."; k.append(sm)}
@@ -60,7 +61,7 @@ a.terug{color:var(--accent)}
   const CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>';
   const knop=(href,tekst,cls,dl)=>{const a=document.createElement("a");a.className="btn"+(cls?" "+cls:"");a.href=href;a.innerHTML=CAL;a.append(tekst);if(dl)a.download=dl;else if(cls!=="hoofd"){a.target="_blank";a.rel="noopener"}return a};
   // echte .ics fan 'e server (Supabase-funksje aginda): dat iepenet de iPhone direkt yn Aginda
-  const blob="https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/rpc/aginda?d="+d+"&t="+encodeURIComponent(t)+"&w="+w+(skatting?"&p="+encodeURIComponent(p):"")+"&apikey=sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
+  const blob="https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/rpc/aginda?d="+d+"&t="+encodeURIComponent(t)+"&w="+w+(w==="oars"&&o?"&o="+encodeURIComponent(o):"")+(skatting?"&p="+encodeURIComponent(p):"")+"&apikey=sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h";
   const google="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(titel)+"&dates="+lok(start)+"/"+lok(end)+"&details="+encodeURIComponent(oms);
   const outlook="https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&subject="+encodeURIComponent(titel)+"&startdt="+d+"T"+t+":00&enddt="+lok(end).replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2}).*/,"$1-$2-$3T$4:$5")+":00&body="+encodeURIComponent(oms);
   el.append(knop(blob,"Tafoegje oan aginda","hoofd"), knop(google,"Google Aginda"), knop(outlook,"Outlook"));
