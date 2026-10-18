@@ -851,6 +851,13 @@ function stokerFig(kwyt, total){
     c.classList.add("cake-tap");
     c.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();pop(c,"Ho! Dy is foar 18 april! 🎂")});
   });
+  // 6. it pilske fan 'e bouwfak: elke tik in oare tekst
+  const BQ=["Ho! Dat pilske is foar de bouwfak! 🍺","Earst de kilo's, dan it bier.","Proost! …mar pas op 24 july. 🍻","Allinne it skom mei al. Neat dus.","Dit glês wurdt hieltyd koeler. Noch even wachtsje!"];
+  let bi=0;
+  document.querySelectorAll('#goals svg[aria-label="Bouwfak"]').forEach(c=>{
+    c.classList.add("cake-tap");
+    c.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();pop(c,BQ[bi++%BQ.length])});
+  });
 })();
 
 // ===== mini-kop by it skowen, mei in sportsjend poppe =====
