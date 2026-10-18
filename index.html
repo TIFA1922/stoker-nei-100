@@ -390,7 +390,10 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 .klas .kfire{font-size:13px;font-weight:600;color:#ff7a2f;white-space:nowrap}
 .kfol{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;min-height:50px;border-radius:8px;background:var(--accent);color:#06261e;font:600 16px var(--f-body);text-decoration:none}
 .kfol svg{width:20px;height:20px}
-.kmei{display:block;text-align:center;margin-top:10px;color:var(--accent);font-weight:600;font-size:15px;text-decoration:none}
+.kmei{display:block;width:100%;background:none;border:0;text-align:center;margin-top:10px;padding:8px;color:var(--accent);font:600 15px var(--f-body);cursor:pointer}
+.kmei span,.kfol span{display:inline-block;transition:transform .2s}
+[aria-expanded="true"] > span{transform:rotate(180deg)}
+.kmeiform{margin-top:10px;display:grid;gap:8px}
 </style></head><body style="margin:0">
 
 <div class="page">
@@ -491,7 +494,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
     <section class="band o14" id="kompetysje" hidden>
       <h2 class="disp">Kompetysje<button type="button" class="kinfo" id="kInfoBtn" aria-expanded="false" aria-controls="kInfo" aria-label="Spulregels en prizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg></button></h2>
       <div class="kinfobox" id="kInfo" hidden>
-        <p class="kregels">Weegje wannear't it dy útkomt: dyn earste weging is de start, de lêste telt. Trainingen en stappen stean derby, mar telle net mei foar it plak. Ek meidwaan? <a href="meidwaan" style="color:var(--accent)">Meld dy hjir oan</a>.</p>
+        <p class="kregels">Weegje wannear't it dy útkomt: dyn earste weging is de start, de lêste telt. Trainingen en stappen stean derby, mar telle net mei foar it plak. Ek meidwaan? Meld dy oan ûnder it klassemint.</p>
         <p class="kregels">🔥 = dagen op rige aktyf (sporte of 10.000 stappen) · 🏅 = tal medaljes</p>
         <p class="kregels" id="kPrizen">👟 <b>Gouden skoen</b>: de measte dagen 10.000 stappen dizze moanne. 🏮 <b>Reade lantearne</b>: wa't ûnderoan stiet. Gjin skande, wol in reden om te rinnen!</p>
       </div>
@@ -499,7 +502,19 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
       <div id="kWin"></div>
       <ol class="klas" id="kLijst"></ol>
       <a class="kfol" href="ynfolle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Dochst mei? Fol hjir dyn wike yn</a>
-      <a class="kmei" href="meidwaan">Ek meidwaan? Meld dy oan →</a>
+      <button type="button" class="kmei" id="kMeiBtn" aria-expanded="false" aria-controls="kMeiForm">Ek meidwaan? Meld dy oan <span aria-hidden="true">▾</span></button>
+      <form class="box kmeiform" id="kMeiForm" hidden autocomplete="on" novalidate>
+        <p class="note" style="font-size:14px;color:var(--soft);margin:0">Alles yn prosinten fan dyn eigen start, dyn kilo's sjocht nimmen. Stoker stjoert dy in persoanlike link fia WhatsApp.</p>
+        <label for="kmNamme">Dyn foarnamme</label>
+        <input class="inp inp-s" id="kmNamme" maxlength="30" autocomplete="given-name" placeholder="bv. Jan">
+        <label for="kmTel">Telefoannûmer <span style="text-transform:none;letter-spacing:0">(foar de útnoeging)</span></label>
+        <input class="inp inp-s" id="kmTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78">
+        <label for="kmBer">Berjochtsje <span style="text-transform:none;letter-spacing:0">(hoecht net)</span></label>
+        <input class="inp inp-s" id="kmBer" maxlength="200" autocomplete="off" placeholder="bv. Ik wol ek nei de 10.000 stappen!">
+        <div class="hp" aria-hidden="true"><label for="kmWeb">Website</label><input id="kmWeb" type="text" tabindex="-1" autocomplete="off"></div>
+        <button type="submit" class="btn" id="kmStjoer">Ik doch mei!</button>
+        <p class="ok-line" id="kmMsg" hidden></p>
+      </form>
 
 
     </section>
@@ -1222,7 +1237,7 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
       $("kLijst").innerHTML=""; $("kWin").innerHTML="";
       $("kLijst").insertAdjacentHTML("beforebegin",'<div class="empty" id="kLeech" style="font-size:15px">Noch gjin meidwaners. Doch as earste mei en strij tsjin Stoker!</div>');
       document.querySelector("#kompetysje .kfol").hidden=true;
-      const km=document.querySelector("#kompetysje .kmei"); km.className="kfol"; km.textContent="Doch mei! Meld dy hjir oan";
+      const km=$("kMeiBtn"); km.className="kfol"; km.innerHTML='Doch mei! Meld dy hjir oan <span aria-hidden="true">▾</span>';
       $("kInfoBtn").addEventListener("click",()=>{const o=$("kInfo").hidden;$("kInfo").hidden=!o;$("kInfoBtn").setAttribute("aria-expanded",String(o))});
       $("kompetysje").hidden=false; return; }
     const mx=Math.max(10,...k.rows.map(x=>x.pct||0));
@@ -1241,6 +1256,27 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
     $("kompetysje").hidden=false;
     if(location.hash==="#kompetysje") setTimeout(()=>$("kompetysje").scrollIntoView(),50);
   }).catch(()=>{});
+})();
+// kompetysje: oanmelde op dizze side
+(()=>{
+  const btn=$("kMeiBtn"), f=$("kMeiForm"); if(!btn||!f) return; const t0=Date.now();
+  btn.addEventListener("click",()=>{const o=f.hidden;f.hidden=!o;btn.setAttribute("aria-expanded",String(o));if(o)setTimeout(()=>$("kmNamme").focus(),50)});
+  const FOUT={ferkearde_namme:"Fier dyn foarnamme yn.","ferkeard_nûmer":"Dat telefoannûmer klopt net.",te_hurd:"It is no even te drok. Besykje it letter nochris.",al_oanmeld:"Do bist hjoed al oanmeld. Stoker komt der oan!",te_folle:"Der steane al in protte oanmeldingen klear. Besykje it letter nochris."};
+  f.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const say=m=>{$("kmMsg").hidden=!m;$("kmMsg").textContent=m||""};
+    const n=$("kmNamme").value.trim().replace(/\s+/g," "), tel=$("kmTel").value.trim(), b=$("kmBer").value.trim();
+    if(!n){say(FOUT.ferkearde_namme);$("kmNamme").focus();return}
+    if(tel&&!/^\+?[0-9 ()-]{8,20}$/.test(tel)){say(FOUT["ferkeard_nûmer"]);$("kmTel").focus();return}
+    const klear=()=>{f.innerHTML='<b style="font-size:17px">Top, do bist oanmeld! 🎉</b><span style="color:var(--soft)">Stoker stjoert dy gau in link fia WhatsApp. Oant dan: rin alfêst in rûntsje!</span>';btn.hidden=true};
+    if($("kmWeb").value||Date.now()-t0<3000){klear();return}
+    say("Even ferstjoere..."); $("kmStjoer").disabled=true;
+    try{
+      const r=await fetch("https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/rpc/dn_oanmelde",{method:"POST",headers:{apikey:"sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h","Content-Type":"application/json"},body:JSON.stringify({namme:n,telefoan:tel||null,berjocht:b||null})});
+      if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
+      klear();
+    }catch(err){ say(FOUT[err.message]||"Dat slagge net. Besykje it oer even nochris."); $("kmStjoer").disabled=false; }
+  });
 })();
 // geheime doar: fiif kear flugge tikke op de fuottekst iepenet it beheer
 (()=>{let n=0,t=0;$("foot").addEventListener("click",()=>{const now=Date.now();n=now-t<800?n+1:1;t=now;if(n>=5){n=0;location.href="https://stokernei100.nl/admin.html"}})})();
