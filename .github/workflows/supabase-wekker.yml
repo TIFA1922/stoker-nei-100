@@ -1,0 +1,23 @@
+# Hâldt it fergese Supabase-projekt wekker: elke dei ien lytse lêsfraach.
+# Brûkt allinne de publike (publishable) kaai, dy't ek yn 'e side stiet.
+name: Supabase wekker
+
+on:
+  schedule:
+    - cron: "17 5 * * *"   # elke dei om 05:17 UTC
+  workflow_dispatch:        # ek mei de hân te starten
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lyts fraachje oan Supabase
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://cupcyeurvttyetfrhuoi.supabase.co/rest/v1/gokken?select=id&limit=1" \
+            -H "apikey: sb_publishable_piOI9XYSPxKDYEhVl6rYag_lSCzmy3h")
+          echo "Supabase antwurde mei $code"
+          test "$code" = "200"
