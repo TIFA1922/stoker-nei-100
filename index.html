@@ -291,6 +291,16 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 @media (prefers-reduced-motion:reduce){.minikop svg.sport{animation:none}}
 .minikop b{font-family:var(--f-display);font-weight:400;font-size:20px;text-transform:uppercase;letter-spacing:.01em}
 .minikop em{margin-left:auto;font-style:normal;font-family:var(--f-display);font-size:22px;color:var(--accent)}
+
+/* telefoan: meidwaan heger, ekstra's leger */
+.o8{order:4}.o9{order:5}.o4{order:6}.o5{order:7}.o7{order:8}.o11{order:9}.o6{order:10}.o10{order:11}
+/* ynklapbere blokken */
+.klap>h2.disp{cursor:pointer;user-select:none}
+.klap>h2.disp::after{content:"";margin-left:auto;width:10px;height:10px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .2s}
+.klap[data-iepen="1"]>h2.disp::after{transform:rotate(-135deg) translateY(-3px)}
+.klap:not([data-iepen="1"])>:not(h2){display:none!important}
+.klap:not([data-iepen="1"]){padding-top:20px;padding-bottom:20px}
+.klap .ticht{font-family:var(--f-body);font-size:13px;color:var(--muted);text-transform:none;font-weight:400;letter-spacing:0;margin-left:4px}
 </style>
 </head>
 <body style="margin:0">
@@ -829,6 +839,19 @@ function stokerFig(kwyt, total){
   fig.addEventListener("animationend",()=>fig.classList.remove("sport"));
   setInterval(sport,9000); setTimeout(sport,1500);
   new IntersectionObserver(([e])=>mk.classList.toggle("on",!e.isIntersecting),{threshold:0,rootMargin:"-60px 0px 0px 0px"}).observe(document.querySelector("section.o1"));
+})();
+// ynklapbere blokken: alle wiken en wat as
+(()=>{
+  document.querySelectorAll("h2.disp").forEach(h=>{
+    const n=h.textContent.trim().toLowerCase();
+    if(n==="alle wiken"||n==="wat as...?"){
+      const sec=h.closest("section"); sec.classList.add("klap");
+      h.setAttribute("role","button"); h.tabIndex=0; h.setAttribute("aria-expanded","false");
+      h.insertAdjacentHTML("beforeend",'<span class="ticht">tik om te iepenjen</span>');
+      const flip=()=>{const o=sec.dataset.iepen==="1"; sec.dataset.iepen=o?"0":"1"; h.setAttribute("aria-expanded",String(!o)); h.querySelector(".ticht").textContent=o?"tik om te iepenjen":"";};
+      h.addEventListener("click",flip); h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}});
+    }
+  });
 })();
 // stoker stookt de kilo's op
 (()=>{
