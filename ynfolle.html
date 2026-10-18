@@ -208,7 +208,8 @@ function teken(){
   $("mySide").href="side.html?n="+encodeURIComponent(MY.slug);
   // gewicht
   const wo=pd(MY.woansdei), al=MY.wegingen.find(w=>w[0]===MY.woansdei);
-  $("kgLbl").textContent="Gewicht fan "+(MY.woansdei===MY.hjoed?"hjoed (woansdei)":FWD[wo.getDay()]+" "+wo.getDate()+" "+FM[wo.getMonth()]);
+  const isStart=!MY.wegingen.length||(MY.wegingen.length===1&&MY.wegingen[0][0]===MY.woansdei);
+  $("kgLbl").textContent=(isStart?"Startgewicht · ":"Gewicht fan ")+(MY.woansdei===MY.hjoed?"hjoed (woansdei)":FWD[wo.getDay()]+" "+wo.getDate()+" "+FM[wo.getMonth()]);
   if(al && document.activeElement!==$("kg")) $("kg").value=nl(al[1]);
   $("kgBtn").textContent=al?"Feroarje":"Bewarje";
   // dagen: lêste 10
