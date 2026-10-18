@@ -314,6 +314,13 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 .stapdoel{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.06em}
 .stapbalken small{font-size:11px;color:var(--muted);text-transform:uppercase}
 .stapbalken b{font-size:11px;font-weight:600;color:var(--soft);white-space:nowrap}
+/* halter: om de safolle tiid in pear herhellingen */
+.stoker-fig .curl,.stoker-fig .druk{transform-box:view-box}
+.stoker-fig .curl{animation:curl 7s ease-in-out infinite}
+.stoker-fig .druk{animation:druk 7s ease-in-out infinite}
+@keyframes curl{0%,55%,100%{transform:rotate(0)}62%{transform:rotate(105deg)}70%{transform:rotate(0)}77%{transform:rotate(105deg)}85%{transform:rotate(0)}}
+@keyframes druk{0%,55%,100%{transform:rotate(0)}62%{transform:rotate(-16deg)}70%{transform:rotate(0)}77%{transform:rotate(-16deg)}85%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.stoker-fig .curl,.stoker-fig .druk{animation:none}}
 </style></head><body style="margin:0">
 
 <div class="page">
@@ -722,19 +729,23 @@ function stokerFig(kwyt, total){
   const limb=(x1,y1,x2,y2,w)=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+skinD+'" stroke-width="'+(w+2.4)+'" stroke-linecap="round"/><line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+skin+'" stroke-width="'+w+'" stroke-linecap="round"/>';
   const bump=(x,y,rx,ry)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="'+skin+'" stroke="'+skinD+'" stroke-width="1.2"/>';
   const sleeve=(x,y)=>'<circle cx="'+x+'" cy="'+y+'" r="'+(aw/2+3.5)+'" '+A+'/>';
-  const hands=[];
+  // halter: stang mei twa gewichten, draait mei de hân mei
+  const halter=(x,y,sc)=>'<g transform="translate('+x+' '+y+') scale('+sc+')"><rect x="-14" y="-2" width="28" height="4" fill="#9a9a9a"/><rect x="-18" y="-9" width="7" height="18" rx="2" fill="#555" stroke="#777"/><rect x="11" y="-9" width="7" height="18" rx="2" fill="#555" stroke="#777"/></g>';
+  const fist=(x,y,r)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+skin+'" stroke="'+skinD+'" stroke-width="1.2"/>';
   const arm=(side)=>{
     const sx=cx+side*(sw-1), sy=top+8;
     if(goal){
       const ex=sx+side*24, ey=sy;
-      hands.push([ex+side*2,ey-26]);return limb(sx,sy,ex,ey,aw)+bump(sx+side*13,sy-4,bic+2,bic)+limb(ex,ey,ex+side*2,ey-22,aw-1)+'<circle cx="'+(ex+side*2)+'" cy="'+(ey-26)+'" r="'+(aw/2+2)+'" fill="'+skin+'" stroke="'+skinD+'" stroke-width="1.2"/>'+sleeve(sx,sy);
+      const fa=limb(ex,ey,ex+side*2,ey-22,aw-1), hx=ex+side*2, hy=ey-26;
+      const voor=side>0?'<g class="druk" style="transform-origin:'+ex+'px '+ey+'px">'+fa+halter(hx-5,hy,0.85)+fist(hx,hy,aw/2+2)+'</g>':fa+fist(hx,hy,aw/2+2);
+      return limb(sx,sy,ex,ey,aw)+bump(sx+side*13,sy-4,bic+2,bic)+voor+sleeve(sx,sy);
     }
     const out=bulge*0.55, ang=(10+8*k)*side, rad=ang*Math.PI/180, len=34;
     const bx=sx+side*out*0.5, ex=bx+Math.sin(rad)*len, ey=sy+Math.cos(rad)*len;
-    let r=limb(sx,sy,bx,sy+6,aw)+limb(bx,sy+6,ex,ey,aw);
+    let r=limb(sx,sy,bx,sy+6,aw);
     if(m>0.12) r+=bump(bx+Math.sin(rad)*8+side*1.5,sy+12,bic*0.75,bic*1.05);
-    hands.push([ex+Math.sin(rad)*3,ey+3]);
-    r+='<circle cx="'+(ex+Math.sin(rad)*3)+'" cy="'+(ey+3)+'" r="'+(aw/2+1.2)+'" fill="'+skin+'" stroke="'+skinD+'" stroke-width="1.2"/>';
+    const hx=ex+Math.sin(rad)*3, hy=ey+3, fa=limb(bx,sy+6,ex,ey,aw);
+    r+= side>0 ? '<g class="curl" style="transform-origin:'+bx+'px '+(sy+6)+'px">'+fa+halter(hx,hy,1)+fist(hx,hy,aw/2+1.2)+'</g>' : fa+fist(hx,hy,aw/2+1.2);
     return r+sleeve(sx,sy);
   };
   // romp: fan pear-foarm nei V-foarm
@@ -773,9 +784,6 @@ function stokerFig(kwyt, total){
             : '<path d="M'+(cx-6)+' '+(ey+10)+' q6 '+(3+3*m)+' 12 0" stroke="'+dark+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
   s+='<path class="drip" d="M'+(cx+hr+1)+' '+(top-40)+' q4.5 7 0 11.5 q-4.5 -4.5 0 -11.5z" fill="#7fd0ff"/>';
   if(goal) s+='<path d="M'+(cx-hr-12)+' '+(top-50)+' l3 -6 l3 6 l-3 -2z M'+(cx+hr+8)+' '+(top-54)+' l3 -6 l3 6 l-3 -2z" fill="#ffd23f"/>';
-  // halter yn 'e rjochterhân (by it doel boppe de holle)
-  {const [x,y]=hands[1], hx=goal?x-5:x, sc=goal?0.85:1;
-   s+='<g transform="translate('+hx+' '+y+') scale('+sc+')"><rect x="-14" y="-2" width="28" height="4" fill="#9a9a9a"/><rect x="-18" y="-9" width="7" height="18" rx="2" fill="#555" stroke="#777"/><rect x="11" y="-9" width="7" height="18" rx="2" fill="#555" stroke="#777"/></g><circle cx="'+x+'" cy="'+y+'" r="'+(aw/2+1.2)+'" fill="'+skin+'" stroke="'+skinD+'" stroke-width="1.2"/>';}
   return s+'</svg>';
 }
 
