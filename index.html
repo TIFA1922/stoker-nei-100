@@ -201,9 +201,6 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 #fire p{margin:0;color:#ffe2cc}
 @keyframes flikker{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.08) translateY(-4px)}}
 @media (prefers-reduced-motion:reduce){#fire svg{animation:none}}
-.swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.swatches span{font-size:12px;color:var(--muted);margin-right:2px}
-.sw{width:32px;height:32px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 3px var(--bg)}
 .sw[aria-pressed="true"]{border-color:var(--fg)}
 .sw:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 #foot{margin:0}
@@ -518,7 +515,6 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
   </section>
 
   <footer class="o13">
-    <div class="swatches" id="swatches" role="group" aria-label="Kies in kleur"><span>Kleur:</span></div>
     <p id="foot">Elke woansdei in update.</p>
     <p class="adm"><a href="https://claude.ai/artifact/1cRW4mzEtXCnVUmmKsqRBK" rel="nofollow noopener" target="_blank" aria-label="Tracker" title="Tracker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11l2 2 4-4M9 17h6"/></svg></a><a href="https://stokernei100.nl/admin.html" rel="nofollow" aria-label="Beheer" title="Beheer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></a></p>
   </footer>
@@ -1138,12 +1134,6 @@ function stokerFig(kwyt, total){
 })();
 
 // kleurkeuze (bewarre yn dizze browser)
-const COLS=[["Mint","#3ef0c0"],["Stoker-oranje","#ff7a2f"],["Goud","#ffd23f"],["Fries blau","#4da3ff"],["Pompeblêd-read","#ff4d5a"],["Lime","#b6f03e"]];
-let saved=null; try{saved=localStorage.getItem("stoker-kleur")}catch(e){}
-const setCol=c=>{document.documentElement.style.setProperty("--accent",c);document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed",b.dataset.c===c?"true":"false"))};
-$("swatches").insertAdjacentHTML("beforeend",COLS.map(([n,c])=>'<button type="button" class="sw" data-c="'+c+'" style="background:'+c+'" aria-label="'+n+'" title="'+n+'" aria-pressed="false"></button>').join(""));
-setCol(COLS.some(x=>x[1]===saved)?saved:COLS[0][1]);
-$("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;setCol(b.dataset.c);try{localStorage.setItem("stoker-kleur",b.dataset.c)}catch(x){}});
 
 $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in update.":"De earste update komt op woansdei 21 oktober.";
 // kompetysje: klassemint (allinne as der oare dielnimmers binne)
