@@ -122,7 +122,6 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
     <section style="display:grid;gap:10px">
       <h2>Myn wegingen</h2>
       <div class="box" id="wegingen" style="gap:0"></div>
-      <div class="rij" style="align-items:flex-start;flex-direction:column"><span style="font-size:15px;color:var(--soft)">Myn kleur</span><div class="kleuren" id="myKleur" role="group" aria-label="Myn kleur"></div></div>
       <div class="box" style="gap:10px">
         <div class="rij"><span style="font-size:15px;color:var(--soft)">Myn doel</span>
           <div class="seg" role="group" aria-label="Soarte doel"><button type="button" id="dsPct" aria-pressed="true">Prosint</button><button type="button" id="dsKg" aria-pressed="false">Doelgewicht</button></div></div>
@@ -132,6 +131,11 @@ select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-
         <p style="margin:0;font-size:13px;color:var(--muted)" id="doelInfo"></p>
         <p class="msg" id="doelMsg" hidden></p>
       </div>
+    </section>
+
+    <section style="display:grid;gap:10px">
+      <h2>Myn kleur</h2>
+      <div class="kleuren" id="myKleur" role="group" aria-label="Myn kleur"></div>
     </section>
 
     <div class="links">
