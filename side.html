@@ -123,7 +123,8 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
     document.title=r.namme+" · Stoker nei 100";
     $("namme").textContent=r.namme; $("av").textContent=r.namme[0].toUpperCase();
     const mei=k.rows.filter(x=>x.pct!=null), plak=mei.findIndex(x=>x.slug===sl)+1;
-    $("meta").textContent=r.start?("Docht mei sûnt "+pd(r.start).getDate()+" "+FL[pd(r.start).getMonth()]+(plak?" · plak "+plak+" fan "+mei.length:"")):"Begjint by de earste weging";
+    const prizen=(r.skoen?" · 👟 gouden skoen":"")+(r.lantearne?" · 🏮 reade lantearne":"");
+    $("meta").textContent=(r.start?("Docht mei sûnt "+pd(r.start).getDate()+" "+FL[pd(r.start).getMonth()]+(plak?" · plak "+plak+" fan "+mei.length:"")):"Begjint by de earste weging")+prizen;
     const p=r.pct||0; $("pct").textContent=(r.pct==null?"0":(p<0?"+":"")+nl(Math.abs(p)))+"%";
     $("balk").style.width=Math.max(0,Math.min(100,p/r.doel*100))+"%"; $("doel").textContent="doel: "+nl(r.doel,r.doel%1?1:0)+"% kwyt";
     $("tT").textContent=r.trainingen; $("tS").textContent=r.stappen; $("tW").textContent=r.wiken.length;

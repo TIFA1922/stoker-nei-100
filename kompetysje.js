@@ -36,6 +36,12 @@
     const wk=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Amsterdam"})); wk.setHours(0,0,0,0); wk.setDate(wk.getDate()-6);
     const grins=wk.getFullYear()+"-"+String(wk.getMonth()+1).padStart(2,"0")+"-"+String(wk.getDate()).padStart(2,"0");
     rows.forEach(x=>{ if(x.wikedei&&x.wikedei>=grins&&x.wike!=null&&x.wike>0&&(!winer||x.wike>winer.wike)) winer=x; });
+    // reade lantearne 🏮: de lêste fan it klassemint (by minimaal 3 meidwaners)
+    const mei=rows.filter(x=>x.pct!=null); if(mei.length>=3) mei[mei.length-1].lantearne=true;
+    // gouden skoen 👟: de measte dagen 10.000 stappen dizze moanne
+    const mnd=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Amsterdam"})), mk=mnd.getFullYear()+"-"+String(mnd.getMonth()+1).padStart(2,"0");
+    rows.forEach(x=>{x.stapMoanne=(x.dagen||[]).filter(d=>d[2]&&String(d[0]).slice(0,7)===mk).length});
+    const mx=Math.max(0,...rows.map(x=>x.stapMoanne)); if(mx>0) rows.forEach(x=>{if(x.stapMoanne===mx) x.skoen=true});
     return {rows, winer, woansdei:wo, oaren:(o||[]).length};
   }
   // ---- motivaasje: medaljes en reeks (allinne prosinten en aktiviteit, nea kilo's) ----
