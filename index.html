@@ -977,7 +977,10 @@ function stokerFig(kwyt, total){
     const t=new Date(); t.setHours(0,0,0,0); const hj=iso(t);
     const keys=[...sport,...Object.keys(stap),"2026-10-21"].sort();
     const b=new Date(keys[0]+"T00:00:00"); b.setDate(1);
-    moannen=[]; for(let d=new Date(b); d<=t || (d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()); d.setMonth(d.getMonth()+1)) moannen.push(new Date(d));
+    // fan de earste moanne oant trije moannen foarút
+    const ein=new Date(t.getFullYear(),t.getMonth()+3,1);
+    moannen=[]; for(let d=new Date(b); d<=ein; d.setMonth(d.getMonth()+1)) moannen.push(new Date(d));
+    const nu=moannen.findIndex(m=>m.getFullYear()===t.getFullYear()&&m.getMonth()===t.getMonth());
     // tellers oer alles
     let nS=0,nT=0,run=0,best=0;
     for(let d=new Date(keys[0]+"T00:00:00"); d<=t; d.setDate(d.getDate()+1)){const k=iso(d),sp=sport.has(k),st=(stap[k]||0)>=10000; if(sp)nS++; if(st)nT++; if(sp||st){run++;best=Math.max(best,run)}else if(k!==hj)run=0;}
@@ -990,7 +993,7 @@ function stokerFig(kwyt, total){
         h+='<i class="'+(fut?"tak":l?"l"+l:"")+(k===hj?" hj":"")+'" title="'+dd+" "+ML[m.getMonth()]+(sp?" · sporte":"")+(stap[k]!=null?" · "+stap[k].toLocaleString("nl-NL")+" stappen":"")+'">'+dd+(sp?'<small>💪</small>':'')+'</i>';}
       return h+'</div></div>'}).join("");
     $("kalSlider").setAttribute("aria-label","Kalinder: "+nS+" dagen sporte, "+nT+" dagen 10.000 stappen, langste rige "+best+" dagen");
-    if(mI<0||mI>=moannen.length) mI=moannen.length-1;
+    if(mI<0||mI>=moannen.length) mI=Math.max(0,nu);
     ga(mI,false);
   };
   const kop=()=>{const m=moannen[mI];$("kalKop").innerHTML=ML[m.getMonth()]+'<small>'+m.getFullYear()+'</small>';$("kalPrev").disabled=mI===0;$("kalNext").disabled=mI>=moannen.length-1};
