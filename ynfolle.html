@@ -226,7 +226,7 @@ function teken(){
   $("myAv").textContent=MY.namme[0].toUpperCase(); $("myNamme").textContent="Hoi "+MY.namme+"!";
   const p=pct(); $("myPct").innerHTML=(p==null?"–":(p>0?"−":p<0?"+":"")+nl(Math.abs(p))+"%")+"<small>kwyt</small>";
   if(!plak) $("myPlak").textContent=MY.wegingen.length?"":"Fol dyn earste gewicht yn om te begjinnen";
-  $("mySide").href="side.html?n="+encodeURIComponent(MY.slug);
+  $("mySide").href="/"+encodeURIComponent(MY.slug); $("mySide").textContent="Myn side: stokernei100.nl/"+MY.slug;
   // gewicht
   // datum fan 'e weging: hjoed of in dei fan de lêste wike
   const hj0=pd(MY.hjoed), keuze=$("kgDei").value||MY.hjoed;

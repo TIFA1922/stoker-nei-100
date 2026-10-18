@@ -76,6 +76,9 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
 .kop{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .kop a.fol{background:var(--accent);border-color:var(--accent);color:#06261e}
 .kop a.fol svg{color:#06261e}
+.koart{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:var(--muted)}
+.koart b{color:var(--fg);font-weight:600;overflow-wrap:anywhere}
+.koart button{margin-left:auto;flex:none;min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:18px;background:var(--band);color:var(--fg);font:600 14px var(--f-body);cursor:pointer}
 .terug{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;min-height:50px;border-radius:8px;background:var(--accent);color:#06261e;font:600 16px var(--f-body);text-decoration:none}
 .terug svg{width:18px;height:18px}
 </style>
@@ -86,6 +89,7 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
   <div id="laden" class="empty" style="margin-top:20px">Even laden…</div>
   <div id="side" hidden>
     <div class="held"><div><h1 id="namme"></h1><p class="meta" id="meta"></p></div><div class="av" id="av"></div></div>
+    <div class="koart"><span>Koarte link:</span><b id="koartLink"></b><button type="button" id="koartBtn">Diel</button></div>
     <div class="grut"><b id="pct">0%</b><span>kwyt sûnt<br>de start</span></div>
     <div class="bar"><i id="balk" style="width:0"></i></div>
     <div class="ends"><span>start</span><span id="doel"></span></div>
@@ -122,6 +126,10 @@ h2::before{content:"";width:5px;height:24px;border-radius:3px;background:var(--c
     if(!r){ $("laden").textContent="Dizze dielnimmer bestiet net (mear)."; return; }
     document.documentElement.style.setProperty("--c",r.kleur);
     document.title=r.namme+" · Stoker nei 100";
+    const kl="stokernei100.nl/"+r.slug; $("koartLink").textContent=kl;
+    $("koartBtn").addEventListener("click",async()=>{const u="https://"+kl;
+      if(navigator.share){try{await navigator.share({title:r.namme+" · Stoker nei 100",url:u});return}catch(e){if(e&&e.name==="AbortError")return}}
+      try{await navigator.clipboard.writeText(u);$("koartBtn").textContent="Kopiearre ✓";setTimeout(()=>$("koartBtn").textContent="Diel",2000)}catch(e){}});
     $("namme").textContent=r.namme; $("av").textContent=r.namme[0].toUpperCase();
     const mei=k.rows.filter(x=>x.pct!=null), plak=mei.findIndex(x=>x.slug===sl)+1;
     const prizen=(r.skoen?" · 👟 gouden skoen":"")+(r.lantearne?" · 🏮 reade lantearne":"");

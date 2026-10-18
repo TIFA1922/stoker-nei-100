@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Stoker nei 100</title>
+<script>
+// koarte link: stokernei100.nl/jan → de persoanlike side fan Jan
+(function(){
+  var p=decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g,"").toLowerCase();
+  if(/^[a-z0-9-]{1,40}$/.test(p)) location.replace("/side.html?n="+encodeURIComponent(p));
+})();
+</script>
+<style>
+body{margin:0;background:#121212;color:#fff;font:16px/1.45 "Work Sans",system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:20px;box-sizing:border-box;text-align:center}
+a{color:#3ef0c0;font-weight:600}
+</style>
+</head>
+<body>
+<p>Dizze side bestiet net.<br><a href="/">Nei Stoker nei 100</a></p>
+</body>
+</html>
