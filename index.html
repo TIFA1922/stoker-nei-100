@@ -713,7 +713,7 @@ function stokerFig(kwyt, total){
   total=total||30;
   // per 5 kilo in stap; by it doel altyd de lêste stân
   const raw=Math.max(0,Math.min(total,Math.floor(kwyt+1e-9))), kg=raw>=total?total:Math.floor(raw/5)*5;
-  const k=1-kg/total, m=kg/total;            // k: dikte, m: spieren
+  const k=Math.pow(1-kg/total,1.5), m=Math.sqrt(kg/total); // bûk giet hurd ôf, spieren komme gau            // k: dikte, m: spieren
   const A='style="fill:var(--accent,#3ef0c0)"', skin="#f2c9a0", skinD="#d9a77e", dark="#121212";
   const cx=60, top=64, hip=136;
   const kd=k*0.65;                           // hoe dik (wat minder as earst)
