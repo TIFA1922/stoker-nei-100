@@ -262,12 +262,16 @@ function renderMei(){
   const done=mei.filter(x=>x.status!=="wacht"&&x.datum>=today);
   const past=mei.filter(x=>x.datum<today).reverse();
   $("tabMei").textContent="Meisporten"+(open.length?" · "+open.length:"");
-  $("meiOpen").innerHTML=open.length?open.map(x=>'<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</span></div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'">Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>').join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
+  $("meiOpen").innerHTML=open.length?open.map(x=>{const bz=bezetMei(x);return '<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</span>'+(bz?'<span style="color:#ffb27a;font-size:13px;margin-top:4px">Bezet: dan heb je al afgesproken met '+esc(bz.naam)+'</span>':'')+'</div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'"'+(bz?' disabled title="Al afgesproken"':'')+'>Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>'}).join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
   const row=(x,wa)=>'<div class="row'+(wa?(x.status==="ja"?' r5':' r4'):'')+'"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</small>'+(wa?'<button type="button" class="flip" data-set="'+(x.status==='ja'?'nee':'ja')+'" data-id="'+esc(x.id)+'">'+(x.status==='ja'?'Toch niet':'Past toch wel')+'</button>':'')+'</div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span>'+(wa&&x.status==="ja"?'<a class="cal" href="'+outlookUrl(x)+'" target="_blank" rel="noopener" aria-label="Zet in Outlook" title="Zet in Outlook">'+CAL+'</a>':'')+(wa?'<a class="wa" href="'+waUrl(x,x.status==="ja"?"remind":"")+'" target="_blank" rel="noopener" aria-label="'+(x.status==="ja"?"Herinnering":"WhatsApp")+' naar '+esc(x.naam)+'" title="'+(x.status==="ja"?"Stuur herinnering":"Stuur WhatsApp")+'">'+WAI+'</a>':'')+'<button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
   $("meiDone").innerHTML=done.length?done.map(x=>row(x,true)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets afgesproken.</div>';
   $("meiPast").innerHTML=past.length?past.slice(0,30).map(x=>row(x,false)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets.</div>';
 }
+// is dat dagdeel al afgesproken met iemand anders?
+const bezetMei=x=>mei.find(y=>y.id!==x.id&&y.status==="ja"&&y.datum===x.datum&&y.dagdiel===x.dagdiel)||null;
 async function setMei(id,status){
+  const x0=mei.find(m=>m.id===id), bz=x0&&status==="ja"&&bezetMei(x0);
+  if(bz){ say("meiMsg","Dat dagdeel is al afgesproken met "+bz.naam+". Zet die eerst op 'Toch niet' als je wilt wisselen."); return; }
   try{
     await fresh();
     const r=await fetch(MEI+"?id=eq."+id,{method:"PATCH",headers:Object.assign({"Content-Type":"application/json",Prefer:"return=representation"},authH()),body:JSON.stringify({status})});

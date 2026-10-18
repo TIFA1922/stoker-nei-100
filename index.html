@@ -266,6 +266,10 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .wknav b small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
 .wknav button{height:40px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:20px;cursor:pointer}
 .wknav button:disabled{opacity:.3;cursor:default}
+.days button.bz{position:relative}
+.days button.bz::after{content:"";position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#ffb27a}
+.days button:disabled,.parts button:disabled{opacity:.35;cursor:not-allowed}
+.parts button small{display:block;font-size:11px;font-weight:400;color:#ffb27a}
 .wkslider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:8px;overscroll-behavior-x:contain}
 .wkslider::-webkit-scrollbar{display:none}
 .wkslide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
@@ -1044,6 +1048,7 @@ function stokerFig(kwyt, total){
   const t=new Date(); t.setHours(0,0,0,0); const today=iso(t);
   const WEEKS=6, days=[...Array(WEEKS*7)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return d});
   const PARTS=["moarns","middeis","jûns"];
+  let bezet=new Set();   // "datum|dieldei" dat al ôfpraat is
   // wat dogge wy: kaai yn 'e database, emoji, namme
   const WAT={sporte:["🏋️","Sportskoalle"],hurdrinne:["🏃","Hurdrinne"],mtb:["🚵","Mountainbike"],kuierje:["🚶","Kuierje"],padel:["🎾","Padel"],oars:["✨","Oars"]};
   const watTekst=r=>{const w=WAT[r.wat]||WAT.sporte;return w[0]+" "+(r.wat==="oars"&&r.wat_oars?r.wat_oars:w[1])};
@@ -1054,7 +1059,8 @@ function stokerFig(kwyt, total){
   let pg=0; const PER=14, PAGES=Math.ceil(days.length/PER);
   const drawDays=()=>{
     const sl=days.slice(pg*PER,pg*PER+PER);
-    $("meiDays").innerHTML=sl.map(d=>'<button type="button" data-d="'+iso(d)+'" aria-pressed="false" aria-label="'+WD[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+'"><small>'+WS[d.getDay()]+'</small><b>'+d.getDate()+'</b></button>').join("");
+    $("meiDays").innerHTML=sl.map(d=>{const k=iso(d),n=PARTS.filter(p=>bezet.has(k+"|"+p)).length;
+      return '<button type="button" data-d="'+k+'" aria-pressed="false"'+(n===3?' disabled':'')+' class="'+(n?'bz':'')+'" aria-label="'+WD[d.getDay()]+' '+d.getDate()+' '+MS[d.getMonth()]+(n===3?', hielendal fol':n?', foar in part fol':'')+'"><small>'+WS[d.getDay()]+'</small><b>'+d.getDate()+'</b></button>'}).join("");
     if(day) pick($("meiDays"),"d",day);
     const a=sl[0], z=sl[sl.length-1];
     $("meiRange").textContent=a.getDate()+" "+MS[a.getMonth()]+" – "+z.getDate()+" "+MS[z.getMonth()];
@@ -1066,7 +1072,11 @@ function stokerFig(kwyt, total){
   $("meiWat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;wat=b.dataset.w;pick($("meiWat"),"w",wat);$("meiOarsBox").hidden=wat!=="oars";if(wat==="oars")$("meiOars").focus()});
   $("meiParts").innerHTML=PARTS.map(p=>'<button type="button" data-p="'+p+'" aria-pressed="false">'+p+'</button>').join("");
   const pick=(box,attr,val)=>box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val)));
-  $("meiDays").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;day=b.dataset.d;pick($("meiDays"),"d",day)});
+  const partsBij=()=>{
+    $("meiParts").querySelectorAll("button").forEach(b=>{const t=day&&bezet.has(day+"|"+b.dataset.p);b.disabled=!!t;b.innerHTML=b.dataset.p+(t?'<small>ôfpraat</small>':'')});
+    if(day&&part&&bezet.has(day+"|"+part)){part=null;pick($("meiParts"),"p","")}
+  };
+  $("meiDays").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled)return;day=b.dataset.d;pick($("meiDays"),"d",day);partsBij()});
   drawDays();
   $("meiParts").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;part=b.dataset.p;pick($("meiParts"),"p",part)});
   // in tiid kieze set ek it dieldei goed
@@ -1075,6 +1085,7 @@ function stokerFig(kwyt, total){
   const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net"};
   const render=rows=>{
     // per wike (moandei oant snein), mei blêdzjen
+    bezet=new Set(rows.filter(r=>r.status==="ja"&&r.datum>=today).map(r=>r.datum+"|"+r.dagdiel)); drawDays(); partsBij();
     const up=rows.filter(r=>r.datum>=today);
     const mo=s=>{const d=pd(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)};
     const wiken=[...new Set([mo(today),...up.map(r=>mo(r.datum))])].sort();
@@ -1122,6 +1133,7 @@ function stokerFig(kwyt, total){
     if(!naam){say("Fier earst dyn foarnamme yn.");$("meiNaam").focus();return}
     if(!day){say("Kies in dei.");return}
     if(!part){say("Kies moarns, middeis of jûns.");return}
+    if(bezet.has(day+"|"+part)){say("Dat dieldei is al ôfpraat. Kies in oar momint.");return}
     const oars=norm($("meiOars").value).slice(0,30);
     if(wat==="oars"&&!oars){say("Fier yn wat jim dogge.");$("meiOars").focus();return}
     const ok="Ferstjoerd! Stoker lit hjir witte oft it past.";
@@ -1134,7 +1146,7 @@ function stokerFig(kwyt, total){
       .then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||"")}
         try{localStorage.setItem("stoker-namme",naam)}catch(e){}
         say(ok); load();})
-      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende seis wiken.":/oars_leech/.test(e.message)?"Fier yn wat jim dogge.":/wat_check/.test(e.message)?"Dy sport kin noch net. Kies in oare.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
+      .catch(e=>say(/te_folle_iepen/.test(e.message)?"Do hast al trije oanbiedingen iepen stean. Wachtsje even op Stoker.":/te_hurd/.test(e.message)?"Ho ho, net sa hurd. Besykje it oer even nochris.":/ferkearde_datum/.test(e.message)?"Kies in dei yn de kommende seis wiken.":/oars_leech/.test(e.message)?"Fier yn wat jim dogge.":/al_ofpraat/.test(e.message)?"Dat dieldei is krekt ôfpraat mei in oar. Kies in oar momint.":/wat_check/.test(e.message)?"Dy sport kin noch net. Kies in oare.":"Dat slagge net. Besykje it oer in skoftsje nochris."))
       .finally(()=>{busy=false;$("meiSend").disabled=false});
   });
 })();
