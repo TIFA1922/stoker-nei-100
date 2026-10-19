@@ -650,8 +650,12 @@ if(reached){
   const PARTY='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Feest"><path d="M4 20l4.5-12 7.5 7.5z"/><path d="M7 12.5l4.5 4.5"/><path d="M14 3v2M19 8h2M17.5 4.5l-1.5 1.5"/><circle cx="20" cy="3.5" r=".8" fill="currentColor"/><circle cx="13" cy="9" r=".8" fill="currentColor"/><path d="M15 12c1.5-1.5 3.5-1.5 5 0"/></svg>';
   const wksTo=d=>Math.max(0,Math.ceil((pd(d)-ref)/(7*864e5)));
   // jierdei en bouwfak hingje oan in mylpeal/stap (allinne kilo's kwyt, gjin gewicht)
-  const EVM={20:{icon:CAKE,date:"2027-04-18",sub:"Myn jierdei · feest 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it. Dan wol ik −20 kilo kwyt wêze!",name:"it feest"},
-             25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"Mei de bouwfak wol ik −25 kilo kwyt wêze. Dan smakket dat pilske ek better!",name:"de bouwfak"}};
+  const EVM={20:{icon:CAKE,date:"2027-04-18",sub:"Myn jierdei · feest 18 april",extra:"Op 13 april bin ik jierdei en op snein 18 april fier ik it. Mei −20 kilo kwyt mei der dan wol taart wêze. Ien punt. Goed, twa as ik der trije kear foar op 'e loopbân stien ha. 🎂",name:"it feest"},
+             25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"−25 mei de bouwfak: dan is it earste pilske op it terras echt fertsjinne. It twadde ek, mar dêr hâlde wy it by. Mei mate, dat wist. 🍺",name:"de bouwfak"}};
+  const FUN={5:"Fiif kilo: in hiele sek ierappels dy't ik net mear de trep op hoech te sjouwen. De trep is der tige bliid mei.",
+             10:"Tsien kilo: twa emmers fol wetter minder om mei te kuierjen. Of ien bern op 'e nekke dat ik ynienen net mear meinim.",
+             15:"Fyftjin kilo: sawat in kraat bier (17 kg) minder. Dy hoeft net opdronken te wurden om it te fieren. 😉",
+             30:"Tritich kilo: in sek sement en noch in bytsje. Sement sjouw ik no allinne noch foar de gesellichheid."};
   const G=[];
   for(let v=5; v<=30; v+=5){
     const e=EVM[v], step=false, done=lost>=v, rest=Math.max(0,v-lost);
@@ -664,10 +668,10 @@ if(reached){
     G.push({c1:e?e.icon.replace('class="ico"','class="ico gi"')+(v===20?"Jierdei":"Bouwfak"):(done?"Mylpeal":"Mylpeal"),c2:done?"Helle ✓":e&&wks?"noch "+wks+" wiken":"noch "+fmt(rest)+" kg",
       kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:"Mylpeal",step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
       cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'<div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>'),
-      extra:e?e.extra:"Elke 5 kilo is in mylpeal. Dan feroaret it poppetsje boppe-oan de side ek!",tip:tip});
+      extra:e?e.extra:(FUN[v]||"Elke 5 kilo is in mylpeal. Dan feroaret it poppetsje boppe-oan de side ek!"),tip:tip});
   }
   G.push({c1:PARTY.replace('class="ico"','class="ico gi"')+"Feest",c2:reached?"Helle ✓":"op wei",kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
-    extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
+    extra:"Op 100 kilo jout Stoker in grut feest. De útnoegings binne der noch net, mar de dûnsskuon steane al klear by de doar. Hâld de side yn 'e gaten! 🎉",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
   // swipe-kaartsjes: helle doelen stean foarop, mar it folgjende doel stiet by it iepenjen foaroan yn byld
   const nxI=Math.max(0,G.findIndex(g=>!g.done));
   $("goals").innerHTML='<div class="gcar" id="gcar">'+G.map((g,i)=>'<button type="button" class="gc'+(g.done?' got':i===nxI?' nx':'')+'" data-g="'+i+'" aria-expanded="false"><b>'+g.kgHtml+'</b><span>'+(i===nxI&&!g.done&&!/svg/.test(g.c1)?"Folgjende":g.c1)+'</span><small>'+g.c2+'</small></button>').join("")+'</div>'+
