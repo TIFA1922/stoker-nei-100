@@ -650,12 +650,12 @@ if(reached){
   const PARTY='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Feest"><path d="M4 20l4.5-12 7.5 7.5z"/><path d="M7 12.5l4.5 4.5"/><path d="M14 3v2M19 8h2M17.5 4.5l-1.5 1.5"/><circle cx="20" cy="3.5" r=".8" fill="currentColor"/><circle cx="13" cy="9" r=".8" fill="currentColor"/><path d="M15 12c1.5-1.5 3.5-1.5 5 0"/></svg>';
   const wksTo=d=>Math.max(0,Math.ceil((pd(d)-ref)/(7*864e5)));
   // jierdei en bouwfak hingje oan in mylpeal/stap (allinne kilo's kwyt, gjin gewicht)
-  const EVM={20:{icon:CAKE,date:"2027-04-18",sub:"Myn jierdei · feest 18 april",extra:"Op 13 april bin ik jierdei en op snein 18 april fier ik it. Mei −20 kilo kwyt giet de BBQ oan: ribeye foar elkenien, in pilske derby, en foar my ek in punt taart. Ien. 🎂",name:"it feest"},
-             25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"−25 mei de bouwfak: dan wurdt it feest! De BBQ stiet klear, de ribeye leit op it rooster en de kraat stiet kâld. Trije wiken frij, dus de pilskes binne mear as fertsjinne. Proast! 🍺🍺🍺",name:"de bouwfak"}};
-  const FUN={5:"Fiif kilo: dat binne sa'n 20 ribeyes fan 250 gram. Net opiten, mar ferbaarnd. De BBQ mei wol oan, mar dan mei ien stik op it rooster. 🥩",
+  const EVM={20:{icon:CAKE,date:"2027-04-18",sub:"Myn jierdei · feest 18 april",extra:"Op 13 april bin ik jierdei en op snein 18 april fier ik it. Mei −20 kilo kwyt mei der wol taart wêze. Ien punt. Goed, twa as ik der trije kear foar op 'e loopbân stien ha. 🎂",name:"it feest"},
+             25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"−25 mei de bouwfak: trije wiken frij! De BBQ giet oan en in pear pilskes binne echt fertsjinne. Mei mate, mar wol mei nocht. 🍺",name:"de bouwfak"}};
+  const FUN={5:"Fiif kilo: in hiele sek ierappels minder om de trep op te sjouwen. De trep is der bliid mei. En ik ek. 🥔",
              10:"Tsien kilo: 40 ribeyes. De slachter freget him al ôf oft der wat mei my is. Gjin soargen, it giet hartstikke goed!",
-             15:"Fyftjin kilo: hast in folle kraat bier. Dy sjouw ik no wer mei nei de BBQ, ynstee fan dat ik him om myn búk meisjouw. 🍺",
-             30:"Tritich kilo: in hiele BBQ foar it hiele doarp, mei worst, saté en ribeye. Allegear net opiten. Of wol, mar dan ferbaarnd. 🔥"};
+             15:"Fyftjin kilo: hast in folle kraat bier. Dy sjouw ik no nei it feestje, ynstee fan om myn búk. 🍺",
+             30:"Tritich kilo: in sek sement en noch in bytsje. Sement sjouw ik no allinne noch foar de gesellichheid. 💪"};
   const G=[];
   for(let v=5; v<=30; v+=5){
     const e=EVM[v], step=false, done=lost>=v, rest=Math.max(0,v-lost);
@@ -671,7 +671,7 @@ if(reached){
       extra:e?e.extra:(FUN[v]||"Elke 5 kilo is in mylpeal. Dan feroaret it poppetsje boppe-oan de side ek!"),tip:tip});
   }
   G.push({c1:PARTY.replace('class="ico"','class="ico gi"')+"Feest",c2:reached?"Helle ✓":"op wei",kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
-    extra:"Op 100 kilo jout Stoker in grut feest: BBQ, ribeye, bier en in DJ dy't \"Stoker nei 100\" draait. De útnoegings komme noch, mar de dûnsskuon steane al klear. Hâld de side yn 'e gaten! 🎉",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
+    extra:"Op 100 kilo jout Stoker in grut feest, mei hapkes, in drankje en muzyk. De útnoegings komme noch, mar de dûnsskuon steane al klear. Hâld de side yn 'e gaten! 🎉",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
   // swipe-kaartsjes: helle doelen stean foarop, mar it folgjende doel stiet by it iepenjen foaroan yn byld
   const nxI=Math.max(0,G.findIndex(g=>!g.done));
   $("goals").innerHTML='<div class="gcar" id="gcar">'+G.map((g,i)=>'<button type="button" class="gc'+(g.done?' got':i===nxI?' nx':'')+'" data-g="'+i+'" aria-expanded="false"><b>'+g.kgHtml+'</b><span>'+(i===nxI&&!g.done&&!/svg/.test(g.c1)?"Folgjende":g.c1)+'</span><small>'+g.c2+'</small></button>').join("")+'</div>'+
