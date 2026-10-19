@@ -69,7 +69,7 @@ h2.disp{font-size:26px;line-height:1}
 .ms-line{font-size:14px;color:var(--soft);margin:0}
 .ms-line b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--fg);letter-spacing:.01em}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-.mpl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mpl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .mpl div{background:var(--band);border:1px solid var(--line);border-radius:6px;padding:10px 4px;text-align:center;display:grid;gap:2px}
 .mpl b{font-family:var(--f-display);font-weight:400;font-size:22px;line-height:1.1;color:var(--muted)}
 .mpl span{font-size:11px;color:var(--muted);min-height:1.2em}
@@ -480,7 +480,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
       <h2 class="disp">Stoker stookt de kilo's op</h2>
       <p class="note" style="font-size:14px;color:var(--soft)">Elke kilo kwyt is in blok yn 'e kachel. Hoe minder hout, hoe hurder it fjoer.</p>
       <div class="kachel" id="kachel"></div>
-      <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">30</b><span>noch op 'e stapel</span></div></div>
+      <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">30</b><span>oant de folgjende 10</span></div></div>
       <p class="kquip" id="kQuip"></p>
     </section>
     <section class="band o13" id="kalBand">
@@ -605,8 +605,8 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const ws=(D.weights||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
 const goal=D.goal||100, reached=D.reached||null;
 const lostRaw=ws.length?ws[ws.length-1][1]:0, lost=Math.max(0,lostRaw);
-const MS=[10,20,30,40];
-const FT=reached?Math.max(1,Math.floor(lost)):Math.max(40,Math.floor(lost)+1); // referinsje foar poppe en kachel
+const MS=[10,20,30];
+const FT=reached?Math.max(1,Math.floor(lost)):Math.max(30,Math.floor(lost)+1); // referinsje foar poppe en kachel
 const weekNo=ws.length?Math.max(0,Math.round((pd(ws[ws.length-1][0])-pd(ws[0][0]))/(7*864e5))):0;
 
 $("lost").textContent=(lost>0?"−":"")+fmt(lost);
@@ -635,7 +635,7 @@ if(reached){
     G.push({kgHtml:e.kg,title:e.title,sub:e.sub,date:true,done:past,pill:past?'Foarby':'Noch '+w+' wiken',
       cells:past?'':'<div><b>'+w+'</b><span>wiken noch</span></div><div><b>−'+fmt(lost+w,0)+'</b><span>kilo kwyt by 1 kg/wike</span></div>',
       extra:e.extra,tip:past?"Dizze datum is foarby.":"Mei sa'n 1 kilo yn 'e wike stiet de teller dan op sa'n −"+fmt(lost+w,0)+" kilo."});});
-  for(let v=5; v<=40; v+=5){
+  for(let v=5; v<=30; v+=5){
     const step=v%10!==0, done=lost>=v, rest=Math.max(0,v-lost);
     G.push({kgHtml:'−'+v,title:"−"+v+" kilo",sub:step?"Stap":"Mylpeal",step:step,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
       cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div><div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>',
@@ -726,7 +726,7 @@ const MEDAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const maxDl=dl.length?Math.max(...dl.map(x=>x[1])):0;
 const full=wk.some(w=>w[1]>=5);
 let run=0,best=0; wk.forEach(w=>{run=w[1]>=4?run+1:0;best=Math.max(best,run)});
-const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["15 kilo kwyt",lost>=15],["20 kilo kwyt",lost>=20],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["25 kilo kwyt",lost>=25],["30 kilo kwyt",lost>=30],["40 kilo kwyt",lost>=40],["100 kilo!",!!reached]];
+const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["15 kilo kwyt",lost>=15],["20 kilo kwyt",lost>=20],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["25 kilo kwyt",lost>=25],["30 kilo kwyt",lost>=30],["50 trainingen",tot>=50],["100 kilo!",!!reached]];
 $("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
 const nGot=MED.filter(m=>m[1]).length;
 $("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste kilo is de earste medalje.";
@@ -1084,7 +1084,7 @@ function stokerFig(kwyt, total){
 })();
 // stoker stookt de kilo's op
 (()=>{
-  const N=FT, burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
+  const N=reached?FT:Math.max(10,(Math.floor(lost+1e-9)/10|0)*10+10), burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
   let logs="";
   for(let i=0;i<N;i++){
     const r=Math.floor(i/6), c=i%6, x=158+c*30+(r%2?15:0), y=232-r*27, on=i<keep;
