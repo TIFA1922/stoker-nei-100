@@ -480,7 +480,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
       <h2 class="disp">Stoker stookt de kilo's op</h2>
       <p class="note" style="font-size:14px;color:var(--soft)">Elke kilo kwyt is in blok yn 'e kachel. Hoe minder hout, hoe hurder it fjoer.</p>
       <div class="kachel" id="kachel"></div>
-      <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">30</b><span>oant de folgjende 10</span></div></div>
+      <div class="kstats"><div><b id="kBurn" style="color:var(--fire)">0</b><span>blokken opstookt</span></div><div><b id="kLeft">35</b><span>noch op 'e stapel</span></div></div>
       <p class="kquip" id="kQuip"></p>
     </section>
     <section class="band o13" id="kalBand">
@@ -1085,7 +1085,7 @@ function stokerFig(kwyt, total){
 })();
 // stoker stookt de kilo's op
 (()=>{
-  const N=reached?FT:Math.max(10,(Math.floor(lost+1e-9)/10|0)*10+10), burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
+  const N=35, burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
   let logs="";
   for(let i=0;i<N;i++){
     const r=Math.floor(i/6), c=i%6, x=158+c*30+(r%2?15:0), y=232-r*27, on=i<keep;
@@ -1101,7 +1101,7 @@ function stokerFig(kwyt, total){
     '<rect x="30" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="106" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="0" y="248" width="340" height="2" fill="#2c2c2c"/>'+
     logs+'</svg>';
   $("kBurn").textContent=burned; $("kLeft").textContent=keep;
-  const Q=[[0,"De kachel is kâld. Woansdei giet it earste blok der yn."],[1,"It earste blok is der yn. Der giet in fjoerke!"],[5,"It fjoer komt op gong. Stoker stookt troch."],[10,"Tsien blokken. De kachel wurdt waarm, de broek wurdt rom."],[20,"De stapel slinkt hurd. Hjir is in echte stoker oan it wurk."],[30,"Tritich blokken! De kachel gloeit, Stoker ek."]];
+  const Q=[[0,"De kachel is kâld. Woansdei giet it earste blok der yn."],[1,"It earste blok is der yn. Der giet in fjoerke!"],[5,"It fjoer komt op gong. Stoker stookt troch."],[10,"Tsien blokken. De kachel wurdt waarm, de broek wurdt rom."],[20,"De stapel slinkt hurd. Hjir is in echte stoker oan it wurk."],[30,"Tritich blokken! De kachel gloeit, Stoker ek."],[N-1,"Noch ien blok..."],[N,"Stapel op, kachel gloeiend!"]];
   $("kQuip").textContent=reached?"Stapel op, kachel gloeiend: Stoker is by de 100!":Q.filter(q=>burned>=q[0]).pop()[1];
 })();
 
