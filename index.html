@@ -605,14 +605,14 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const ws=(D.weights||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
 const goal=D.goal||100, reached=D.reached||null;
 const lostRaw=ws.length?ws[ws.length-1][1]:0, lost=Math.max(0,lostRaw);
-const MS=[10,20,30];
+const MS=[5,10,15,20,25,30];
 const FT=reached?Math.max(1,Math.floor(lost)):Math.max(30,Math.floor(lost)+1); // referinsje foar poppe en kachel
 const weekNo=ws.length?Math.max(0,Math.round((pd(ws[ws.length-1][0])-pd(ws[0][0]))/(7*864e5))):0;
 
 $("lost").textContent=(lost>0?"−":"")+fmt(lost);
 {const d=ws.length>1?ws[ws.length-1][1]-ws[ws.length-2][1]:null; $("left").textContent=d==null?"–":(d>0?"−":d<0?"+":"±")+fmt(d);}
 const nextMs=MS.find(m=>lost<m), hitMs=MS.filter(m=>lost>=m);
-$("mpl").innerHTML=MS.map(m=>{const got=lost>=m, nx=m===nextMs&&!reached;return '<div role="listitem" class="'+(got?'got':nx?'next':'')+'"><b>−'+m+'</b><span>'+(got?'helle':nx?'folgjende':'')+'</span></div>'}).join("");
+$("mpl").innerHTML=MS.map(m=>{const got=lost>=m, nx=m===nextMs&&!reached;return '<div role="listitem" class="'+(got?'got':nx?'next':'')+'"><b>−'+m+'</b><span>'+(got?'helle':nx?'folgjende':m===20?'jierdei':m===25?'bouwfak':'')+'</span></div>'}).join("");
 // feest by 100
 if(reached){
   const r=ws.find(x=>x[0]>=reached)||ws[ws.length-1];
@@ -632,16 +632,16 @@ if(reached){
              25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"Mei de bouwfak wol ik −25 kilo kwyt wêze. Dan smakket dat pilske ek better!",name:"de bouwfak"}};
   const G=[];
   for(let v=5; v<=30; v+=5){
-    const e=EVM[v], step=v%10!==0, done=lost>=v, rest=Math.max(0,v-lost);
+    const e=EVM[v], step=false, done=lost>=v, rest=Math.max(0,v-lost);
     const wks=e?wksTo(e.date):null, per=wks?rest/wks:null;
     let tip;
     if(done) tip="Helle! Op nei it folgjende doel.";
     else if(wks===0) tip="De datum is foarby. Gjin punt: hâld it tempo fêst.";
     else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
     else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(rest)+" wiken.";
-    G.push({kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:(step?"Stap":"Mylpeal"),step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
+    G.push({kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:"Mylpeal",step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
       cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'<div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>'),
-      extra:e?e.extra:(step?"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!":null),tip:tip});
+      extra:e?e.extra:"Elke 5 kilo is in mylpeal. Dan feroaret it poppetsje boppe-oan de side ek!",tip:tip});
   }
   G.push({kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
     extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
@@ -649,7 +649,7 @@ if(reached){
 })();
 // ien doel tagelyk iepen
 document.querySelectorAll("#goals details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#goals details").forEach(o=>{if(o!==d)o.open=false})}));
-$("msLine").innerHTML=reached?'<b>Doel helle!</b> Stoker is op 100 kilo.':(hitMs.length?'<b>Helle:</b> '+hitMs.map(m=>"−"+m).join(", ")+' kilo. ':'')+(nextMs?'<b>Folgjende mylpeal: −'+nextMs+' kilo'+(nextMs===20?' op myn jierdei':'')+'.</b> Noch '+fmt(nextMs-lost)+' kilo.':'Op nei de 100!');
+$("msLine").innerHTML=reached?'<b>Doel helle!</b> Stoker is op 100 kilo.':(hitMs.length?'<b>Helle:</b> '+hitMs.map(m=>"−"+m).join(", ")+' kilo. ':'')+(nextMs?'<b>Folgjende mylpeal: −'+nextMs+' kilo'+(nextMs===20?' op myn jierdei':nextMs===25?' mei de bouwfak':'')+'.</b> Noch '+fmt(nextMs-lost)+' kilo.':'Op nei de 100!');
 $("when").innerHTML=ws.length&&weekNo>0?"Wike "+weekNo+"<br>"+fd(ws[ws.length-1][0]):"Start<br>"+(ws.length?fd(ws[0][0]):"21 oktober");
 
 const wk=D.weeks||[]; const tot=wk.reduce((a,w)=>a+(w[1]||0),0);
@@ -1222,7 +1222,7 @@ function stokerFig(kwyt, total){
   const draw=()=>{
     const pace=+$("tempo").value/10;
     $("paceLbl").textContent=pace.toLocaleString("nl-NL",{minimumFractionDigits:1})+" kg / wike";
-    const rows=[10,20,25,30].map(m=>{
+    const rows=MS.map(m=>{
       if(lost>=m)return '<div class="wrow"><b>−'+m+'</b><div><strong>Helle!</strong><span>Dit doel is al binnen.</span></div></div>';
       const d=new Date(ref); d.setDate(d.getDate()+Math.ceil((m-lost)/pace*7));
       const e=EV[m], ok=e?d<=e[0]:true;
