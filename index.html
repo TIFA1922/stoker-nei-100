@@ -1065,6 +1065,15 @@ function stokerFig(kwyt, total){
       $("stapBalken").setAttribute("aria-label","Stappen de lêste 7 dagen, gemiddeld "+gem+" deis, doel 10.000, "+helle+" dagen helle");
       $("stapNote").textContent="Gemiddeld "+gem.toLocaleString("nl-NL")+" stappen deis."+hjT+" Komt automatysk fan Stoker syn iPhone.";
       $("stapBand").hidden=false;
+      // lêste update (as de kolom 'bywurke' bestiet)
+      fetch(URL+"?select=bywurke&bywurke=not.is.null&order=bywurke.desc&limit=1",{headers:{apikey:KEY}}).then(r=>r.ok?r.json():[]).then(x=>{
+        if(!x.length||!x[0].bywurke) return; const d=new Date(x[0].bywurke); if(isNaN(d)) return;
+        const tz={timeZone:"Europe/Amsterdam"}, dk=v=>v.toLocaleDateString("en-CA",tz), nu=new Date(), jr=new Date(nu-864e5);
+        const FD=["snein","moandei","tiisdei","woansdei","tongersdei","freed","sneon"], FM=["jan","feb","mrt","apr","mai","jun","jul","aug","sep","okt","nov","des"];
+        const ld=new Date(d.toLocaleString("en-US",tz)), tm=d.toLocaleTimeString("nl-NL",{...tz,hour:"2-digit",minute:"2-digit"});
+        const dei=dk(d)===dk(nu)?"hjoed":dk(d)===dk(jr)?"juster":FD[ld.getDay()]+" "+ld.getDate()+" "+FM[ld.getMonth()];
+        $("stapNote").textContent+=" Lêste update: "+dei+" om "+tm+".";
+      }).catch(()=>{});
     }).catch(()=>{});
 })();
 // stoker stookt de kilo's op
