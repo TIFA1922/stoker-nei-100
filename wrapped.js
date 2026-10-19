@@ -36,7 +36,7 @@
     for(let d=new Date(b);d.getFullYear()===jier;d.setDate(d.getDate()+1)) stip.push(stS.has(iso(d)));
     const med=window.StokerKomp?StokerKomp.medaljes(r).filter(m=>m[1]).map(m=>m[0]):[];
     const mei=(k&&k.rows||[]).filter(x=>x.pct!=null), plak=mei.findIndex(x=>x.slug===r.slug)+1;
-    return {pct:Math.round((p1-p0)*10)/10, tot:r.pct||0, doel:Number(r.doel)||10, best, del:del.slice(-12), tr:tr.length, fav, st:st.length, beste, stip,
+    return {pct:Math.round((p1-p0)*10)/10, tot:r.pct||0, doel:r.doel==null?null:(Number(r.doel)||10), helle:!!r.doelHelle, best, del:del.slice(-12), tr:tr.length, fav, st:st.length, beste, stip,
       med, plak, n:mei.length, stapSom:r.stapJier?r.stapJier[J]||0:0, skoen:!!r.skoen};
   }
 
@@ -98,8 +98,8 @@
       sl.push(`<section class="slide lila"><p class="w-k">Stappen</p><p class="w-big" style="font-size:clamp(64px,21vw,104px)"><span data-n="${mil?s.stapSom/1e6:Math.round(s.stapSom/1000)}" data-d="${mil?2:0}">0</span><small>${mil?"miljoen":"tûzen"}</small></p><p class="w-t">Sa'n ${km.toLocaleString("nl-NL")} kilometer. ${reis(km)}</p></section>`); }
     sl.push(`<section class="slide eigen"><p class="w-k">Medaljes</p><p class="w-big"><span data-n="${s.med.length}">0</span><small>🏅</small></p><div class="w-chips">${s.med.slice(-6).map(m=>`<span class="w-chip">${E(m)}</span>`).join("")||'<span class="w-chip">De earste komt der oan!</span>'}</div></section>`);
     if(s.n>=2&&s.plak>0) sl.push(`<section class="slide fire"><p class="w-k">Kompetysje</p><div class="w-h">Plak ${s.plak} fan ${s.n}</div><p class="w-t">${s.plak===1?"Boppe-oan! De rest moat oan 'e bak.":s.plak<=3?"Op it poadium. Dat smakket nei mear.":"Der sit noch genôch rek yn. Op nei boppen!"}</p>${s.skoen?'<div class="w-chips"><span class="w-chip">👟 Gouden skoen</span></div>':""}</section>`);
-    const rest=Math.round((s.doel-s.tot)*10)/10;
-    sl.push(`<section class="slide night"><p class="w-k">En no?</p><div class="w-h" style="font-size:clamp(52px,16vw,80px)">${rest<=0?"Doel helle! 🎉":`Noch <span style="color:var(--wc)">${nl(rest)}%</span> nei dyn doel`}</div><p class="w-t" style="opacity:.75">Op nei ${jier+1}. Stook him op! 🔥</p><div class="w-deco" style="color:#ff7a2f">${String(jier+1).slice(2)}</div></section>`);
+    const rest=s.doel==null?(s.helle?0:null):Math.round((s.doel-s.tot)*10)/10;
+    sl.push(`<section class="slide night"><p class="w-k">En no?</p><div class="w-h" style="font-size:clamp(52px,16vw,80px)">${rest==null?"Op wei nei de 100!":rest<=0?"Doel helle! 🎉":`Noch <span style="color:var(--wc)">${nl(rest)}%</span> nei dyn doel`}</div><p class="w-t" style="opacity:.75">Op nei ${jier+1}. Stook him op! 🔥</p><div class="w-deco" style="color:#ff7a2f">${String(jier+1).slice(2)}</div></section>`);
 
     if(!document.getElementById("swrCss")){const st=document.createElement("style");st.id="swrCss";st.textContent=CSS;document.head.appendChild(st)}
     const ov=document.createElement("div"); ov.id="swr"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true"); ov.setAttribute("aria-label",r.namme+" syn jier "+jier);

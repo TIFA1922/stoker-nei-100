@@ -11,14 +11,15 @@
   }
   async function stokerRij(D){
     D=await stokerData(D); if(!D) return null;
-    const w=(D.weights||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1), st=Number(D.start)||(w[0]&&w[0][1]);
+    // Stoker: allinne hiele prosinten (kpct) en gjin doel-prosint, oars is syn startgewicht út te rekkenjen.
+    const w=(D.kpct||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
     let stap=[]; try{ stap=await (await fetch(SB+"/rest/v1/stappen?select=dei,stappen&order=dei.asc",{headers:{apikey:KEY}})).json(); }catch(e){}
     const dm={}; (D.sport||[]).forEach(d=>dm[d]=[d,true,false]); (Array.isArray(stap)?stap:[]).forEach(s=>{ if(s.stappen>=10000){ dm[s.dei]=dm[s.dei]||[s.dei,false,false]; dm[s.dei][2]=true; } });
     const stapJier={}; (Array.isArray(stap)?stap:[]).forEach(s=>{const j=String(s.dei).slice(0,4);stapJier[j]=(stapJier[j]||0)+(Number(s.stappen)||0)});
     const last=w[w.length-1], prev=w[w.length-2];
-    return {slug:"stoker",namme:"Stoker",kleur:"#3ef0c0",doel:r1((st-Number(D.goal||100))/st*100),stoker:true,
-      start:w[0]?w[0][0]:null, pct:last?r1((st-last[1])/st*100):null, wike:last&&prev?r1((prev[1]-last[1])/st*100):null, wikedei:last?last[0]:null,
-      wiken:w.map(x=>[x[0],r1((st-x[1])/st*100)]), trainingen:(D.sport||[]).length, stappen:Object.values(dm).filter(x=>x[2]).length,
+    return {slug:"stoker",namme:"Stoker",kleur:"#3ef0c0",doel:null,doelHelle:!!D.reached,stoker:true,heel:true,
+      start:w[0]?w[0][0]:null, pct:last?last[1]:null, wike:last&&prev?last[1]-prev[1]:null, wikedei:last?last[0]:null,
+      wiken:w.map(x=>[x[0],x[1]]), trainingen:(D.sport||[]).length, stappen:Object.values(dm).filter(x=>x[2]).length,
       dagen:Object.values(dm).sort((a,b)=>a[0]<b[0]?-1:1), stapJier};
   }
   async function oaren(){
@@ -53,9 +54,9 @@
     const perWike={}; dagen.filter(x=>x[1]).forEach(x=>{const d=pdD(x[0]);d.setDate(d.getDate()-((d.getDay()+6)%7));const k=isoD(d);perWike[k]=(perWike[k]||0)+1});
     const akt=new Set(dagen.filter(x=>x[1]||x[2]).map(x=>x[0])); let rige=0,beste=0;
     if(akt.size){const ks=[...akt].sort();for(let d=pdD(ks[0]);d<=pdD(ks[ks.length-1]);d.setDate(d.getDate()+1)){if(akt.has(isoD(d))){rige++;beste=Math.max(beste,rige)}else rige=0}}
-    return [["Begûn!",!!r.start],["1% kwyt",pc>=1],["3% kwyt",pc>=3],["5% kwyt",pc>=5],["Healwei it doel",pc>=doel/2],["10% kwyt",pc>=10],
+    return [["Begûn!",!!r.start],["1% kwyt",pc>=1],["3% kwyt",pc>=3],["5% kwyt",pc>=5],["Healwei it doel",r.doel==null?!!r.doelHelle:pc>=doel/2],["10% kwyt",pc>=10],
       ["Earste training",(r.trainingen||0)>=1],["10 trainingen",(r.trainingen||0)>=10],["Perfekte wike",Object.values(perWike).some(n=>n>=5)],
-      ["7 dagen op rige",beste>=7],["10× 10.000 stappen",(r.stappen||0)>=10],["Doel helle!",pc>=doel&&pc>0]];
+      ["7 dagen op rige",beste>=7],["10× 10.000 stappen",(r.stappen||0)>=10],["Doel helle!",r.doel==null?!!r.doelHelle:pc>=doel&&pc>0]];
   }
   // hjoeddeiske reeks: dagen op rige aktyf (sporte of 10.000 stappen), oant hjoed of juster
   function reeks(dagen){

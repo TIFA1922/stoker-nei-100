@@ -69,6 +69,16 @@ h2.disp{font-size:26px;line-height:1}
 .ms-line{font-size:14px;color:var(--soft);margin:0}
 .ms-line b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--fg);letter-spacing:.01em}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.mpl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mpl div{background:var(--band);border:1px solid var(--line);border-radius:6px;padding:10px 4px;text-align:center;display:grid;gap:2px}
+.mpl b{font-family:var(--f-display);font-weight:400;font-size:22px;line-height:1.1;color:var(--muted)}
+.mpl span{font-size:11px;color:var(--muted);min-height:1.2em}
+.mpl .got{border-color:var(--accent)}.mpl .got b{color:var(--accent)}
+.mpl .next{border-style:dashed;border-color:var(--muted)}.mpl .next b{color:var(--fg)}
+.feest{text-align:center;justify-items:center;padding-block:40px;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--accent) 22%,var(--bg)) 0,var(--bg) 70%)}
+.feest .hundred{font-family:var(--f-display);font-size:clamp(120px,40vw,180px);line-height:.85;color:var(--accent)}
+.feest p{margin:0;color:var(--soft)}
+.feest .tot{font-family:var(--f-display);font-size:34px;color:var(--fg)}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--line)}
 .stat{padding:18px 12px;display:grid;gap:2px;border-right:1px solid var(--line);min-width:0}
 .stat:first-child{padding-left:max(20px,env(safe-area-inset-left,0px))}
@@ -400,6 +410,12 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 
 <div class="page">
   <div class="col col-a">
+    <section class="band feest" id="feestBand" hidden>
+      <p class="disp" style="font-size:clamp(40px,12vw,56px);line-height:.95;color:var(--fg)">Stoker sit op</p>
+      <div class="hundred">100</div>
+      <p id="feestDei"></p>
+      <p class="tot" id="feestTot"></p>
+    </section>
     <section class="band o1">
       <p class="weachdei" id="weachdei" hidden></p>
       <div class="top">
@@ -411,17 +427,13 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
       </div>
       </div>
       <button type="button" class="big" id="bigBtn" aria-label="Tik foar in oare ienheid"><b id="lost">0,0</b><span id="lostUnit">kilo<br>kwyt</span></button>
-      <div>
-        <div class="ticks" id="ticks" role="group" aria-label="30 kilo, tik op in blûkje"></div>
-        <div class="ends" style="margin-top:6px"><span id="startLbl">130</span><span id="goalLbl">100</span></div>
-      </div>
-      <p class="tick-info" id="tickInfo" hidden></p>
+      <div class="mpl" id="mpl" role="list" aria-label="Mylpealen"></div>
       <p class="ms-line" id="msLine"></p>
       <div class="kwyt" id="kwyt"></div>
     </section>
 
     <div class="stats o3">
-      <div class="stat"><b id="left">30,0</b><span>noch te gean</span></div>
+      <div class="stat"><b id="left">–</b><span>lêste weging</span></div>
       <div class="stat"><b id="train">0</b><span>trainingen</span></div>
       <div class="stat"><b id="dl">–</b><span>kg deadlift</span></div>
     </div>
@@ -448,7 +460,7 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 
   <div class="col col-b">
     <section class="band o5">
-      <h2 class="disp">Gewicht</h2>
+      <h2 class="disp">Kilo's kwyt</h2>
       <div id="chart"></div>
       <p class="note" id="chartNote">Stippellyn: it plan fan sa'n 1 kilo yn 'e wike.</p>
     </section>
@@ -577,72 +589,66 @@ h2.disp::before{content:"";width:6px;height:24px;border-radius:3px;background:va
 
 <script src="kompetysje.js"></script>
 <script src="wrapped.js"></script>
-<script type="application/json" id="data">{"updated":null,"start":130,"goal":100,"weights":[],"weeks":[],"deadlift":[],"note":"","photos":[],"contour":null}</script>
+<script type="application/json" id="data">{"updated":null,"goal":100,"weights":[],"kpct":[],"reached":null,"weeks":[],"deadlift":[],"note":"","photos":[],"contour":null}</script>
 <script>
 (() => {
 const MONTHS=["jannewaris","febrewaris","maart","april","maaie","juny","july","augustus","septimber","oktober","novimber","desimber"];
 const $=id=>document.getElementById(id);
-let D; try{D=JSON.parse($("data").textContent)}catch(e){D={start:130,goal:100}}
+let D; try{D=JSON.parse($("data").textContent)}catch(e){D={goal:100}}
 const pd=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
 const fmt=(n,d=1)=>n==null?"–":Math.abs(n).toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d});
 const fd=s=>{const d=pd(s);return d.getDate()+" "+MONTHS[d.getMonth()]};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+// Privacy: de side kin allinne kilo's KWYT (sûnt de start), nea it echte gewicht of it startgewicht.
+// weights: [[datum, kilo kwyt]], reached: datum dat de 100 helle is (oars null).
 const ws=(D.weights||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
-const start=D.start||130, goal=D.goal||100, cur=ws.length?ws[ws.length-1][1]:start;
-const lost=Math.max(0,start-cur), left=Math.max(0,cur-goal), total=start-goal;
+const goal=D.goal||100, reached=D.reached||null;
+const lostRaw=ws.length?ws[ws.length-1][1]:0, lost=Math.max(0,lostRaw);
+const MS=[10,20,30,40];
+const FT=reached?Math.max(1,Math.floor(lost)):Math.max(40,Math.floor(lost)+1); // referinsje foar poppe en kachel
 const weekNo=ws.length?Math.max(0,Math.round((pd(ws[ws.length-1][0])-pd(ws[0][0]))/(7*864e5))):0;
 
 $("lost").textContent=(lost>0?"−":"")+fmt(lost);
-$("left").textContent=fmt(left);
-$("startLbl").textContent=fmt(start,0); $("goalLbl").textContent=fmt(goal,0);
-const on=Math.min(30,Math.round(lost/total*30));
-const MSS=[{kg:120,goal:"ûnder de 120 kilo",when:"op myn jierdei (13 april)",done:c=>c<120},{kg:110,goal:"110 kilo",when:"mei de bouwfak (24 july)",done:c=>c<=110}];
-const msIdx=MSS.map(m=>Math.round((start-m.kg)/total*30)-1);
-$("ticks").innerHTML=Array.from({length:30},(_,i)=>{const c=[];if(i<on)c.push("on");if(msIdx.includes(i))c.push("ms");return '<button type="button" data-k="'+i+'" aria-label="Kilo '+(i+1)+'"'+(c.length?' class="'+c.join(" ")+'"':'')+'></button>'}).join("");
-const next=MSS.find(m=>!m.done(cur)), hit=MSS.filter(m=>m.done(cur));
+{const d=ws.length>1?ws[ws.length-1][1]-ws[ws.length-2][1]:null; $("left").textContent=d==null?"–":(d>0?"−":d<0?"+":"±")+fmt(d);}
+const nextMs=MS.find(m=>lost<m), hitMs=MS.filter(m=>lost>=m);
+$("mpl").innerHTML=MS.map(m=>{const got=lost>=m, nx=m===nextMs&&!reached;return '<div role="listitem" class="'+(got?'got':nx?'next':'')+'"><b>−'+m+'</b><span>'+(got?'helle':nx?'folgjende':'')+'</span></div>'}).join("");
+// feest by 100
+if(reached){
+  const r=ws.find(x=>x[0]>=reached)||ws[ws.length-1];
+  $("feestDei").textContent="Helle op "+fd(reached)+" "+reached.slice(0,4);
+  $("feestTot").textContent=r?"−"+fmt(r[1])+" kilo":"";
+  $("feestBand").hidden=false;
+}
 // klikbere doelen
 (()=>{
   const ref=D.updated?pd(D.updated):new Date();
   const CAKE='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Jierdei"><path d="M4 21h16"/><path d="M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM12 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5zM16 6.5c0-.8.6-1.5 0-2.5-.6 1-1 1.7 0 2.5z" fill="currentColor"/></svg>';
   const BEER='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Bouwfak"><path d="M6 8h10v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M6 8a2.5 2.5 0 0 1 1.5-4.6A3 3 0 0 1 13 3a2.5 2.5 0 0 1 3 2.6A2 2 0 0 1 16 8"/><path d="M9.5 12v6M12.5 12v6"/></svg>';
   const PARTY='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Feest"><path d="M4 20l4.5-12 7.5 7.5z"/><path d="M7 12.5l4.5 4.5"/><path d="M14 3v2M19 8h2M17.5 4.5l-1.5 1.5"/><circle cx="20" cy="3.5" r=".8" fill="currentColor"/><circle cx="13" cy="9" r=".8" fill="currentColor"/><path d="M15 12c1.5-1.5 3.5-1.5 5 0"/></svg>';
-  const G=[{kg:120,title:"Ûnder de 120",icon:CAKE,sub:"Feest op 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it. Dan wol ik der stean op ûnder de 120!",date:"2027-04-13",target:119.9,done:cur<120},
-           {kg:110,title:"110 kilo",icon:BEER,sub:"Bouwfak · 24 july",date:"2027-07-24",target:110,done:cur<=110},
-           {kg:goal,title:fmt(goal,0)+" kilo",icon:PARTY,sub:"Feest · datum komt",extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",date:null,target:goal,done:cur<=goal}];
-  // tuskenstappen per 5 kilo (sûnder datum), tusken de echte doelen yn
-  for(let v=goal+5; v<start; v+=5){
-    if(G.some(g=>g.kg===v)) continue;
-    G.push({kg:v,title:v+" kilo",sub:"Stap: "+fmt(start-v,0)+" kilo kwyt",step:true,date:null,target:v,done:cur<=v,
-      extra:"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!"});
+  const wksTo=d=>Math.max(0,Math.ceil((pd(d)-ref)/(7*864e5)));
+  // datums: jierdei en bouwfak, sûnder kilogetal
+  const DT=[{date:"2027-04-18",kg:CAKE,title:"Myn jierdei",sub:"Feest op 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it."},
+            {date:"2027-07-24",kg:BEER,title:"Bouwfak",sub:"24 july",extra:"De bouwfak begjint. Dan wol ik der goed foar stean!"}];
+  const G=[];
+  DT.forEach(e=>{const w=wksTo(e.date), past=w===0;
+    G.push({kgHtml:e.kg,title:e.title,sub:e.sub,date:true,done:past,pill:past?'Foarby':'Noch '+w+' wiken',
+      cells:past?'':'<div><b>'+w+'</b><span>wiken noch</span></div><div><b>−'+fmt(lost+w,0)+'</b><span>kilo kwyt by 1 kg/wike</span></div>',
+      extra:e.extra,tip:past?"Dizze datum is foarby.":"Mei sa'n 1 kilo yn 'e wike stiet de teller dan op sa'n −"+fmt(lost+w,0)+" kilo."});});
+  for(let v=5; v<=40; v+=5){
+    const step=v%10!==0, done=lost>=v, rest=Math.max(0,v-lost);
+    G.push({kgHtml:'−'+v,title:"−"+v+" kilo",sub:step?"Stap":"Mylpeal",step:step,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
+      cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div><div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>',
+      extra:step?"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!":null,
+      tip:done?"Helle! Op nei it folgjende doel.":"Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(rest)+" wiken."});
   }
-  G.sort((a,b)=>b.kg-a.kg);
-  const firstOpen=G.findIndex(g=>!g.done);
-  $("goals").innerHTML=G.map((g,i)=>{
-    const left=Math.max(0,cur-g.target), wks=g.date?Math.max(0,Math.ceil((pd(g.date)-ref)/(7*864e5))):null;
-    const per=wks?left/wks:null;
-    let tip;
-    if(g.done) tip="Helle! Op nei it folgjende doel.";
-    else if(wks===0) tip="De datum is foarby. Gjin punt: hâld it tempo fêst.";
-    else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
-    else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(left)+" wiken.";
-    const cells=g.done?'':'<div><b>'+fmt(left)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'');
-    return '<details class="goal'+(g.step?' step':'')+'" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kg+'</span><span class="what"><b>'+g.title+(g.icon||'')+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done?' ok':'')+'">'+(g.done?'Helle':'Noch '+fmt(left)+' kg')+'</span></summary><div class="more">'+cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+tip+'</p></div></details>';
-  }).join("");
+  G.push({kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
+    extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
+  $("goals").innerHTML=G.map((g,i)=>'<details class="goal'+(g.step?' step':'')+'" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kgHtml+'</span><span class="what"><b>'+g.title+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done&&!g.date?' ok':'')+'">'+g.pill+'</span></summary><div class="more">'+g.cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+g.tip+'</p></div></details>').join("");
 })();
 // ien doel tagelyk iepen
 document.querySelectorAll("#goals details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#goals details").forEach(o=>{if(o!==d)o.open=false})}));
-// klikbere blûkjes
-$("ticks").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-k]"); if(!b)return;
-  const k=+b.dataset.k, step=total/30, from=start-k*step, to=start-(k+1)*step;
-  let gi=msIdx.indexOf(k); if(k===29)gi=2;
-  document.querySelectorAll("#ticks button.sel").forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
-  $("tickInfo").hidden=false;
-  $("tickInfo").innerHTML='<b>Kilo '+(k+1)+' fan 30</b> · fan '+fmt(from)+' nei '+fmt(to)+' kg · '+(k<on?'helle':'noch te dwaan')+(gi>=0?' · '+['tuskendoel jierdei','tuskendoel bouwfak','einddoel'][gi]:'');
-  if(gi>=0){const d=$("goal"+gi); if(d){d.open=true; d.scrollIntoView({behavior:"smooth",block:"nearest"})}}
-});
-$("msLine").innerHTML=(hit.length?'<b>Helle:</b> '+hit.map(m=>m.goal).join(", ")+'. ':'')+(next?'<b>Tuskendoel: '+next.goal+'</b> '+next.when+'. Noch '+fmt(Math.max(0,cur-(next.kg===120?119.9:next.kg)))+' kilo.':'');
+$("msLine").innerHTML=reached?'<b>Doel helle!</b> Stoker is op 100 kilo.':(hitMs.length?'<b>Helle:</b> '+hitMs.map(m=>"−"+m).join(", ")+' kilo. ':'')+(nextMs?'<b>Folgjende mylpeal: −'+nextMs+' kilo.</b> Noch '+fmt(nextMs-lost)+' kilo.':'Op nei de 100!');
 $("when").innerHTML=ws.length&&weekNo>0?"Wike "+weekNo+"<br>"+fd(ws[ws.length-1][0]):"Start<br>"+(ws.length?fd(ws[0][0]):"21 oktober");
 
 const wk=D.weeks||[]; const tot=wk.reduce((a,w)=>a+(w[1]||0),0);
@@ -650,39 +656,39 @@ $("train").textContent=wk.length?tot+"/"+(wk.length*5):"0";
 const dl=(D.deadlift||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
 $("dl").textContent=dl.length?fmt(dl[dl.length-1][1],dl[dl.length-1][1]%1?1:0):"–";
 
-// grafiek
+// grafiek: kilo's kwyt sûnt de start (gjin echt gewicht)
 if(ws.length>=2){
-  const W=350,H=160,T=12,B=22;
+  const W=350,H=160,T=12,B=22,L=26;
   const t=ws.map(p=>pd(p[0]).getTime()), x0=t[0], x1=Math.max(t[t.length-1],x0+21*864e5);
-  const ys=ws.map(p=>p[1]).concat([start]); const y0=Math.min(...ys)-1.5, y1=Math.max(...ys)+1;
-  const X=v=>(v-x0)/(x1-x0)*W, Y=v=>T+(y1-v)/(y1-y0)*(H-T-B);
-  const pe=Math.min(x1,x0+(start-goal)*7*864e5), pv=start-(pe-x0)/(7*864e5);
+  const vs=ws.map(p=>p[1]), lo=Math.min(0,...vs), pw=(x1-x0)/(7*864e5), hi=Math.max(5,...vs,Math.min(pw,Math.max(...vs)+3));
+  const X=v=>L+(v-x0)/(x1-x0)*(W-L), Y=v=>T+(v-lo)/(hi-lo)*(H-T-B);
+  const pv=Math.min(hi,pw);
   const pts=ws.map((p,i)=>X(t[i]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ");
   const lx=X(t[t.length-1]), ly=Y(ws[ws.length-1][1]);
-  $("chart").innerHTML='<svg class="chart" viewBox="-6 0 '+(W+12)+' '+H+'" role="img" aria-label="Gewicht fan '+fmt(ws[0][1])+' nei '+fmt(cur)+' kilo">'+
-    '<line x1="0" x2="'+W+'" y1="'+(H-B)+'" y2="'+(H-B)+'" stroke="var(--line)"/>'+
-    '<line x1="0" y1="'+Y(start)+'" x2="'+X(pe)+'" y2="'+Y(pv)+'" stroke="#555" stroke-width="1.5" stroke-dasharray="5 5"/>'+
+  const step=hi>20?10:5; let grid="";
+  for(let g=0; g<=hi; g+=step) grid+='<line x1="'+L+'" x2="'+W+'" y1="'+Y(g)+'" y2="'+Y(g)+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(Y(g)+4)+'" text-anchor="end">'+(g?"−"+g:"0")+'</text>';
+  $("chart").innerHTML='<svg class="chart" viewBox="-6 0 '+(W+12)+' '+H+'" role="img" aria-label="Kilo\'s kwyt: no '+fmt(lost)+' kilo">'+grid+
+    '<line x1="'+X(x0)+'" y1="'+Y(0)+'" x2="'+X(x0+pv*7*864e5)+'" y2="'+Y(pv)+'" stroke="#555" stroke-width="1.5" stroke-dasharray="5 5"/>'+
     '<polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>'+
     '<circle cx="'+lx+'" cy="'+ly+'" r="5" fill="var(--accent)"/>'+
-    '<text x="0" y="'+(H-6)+'">'+fd(ws[0][0])+'</text><text x="'+W+'" y="'+(H-6)+'" text-anchor="end">'+fd(ws[ws.length-1][0])+'</text>'+
-    '<text x="'+Math.max(20,lx-8)+'" y="'+(ly-10)+'" text-anchor="end" style="fill:var(--fg)">'+fmt(cur)+'</text></svg>';
+    '<text x="'+L+'" y="'+(H-6)+'">'+fd(ws[0][0])+'</text><text x="'+W+'" y="'+(H-6)+'" text-anchor="end">'+fd(ws[ws.length-1][0])+'</text>'+
+    '<text x="'+Math.max(L+20,lx-8)+'" y="'+(ly-10)+'" text-anchor="end" style="fill:var(--fg)">'+(lostRaw>0?"−":lostRaw<0?"+":"")+fmt(lostRaw)+'</text></svg>';
 } else {
   $("chartNote").hidden=true;
-  $("chart").innerHTML='<div class="empty">'+(ws.length?"Startgewicht stiet der yn. Nei de twadde weging ferskynt hjir de line.":"De earste weging is op woansdei 21 oktober.")+'</div>';
+  $("chart").innerHTML='<div class="empty">'+(ws.length?"De start stiet der yn. Nei de twadde weging ferskynt hjir de line.":"Nei de earste weging ferskynt hjir de line.")+'</div>';
 }
 
 // weekkaartjes: per weging, nijste earst
 if(ws.length){
   const cards=ws.map((w,i)=>{const d=i?w[1]-ws[i-1][1]:null;const n=Math.round((pd(w[0])-pd(ws[0][0]))/(7*864e5));
-    const tr=wk.find(x=>Math.abs(pd(x[0])-pd(w[0]))<7*864e5&&pd(x[0])<=pd(w[0]));
-    return '<div class="wk"><span>'+(n?"Wike "+n:"Start")+'</span><b>'+fmt(w[1])+'</b>'+
-      (d==null?'<small>'+fd(w[0])+'</small>':'<em'+(d>0?' class="up"':'')+'>'+(d>0?"+":"−")+fmt(d)+' kg</em>')+'</div>'}).reverse();
+    return '<div class="wk"><span>'+(n?"Wike "+n:"Start")+'</span><b>'+(i?(w[1]>0?"−":w[1]<0?"+":"")+fmt(w[1]):fd(w[0]))+'</b>'+
+      (d==null?'<small>de start</small>':'<em'+(d<0?' class="up"':'')+'>'+(d<0?"+":"−")+fmt(d)+' kg</em>')+'</div>'}).reverse();
   $("weeks").innerHTML='<div class="weeks">'+cards.join("")+'</div>';
 } else $("weeks").innerHTML='<div class="empty">Elke woansdei komt der in kaartsje by.</div>';
 
 // dizze wike
 if(D.note){$("story").textContent=D.note}
-else{$("story").textContent=ws.length?"":"Fan 130 nei 100 kilo. Fiif kear yn 'e wike traine en goed ite. Elke woansdei in update."; if(ws.length)$("storyBand").hidden=true}
+else{$("story").textContent=ws.length?"":"Op wei nei 100 kilo. Fiif kear yn 'e wike traine en goed ite. Elke woansdei in update."; if(ws.length)$("storyBand").hidden=true}
 
 // foto's (allinne as der dielde foto's binne)
 const ph=(D.photos||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
@@ -720,7 +726,7 @@ const MEDAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const maxDl=dl.length?Math.max(...dl.map(x=>x[1])):0;
 const full=wk.some(w=>w[1]>=5);
 let run=0,best=0; wk.forEach(w=>{run=w[1]>=4?run+1:0;best=Math.max(best,run)});
-const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["Ûnder de 120",cur<120],["20 kilo kwyt",lost>=20],["Ûnder de 110",cur<=110],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["Deadlift mear as ik weach",maxDl>0&&maxDl>=cur],["25 kilo kwyt",lost>=25],["100 kilo!",cur<=goal]];
+const MED=[["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["15 kilo kwyt",lost>=15],["20 kilo kwyt",lost>=20],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["25 kilo kwyt",lost>=25],["30 kilo kwyt",lost>=30],["40 kilo kwyt",lost>=40],["100 kilo!",!!reached]];
 $("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
 const nGot=MED.filter(m=>m[1]).length;
 $("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste kilo is de earste medalje.";
@@ -897,11 +903,11 @@ function stokerFig(kwyt, total){
 
 // poppe yn 'e kop, mei wiebelje en in tekstballonke
 (()=>{
-  $("figBtn").innerHTML=stokerFig(lost,total);
+  $("figBtn").innerHTML=stokerFig(lost,FT);
   if(Math.floor(lost)<10) $("figBtn").classList.add("zwit"); // swiere poppe swit oan ien stik troch
-  const left=Math.max(0,Math.ceil((cur-goal)*10)/10);
+  const toMs=nextMs?Math.max(0,Math.ceil((nextMs-lost)*10)/10):null;
   const kw=Math.floor(lost);
-  const ALG=["Hee, net kidelje!","Noch "+fmt(left)+" kilo!","Stoker stookt troch! 🔥","Gjin snoeperij hjoed!","Op nei de sportskoalle!","Dyn gok al dien?",
+  const ALG=["Hee, net kidelje!",(toMs!=null?"Noch "+fmt(toMs)+" kilo oant −"+nextMs+"!":"Elke kilo telt!"),"Stoker stookt troch! 🔥","Gjin snoeperij hjoed!","Op nei de sportskoalle!","Dyn gok al dien?",
     "Gean ris mei te sporten!","Woansdei is weachdei!","Wetter drinke, wetter drinke!","Hjoed al 10.000 stappen?","Snoeperij? Nee, tankjewol!",
     "Krat bier? Allinne om te tillen.","Ik rûk de patat wol, mar ik yt it net.","Deadlift? Kom mar op!","De kachel moat brâne!",
     "Kom, in rûntsje kuierje!","Oant de bouwfak: fol gas!","Hoi! Ik bin Stoker.","Elke kilo telt!","Net opjaan, gewoan trochgean."];
@@ -909,7 +915,7 @@ function stokerFig(kwyt, total){
   const FIT=["Sjoch dy earms ris!","Sterk as in Fries hynder!","Myn broek sakket ôf!","Dizze spieren binne net fan sûker.","Wa hat myn bûk sjoen?"];
   const DOEL=["Sjoch dy spieren!","100 kilo, feest!","Wa docht my wat?","Ik bin der! Tank foar jim help!","Stoker is binnen! 🔥"];
   const shuffle=a=>{for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]]}return a};
-  const Q=shuffle(lost>=total?DOEL:ALG.concat(kw<10?DIK:[],kw>=15?FIT:[]));
+  const Q=shuffle(reached?DOEL:ALG.concat(kw<10?DIK:[],kw>=15?FIT:[]));
   let i=0, tm=0;
   $("figBtn").addEventListener("click",()=>{
     const b=$("figBtn"); b.classList.remove("wiebel","drip1"); void b.offsetWidth; b.classList.add("wiebel","drip1");
@@ -978,7 +984,7 @@ function stokerFig(kwyt, total){
 // ===== mini-kop by it skowen, mei in sportsjend poppe =====
 (()=>{
   const mk=document.createElement("div"); mk.className="minikop"; mk.setAttribute("role","button"); mk.setAttribute("aria-label","Nei boppen"); mk.tabIndex=0;
-  mk.innerHTML=stokerFig(lost,total)+'<b>Stoker nei 100</b><em>'+(lost>0?"−":"")+fmt(lost)+' kg</em>';
+  mk.innerHTML=stokerFig(lost,FT)+'<b>Stoker nei 100</b><em>'+(lost>0?"−":"")+fmt(lost)+' kg</em>';
   document.body.appendChild(mk);
   mk.addEventListener("click",()=>scrollTo({top:0,behavior:"smooth"}));
   // sa no en dan even sporte: 2 sekonden joggen, dan wer in skoftsje stil
@@ -1078,7 +1084,7 @@ function stokerFig(kwyt, total){
 })();
 // stoker stookt de kilo's op
 (()=>{
-  const N=Math.max(1,Math.round(total)), burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
+  const N=FT, burned=Math.max(0,Math.min(N,Math.floor(lost+1e-9))), keep=N-burned, f=burned/N;
   let logs="";
   for(let i=0;i<N;i++){
     const r=Math.floor(i/6), c=i%6, x=158+c*30+(r%2?15:0), y=232-r*27, on=i<keep;
@@ -1094,8 +1100,8 @@ function stokerFig(kwyt, total){
     '<rect x="30" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="106" y="230" width="12" height="18" fill="#3a3a3a"/><rect x="0" y="248" width="340" height="2" fill="#2c2c2c"/>'+
     logs+'</svg>';
   $("kBurn").textContent=burned; $("kLeft").textContent=keep;
-  const Q=[[0,"De kachel is kâld. Woansdei giet it earste blok der yn."],[1,"It earste blok is der yn. Der giet in fjoerke!"],[5,"It fjoer komt op gong. Stoker stookt troch."],[10,"Tsien blokken. De kachel wurdt waarm, de broek wurdt rom."],[20,"De stapel slinkt hurd. Hjir is in echte stoker oan it wurk."],[N-1,"Noch ien blok..."],[N,"Stapel op, kachel gloeiend: Stoker is by de 100!"]];
-  $("kQuip").textContent=Q.filter(q=>burned>=q[0]).pop()[1];
+  const Q=[[0,"De kachel is kâld. Woansdei giet it earste blok der yn."],[1,"It earste blok is der yn. Der giet in fjoerke!"],[5,"It fjoer komt op gong. Stoker stookt troch."],[10,"Tsien blokken. De kachel wurdt waarm, de broek wurdt rom."],[20,"De stapel slinkt hurd. Hjir is in echte stoker oan it wurk."],[30,"Tritich blokken! De kachel gloeit, Stoker ek."]];
+  $("kQuip").textContent=reached?"Stapel op, kachel gloeiend: Stoker is by de 100!":Q.filter(q=>burned>=q[0]).pop()[1];
 })();
 
 // gean in kear mei: oanbiedingen yn Supabase, Stoker seit ja of nee
@@ -1210,17 +1216,19 @@ function stokerFig(kwyt, total){
 // wat as
 (()=>{
   const M=MONTHS, ref=ws.length?pd(ws[ws.length-1][0]):pd("2026-10-21");
-  $("watIntro").textContent="Skuif mei it tempo en sjoch wannear't Stoker by syn doelen is. No: "+fmt(cur)+" kilo.";
-  const goalsW=[[119.9,"120",pd("2027-04-18"),"it feest"],[110,"110",pd("2027-07-24"),"de bouwfak"],[goal,fmt(goal,0),null,""]];
+  $("watIntro").textContent="Skuif mei it tempo en sjoch wannear't Stoker by syn mylpealen is. No: "+(lost>0?"−":"")+fmt(lost)+" kilo.";
+  const EV=[[pd("2027-04-18"),"it feest"],[pd("2027-07-24"),"de bouwfak"]];
   const draw=()=>{
     const pace=+$("tempo").value/10;
     $("paceLbl").textContent=pace.toLocaleString("nl-NL",{minimumFractionDigits:1})+" kg / wike";
-    $("watRows").innerHTML=goalsW.map(([kg,lab,dl,name])=>{
-      if(cur<=kg)return '<div class="wrow"><b>'+lab+'</b><div><strong>Helle!</strong><span>Dit doel is al binnen.</span></div></div>';
-      const d=new Date(ref); d.setDate(d.getDate()+Math.ceil((cur-kg)/pace*7));
-      const ok=dl?d<=dl:true;
-      return '<div class="wrow"><b>'+lab+'</b><div><strong>'+d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+'</strong><span'+(ok?'':' class="late"')+'>'+(dl?(ok?"Op tiid foar "+name+"!":"Te let foar "+name):"It einddoel")+'</span></div></div>';
-    }).join("");
+    const rows=MS.map(m=>{
+      if(lost>=m)return '<div class="wrow"><b>−'+m+'</b><div><strong>Helle!</strong><span>Dizze mylpeal is al binnen.</span></div></div>';
+      const d=new Date(ref); d.setDate(d.getDate()+Math.ceil((m-lost)/pace*7));
+      const ev=EV.find(e=>d<=e[0]);
+      return '<div class="wrow"><b>−'+m+'</b><div><strong>'+d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+'</strong><span>'+(ev?"Foar "+ev[1]+"!":"Nei de bouwfak")+'</span></div></div>';
+    });
+    EV.forEach(e=>{const w=Math.max(0,(e[0]-ref)/(7*864e5)); if(w>0) rows.push('<div class="wrow"><b>'+e[0].getDate()+'/'+(e[0].getMonth()+1)+'</b><div><strong>Sa\'n −'+fmt(lost+w*pace,0)+' kilo</strong><span>By '+e[1]+'</span></div></div>')});
+    $("watRows").innerHTML=rows.join("");
   };
   $("tempo").addEventListener("input",draw); draw();
 })();
@@ -1258,14 +1266,14 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
       $("kompetysje").hidden=false; return; }
     const mx=Math.max(10,...k.rows.map(x=>x.pct||0));
     const CUP='<svg viewBox="0 0 24 24" fill="none" stroke="#ffd23f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
-    $("kWin").innerHTML=k.winer?'<div class="kwin">'+CUP+'<div><span>Grutste ôffaller fan \'e wike</span><b>'+E(k.winer.namme)+'</b></div><em>−'+nl1(k.winer.wike)+'%</em></div>':'';
+    $("kWin").innerHTML=k.winer?'<div class="kwin">'+CUP+'<div><span>Grutste ôffaller fan \'e wike</span><b>'+E(k.winer.namme)+'</b></div><em>−'+(k.winer.heel?Math.round(k.winer.wike):nl1(k.winer.wike))+'%</em></div>':'';
     let n=0;
     $("kLijst").innerHTML=k.rows.map(x=>{const p=x.pct; if(p!=null)n++;
       const href=x.stoker?"#":"side.html?n="+encodeURIComponent(x.slug);
-      return '<li class="'+(x.stoker?"ik":"")+'"><a href="'+href+'"'+(x.stoker?' data-top="1"':'')+' aria-label="'+E(x.namme)+(p!=null?", plak "+n+", "+nl1(p)+" prosint kwyt":", noch net begûn")+'">'+
+      return '<li class="'+(x.stoker?"ik":"")+'"><a href="'+href+'"'+(x.stoker?' data-top="1"':'')+' aria-label="'+E(x.namme)+(p!=null?", plak "+n+", "+(x.heel?Math.round(p):nl1(p))+" prosint kwyt":", noch net begûn")+'">'+
         '<span class="pl">'+(p!=null?n:"–")+'</span><span class="kav" style="background:'+E(x.kleur)+'">'+E(x.namme[0].toUpperCase())+'</span>'+
         '<span class="nm"><b>'+E(x.namme)+(x.skoen?' <span class="kpriis" title="Gouden skoen: de measte dagen 10.000 stappen dizze moanne">👟</span>':'')+(x.lantearne?' <span class="kpriis" title="Reade lantearne: de lêste plak">🏮</span>':'')+((n2=>n2>=2?' <span class="kfire" title="'+n2+' dagen op rige aktyf">🔥'+n2+'</span>':'')(StokerKomp.reeks?StokerKomp.reeks(x.dagen):0))+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k'+((m=>m?' · 🏅 '+m:'')(StokerKomp.medaljes?StokerKomp.medaljes(x).filter(q=>q[1]).length:0)):'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
-        '<span class="kp">'+(p==null?"–":(p<0?"+":p>0?"−":"")+nl1(Math.abs(p))+"%")+'<small>kwyt</small></span></a></li>'}).join("");
+        '<span class="kp">'+(p==null?"–":(p<0?"+":p>0?"−":"")+(x.heel?Math.round(Math.abs(p)):nl1(Math.abs(p)))+"%")+'<small>kwyt</small></span></a></li>'}).join("");
     $("kLijst").addEventListener("click",e=>{const a=e.target.closest('[data-top]');if(a){e.preventDefault();scrollTo({top:0,behavior:"smooth"})}});
     $("kPrizen").hidden=!k.rows.some(x=>x.skoen||x.lantearne);
     $("kInfoBtn").addEventListener("click",()=>{const o=$("kInfo").hidden;$("kInfo").hidden=!o;$("kInfoBtn").setAttribute("aria-expanded",String(o))});
