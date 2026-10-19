@@ -627,20 +627,21 @@ if(reached){
   const BEER='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Bouwfak"><path d="M6 8h10v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M6 8a2.5 2.5 0 0 1 1.5-4.6A3 3 0 0 1 13 3a2.5 2.5 0 0 1 3 2.6A2 2 0 0 1 16 8"/><path d="M9.5 12v6M12.5 12v6"/></svg>';
   const PARTY='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Feest"><path d="M4 20l4.5-12 7.5 7.5z"/><path d="M7 12.5l4.5 4.5"/><path d="M14 3v2M19 8h2M17.5 4.5l-1.5 1.5"/><circle cx="20" cy="3.5" r=".8" fill="currentColor"/><circle cx="13" cy="9" r=".8" fill="currentColor"/><path d="M15 12c1.5-1.5 3.5-1.5 5 0"/></svg>';
   const wksTo=d=>Math.max(0,Math.ceil((pd(d)-ref)/(7*864e5)));
-  // datums: jierdei en bouwfak, sûnder kilogetal
-  const DT=[{date:"2027-04-18",kg:CAKE,title:"Myn jierdei",sub:"Feest op 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it."},
-            {date:"2027-07-24",kg:BEER,title:"Bouwfak",sub:"24 july",extra:"De bouwfak begjint. Dan wol ik der goed foar stean!"}];
+  // jierdei en bouwfak hingje oan in mylpeal/stap (allinne kilo's kwyt, gjin gewicht)
+  const EVM={20:{icon:CAKE,date:"2027-04-18",sub:"Myn jierdei · feest 18 april",extra:"Op 13 april bin ik jierdei, op snein 18 april fier ik it. Dan wol ik −20 kilo kwyt wêze!",name:"it feest"},
+             25:{icon:BEER,date:"2027-07-24",sub:"Bouwfak · 24 july",extra:"Mei de bouwfak wol ik −25 kilo kwyt wêze. Dan smakket dat pilske ek better!",name:"de bouwfak"}};
   const G=[];
-  DT.forEach(e=>{const w=wksTo(e.date), past=w===0;
-    G.push({kgHtml:e.kg,title:e.title,sub:e.sub,date:true,done:past,pill:past?'Foarby':'Noch '+w+' wiken',
-      cells:past?'':'<div><b>'+w+'</b><span>wiken noch</span></div><div><b>−'+fmt(lost+w,0)+'</b><span>kilo kwyt by 1 kg/wike</span></div>',
-      extra:e.extra,tip:past?"Dizze datum is foarby.":"Mei sa'n 1 kilo yn 'e wike stiet de teller dan op sa'n −"+fmt(lost+w,0)+" kilo."});});
   for(let v=5; v<=30; v+=5){
-    const step=v%10!==0, done=lost>=v, rest=Math.max(0,v-lost);
-    G.push({kgHtml:'−'+v,title:"−"+v+" kilo",sub:step?"Stap":"Mylpeal",step:step,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
-      cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div><div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>',
-      extra:step?"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!":null,
-      tip:done?"Helle! Op nei it folgjende doel.":"Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(rest)+" wiken."});
+    const e=EVM[v], step=v%10!==0, done=lost>=v, rest=Math.max(0,v-lost);
+    const wks=e?wksTo(e.date):null, per=wks?rest/wks:null;
+    let tip;
+    if(done) tip="Helle! Op nei it folgjende doel.";
+    else if(wks===0) tip="De datum is foarby. Gjin punt: hâld it tempo fêst.";
+    else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
+    else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(rest)+" wiken.";
+    G.push({kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:(step?"Stap":"Mylpeal"),step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
+      cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'<div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>'),
+      extra:e?e.extra:(step?"Elke 5 kilo is in stap. By dizze stap feroaret it poppetsje boppe-oan de side ek!":null),tip:tip});
   }
   G.push({kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
     extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
@@ -648,7 +649,7 @@ if(reached){
 })();
 // ien doel tagelyk iepen
 document.querySelectorAll("#goals details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#goals details").forEach(o=>{if(o!==d)o.open=false})}));
-$("msLine").innerHTML=reached?'<b>Doel helle!</b> Stoker is op 100 kilo.':(hitMs.length?'<b>Helle:</b> '+hitMs.map(m=>"−"+m).join(", ")+' kilo. ':'')+(nextMs?'<b>Folgjende mylpeal: −'+nextMs+' kilo.</b> Noch '+fmt(nextMs-lost)+' kilo.':'Op nei de 100!');
+$("msLine").innerHTML=reached?'<b>Doel helle!</b> Stoker is op 100 kilo.':(hitMs.length?'<b>Helle:</b> '+hitMs.map(m=>"−"+m).join(", ")+' kilo. ':'')+(nextMs?'<b>Folgjende mylpeal: −'+nextMs+' kilo'+(nextMs===20?' op myn jierdei':'')+'.</b> Noch '+fmt(nextMs-lost)+' kilo.':'Op nei de 100!');
 $("when").innerHTML=ws.length&&weekNo>0?"Wike "+weekNo+"<br>"+fd(ws[ws.length-1][0]):"Start<br>"+(ws.length?fd(ws[0][0]):"21 oktober");
 
 const wk=D.weeks||[]; const tot=wk.reduce((a,w)=>a+(w[1]||0),0);
@@ -1217,17 +1218,16 @@ function stokerFig(kwyt, total){
 (()=>{
   const M=MONTHS, ref=ws.length?pd(ws[ws.length-1][0]):pd("2026-10-21");
   $("watIntro").textContent="Skuif mei it tempo en sjoch wannear't Stoker by syn mylpealen is. No: "+(lost>0?"−":"")+fmt(lost)+" kilo.";
-  const EV=[[pd("2027-04-18"),"it feest"],[pd("2027-07-24"),"de bouwfak"]];
+  const EV={20:[pd("2027-04-18"),"it feest"],25:[pd("2027-07-24"),"de bouwfak"]};
   const draw=()=>{
     const pace=+$("tempo").value/10;
     $("paceLbl").textContent=pace.toLocaleString("nl-NL",{minimumFractionDigits:1})+" kg / wike";
-    const rows=MS.map(m=>{
-      if(lost>=m)return '<div class="wrow"><b>−'+m+'</b><div><strong>Helle!</strong><span>Dizze mylpeal is al binnen.</span></div></div>';
+    const rows=[10,20,25,30].map(m=>{
+      if(lost>=m)return '<div class="wrow"><b>−'+m+'</b><div><strong>Helle!</strong><span>Dit doel is al binnen.</span></div></div>';
       const d=new Date(ref); d.setDate(d.getDate()+Math.ceil((m-lost)/pace*7));
-      const ev=EV.find(e=>d<=e[0]);
-      return '<div class="wrow"><b>−'+m+'</b><div><strong>'+d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+'</strong><span>'+(ev?"Foar "+ev[1]+"!":"Nei de bouwfak")+'</span></div></div>';
+      const e=EV[m], ok=e?d<=e[0]:true;
+      return '<div class="wrow"><b>−'+m+'</b><div><strong>'+d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+'</strong><span'+(ok?'':' class="late"')+'>'+(e?(ok?"Op tiid foar "+e[1]+"!":"Te let foar "+e[1]):"Mylpeal")+'</span></div></div>';
     });
-    EV.forEach(e=>{const w=Math.max(0,(e[0]-ref)/(7*864e5)); if(w>0) rows.push('<div class="wrow"><b>'+e[0].getDate()+'/'+(e[0].getMonth()+1)+'</b><div><strong>Sa\'n −'+fmt(lost+w*pace,0)+' kilo</strong><span>By '+e[1]+'</span></div></div>')});
     $("watRows").innerHTML=rows.join("");
   };
   $("tempo").addEventListener("input",draw); draw();
