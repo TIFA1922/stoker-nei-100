@@ -145,6 +145,28 @@ h2.disp{font-size:26px;line-height:1}
 .kwyt svg{width:34px;height:34px;color:var(--accent)}
 .kwyt b{display:block;font-size:15px}
 .kwyt span{font-size:13px;color:var(--muted)}
+.o2 .count{display:none}
+.gcar{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding-bottom:2px}
+.gcar::-webkit-scrollbar{display:none}
+.gc{flex:0 0 132px;scroll-snap-align:start;background:var(--band);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:3px;text-align:left;color:var(--fg);font:inherit;cursor:pointer}
+.gc b{font-family:var(--f-display);font-weight:400;font-size:30px;line-height:1;color:var(--muted)}
+.gc span{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.gc small{font-size:12px;color:var(--muted)}
+.gc .gi{width:15px;height:15px;color:var(--accent)}
+.gc.got{border-color:var(--accent)}.gc.got b,.gc.got small{color:var(--accent)}
+.gc.nx{border-color:var(--fg)}.gc.nx b{color:var(--fg)}
+.gc[aria-expanded="true"] > span{transform:none}
+.gc[aria-expanded="true"]{background:color-mix(in srgb,var(--accent) 14%,var(--band))}
+.gc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gswipe{font-size:12px;color:var(--muted);margin:8px 0 0}
+.gdet{margin-top:10px;background:var(--band);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:grid;gap:6px}
+.gdet>b{font-weight:600;display:flex;align-items:center;gap:6px}
+.gdet .sub{font-size:13px;color:var(--muted)}
+.gdet .more{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gdet .more div{display:grid;gap:2px}
+.gdet .more b{font-family:var(--f-display);font-weight:400;font-size:22px}
+.gdet .more span{font-size:12px;color:var(--muted)}
+.gdet .tip{margin:0;font-size:14px;color:var(--soft)}
 .count{display:flex;gap:8px;flex-wrap:wrap}
 .count div{flex:1 1 140px;background:var(--band);border-radius:6px;padding:10px 12px;display:grid;gap:2px}
 .count b{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -639,13 +661,23 @@ if(reached){
     else if(wks===0) tip="De datum is foarby. Gjin punt: hâld it tempo fêst.";
     else if(per!=null) tip=per<=0.5?"Rom op skema. Dit is goed te dwaan, ek mei in pear minder wiken.":per<=0.9?"Op skema as it tempo bliuwt sa't it no is.":"Krap. Elke wike telt, mar it kin noch.";
     else tip="Mei sa'n 1 kilo yn 'e wike bist der yn likernôch "+Math.ceil(rest)+" wiken.";
-    G.push({kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:"Mylpeal",step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
+    G.push({c1:e?e.icon.replace('class="ico"','class="ico gi"')+(v===20?"Jierdei":"Bouwfak"):(done?"Mylpeal":"Mylpeal"),c2:done?"Helle ✓":e&&wks?"noch "+wks+" wiken":"noch "+fmt(rest)+" kg",
+      kgHtml:'−'+v,title:"−"+v+" kilo"+(e?e.icon:""),sub:e?e.sub:"Mylpeal",step:step&&!e,done:done,pill:done?'Helle':'Noch '+fmt(rest)+' kg',
       cells:done?'':'<div><b>'+fmt(rest)+'</b><span>kilo noch</span></div>'+(wks!=null?'<div><b>'+wks+'</b><span>wiken noch</span></div><div><b>'+fmt(per)+'</b><span>kilo yn \'e wike</span></div>':'<div><b>'+Math.ceil(rest)+'</b><span>wiken by 1 kg/wike</span></div>'),
       extra:e?e.extra:"Elke 5 kilo is in mylpeal. Dan feroaret it poppetsje boppe-oan de side ek!",tip:tip});
   }
-  G.push({kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
+  G.push({c1:PARTY.replace('class="ico"','class="ico gi"')+"Feest",c2:reached?"Helle ✓":"op wei",kgHtml:fmt(goal,0),title:fmt(goal,0)+" kilo"+PARTY,sub:"Feest · datum komt",done:!!reached,pill:reached?'Helle':'Op wei',cells:'',
     extra:"Op 100 kilo jout Stoker in grut feest. De datum wurdt noch bekend makke, dus hâld de side yn de gaten!",tip:reached?"Helle! Feest!":"Elke kilo kwyt is in stap tichterby."});
-  $("goals").innerHTML=G.map((g,i)=>'<details class="goal'+(g.step?' step':'')+'" name="doelen" id="goal'+i+'"><summary><span class="kg">'+g.kgHtml+'</span><span class="what"><b>'+g.title+'</b><span>'+g.sub+'</span></span><span class="pill'+(g.done&&!g.date?' ok':'')+'">'+g.pill+'</span></summary><div class="more">'+g.cells+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+g.tip+'</p></div></details>').join("");
+  // swipe-kaartsjes: helle doelen stean foarop, mar it folgjende doel stiet by it iepenjen foaroan yn byld
+  const nxI=Math.max(0,G.findIndex(g=>!g.done));
+  $("goals").innerHTML='<div class="gcar" id="gcar">'+G.map((g,i)=>'<button type="button" class="gc'+(g.done?' got':i===nxI?' nx':'')+'" data-g="'+i+'" aria-expanded="false"><b>'+g.kgHtml+'</b><span>'+(i===nxI&&!g.done&&!/svg/.test(g.c1)?"Folgjende":g.c1)+'</span><small>'+g.c2+'</small></button>').join("")+'</div>'+
+    '<p class="gswipe">Feie opsij foar de oare doelen'+(nxI>0?' (helle stean links)':'')+' →</p><div class="gdet" id="gdet" hidden></div>';
+  const car=$("gcar"), det=$("gdet");
+  const naarFolgjende=()=>{const c=car.children[nxI]; if(c) car.scrollLeft=c.offsetLeft-car.firstElementChild.offsetLeft;};
+  requestAnimationFrame(naarFolgjende); addEventListener("load",naarFolgjende,{once:true});
+  car.addEventListener("click",e=>{const b=e.target.closest(".gc");if(!b)return;const g=G[+b.dataset.g],open=b.getAttribute("aria-expanded")!=="true";
+    car.querySelectorAll(".gc").forEach(x=>x.setAttribute("aria-expanded","false"));b.setAttribute("aria-expanded",String(open));
+    det.hidden=!open; det.innerHTML=open?'<b>'+g.title+'</b><span class="sub">'+g.sub+'</span>'+(g.cells?'<div class="more">'+g.cells+'</div>':'')+(g.extra?'<p class="tip">'+g.extra+'</p>':'')+'<p class="tip">'+g.tip+'</p>':"";});
 })();
 // ien doel tagelyk iepen
 document.querySelectorAll("#goals details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#goals details").forEach(o=>{if(o!==d)o.open=false})}));
