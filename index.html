@@ -760,13 +760,17 @@ if(ph.length){
 
 // medaljes
 const MEDAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2l2.5 6M16 2l-2.5 6"/><circle cx="12" cy="14.5" r="6.5"/><path d="M12 11.2l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="currentColor"/></svg>';
-const maxDl=dl.length?Math.max(...dl.map(x=>x[1])):0;
-const full=wk.some(w=>w[1]>=5);
-let run=0,best=0; wk.forEach(w=>{run=w[1]>=4?run+1:0;best=Math.max(best,run)});
-const MED=[["Begûn!",ws.length>0],["Earste training",tot>=1||(D.sport||[]).length>0],["Earste kilo",lost>=1],["5 kilo kwyt",lost>=5],["10 kilo kwyt",lost>=10],["15 kilo kwyt",lost>=15],["20 kilo kwyt",lost>=20],["Perfekte wike",full],["4 wiken op rige",best>=4],["Deadlift 100\u00a0kg",maxDl>=100],["25 kilo kwyt",lost>=25],["30 kilo kwyt",lost>=30],["50 trainingen",tot>=50],["100 kilo!",!!reached]];
-$("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
-const nGot=MED.filter(m=>m[1]).length; window.StokerMedaljes=nGot;
-$("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste weging is de earste medalje.";
+// medaljes: deselde set as foar alle meidwaners (út kompetysje.js)
+function renderMed(r){
+  if(!window.StokerKomp||!StokerKomp.medaljes) return;
+  const MED=StokerKomp.medaljes(r);
+  $("medals").innerHTML=MED.map(([n,g])=>'<button type="button" class="medal'+(g?' got':'')+'"'+(g?'':' aria-disabled="true"')+' aria-label="'+n+(g?', helle':', noch net helle')+'">'+MEDAL+'<b>'+n+'</b></button>').join("");
+  const nGot=MED.filter(m=>m[1]).length;
+  $("medalNote").textContent=nGot?nGot+" fan de "+MED.length+" medaljes helle. Deselde medaljes as alle meidwaners. Tik op in medalje foar konfetty.":"Noch gjin medaljes. De earste weging is de earste medalje.";
+}
+window.StokerRenderMed=renderMed;
+{const kp=(D.kpct||[]).slice().sort((a,b)=>a[0]<b[0]?-1:1), sp=(D.sport||[]).slice().sort();
+ renderMed({start:ws[0]?ws[0][0]:(kp[0]?kp[0][0]:null),pct:kp.length?kp[kp.length-1][1]:null,doel:null,doelHelle:!!reached,trainingen:sp.length,stappen:0,dagen:sp.map(d=>[d,true,false])});}
 
 // konfetty
 function confetti(){
@@ -1292,6 +1296,7 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
   const E=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   StokerKomp.laad(D).then(k=>{
     const stk=k.rows.find(x=>x.stoker);
+    if(stk&&window.StokerRenderMed) StokerRenderMed(stk);
     if(stk&&window.StokerWrapped){ const wb=StokerWrapped.knop(stk,k,"🎁 Stoker syn jier "+StokerWrapped.finster(),false); if(wb){ wb.style.margin="0 0 14px"; $("kWin").before(wb); } }
     if(!k.oaren){ // noch gjin oare meidwaners: lit allinne de útnoeging sjen
       $("kLijst").innerHTML=""; $("kWin").innerHTML="";
@@ -1308,7 +1313,7 @@ $("foot").textContent=D.updated?"Bywurke op "+fd(D.updated)+". Elke woansdei in 
       const href=x.stoker?"#":"side.html?n="+encodeURIComponent(x.slug);
       return '<li class="'+(x.stoker?"ik":"")+'"><a href="'+href+'"'+(x.stoker?' data-top="1"':'')+' aria-label="'+E(x.namme)+(p!=null?", plak "+n+", "+(x.heel?Math.round(p):nl1(p))+" prosint kwyt":", noch net begûn")+'">'+
         '<span class="pl">'+(p!=null?n:"–")+'</span><span class="kav" style="background:'+E(x.kleur)+'">'+E(x.namme[0].toUpperCase())+'</span>'+
-        '<span class="nm"><b>'+E(x.namme)+(x.skoen?' <span class="kpriis" title="Gouden skoen: de measte dagen 10.000 stappen dizze moanne">👟</span>':'')+(x.lantearne?' <span class="kpriis" title="Reade lantearne: de lêste plak">🏮</span>':'')+((n2=>n2>=2?' <span class="kfire" title="'+n2+' dagen op rige aktyf">🔥'+n2+'</span>':'')(StokerKomp.reeks?StokerKomp.reeks(x.dagen):0))+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k'+((m=>m?' · 🏅 '+m:'')(x.stoker&&window.StokerMedaljes!=null?window.StokerMedaljes:StokerKomp.medaljes?StokerKomp.medaljes(x).filter(q=>q[1]).length:0)):'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
+        '<span class="nm"><b>'+E(x.namme)+(x.skoen?' <span class="kpriis" title="Gouden skoen: de measte dagen 10.000 stappen dizze moanne">👟</span>':'')+(x.lantearne?' <span class="kpriis" title="Reade lantearne: de lêste plak">🏮</span>':'')+((n2=>n2>=2?' <span class="kfire" title="'+n2+' dagen op rige aktyf">🔥'+n2+'</span>':'')(StokerKomp.reeks?StokerKomp.reeks(x.dagen):0))+'</b><small>'+(p!=null?x.trainingen+(x.trainingen===1?' training':' trainingen')+' · '+x.stappen+'× 10k'+((m=>m?' · 🏅 '+m:'')(StokerKomp.medaljes?StokerKomp.medaljes(x).filter(q=>q[1]).length:0)):'Begjint by de earste weging')+'</small><span class="kbar"><i style="width:'+Math.max(0,Math.min(100,(p||0)/mx*100))+'%;background:'+E(x.kleur)+'"></i></span></span>'+
         '<span class="kp">'+(p==null?"–":(p<0?"+":p>0?"−":"")+(x.heel?Math.round(Math.abs(p)):nl1(Math.abs(p)))+"%")+'<small>kwyt</small></span></a></li>'}).join("");
     $("kLijst").addEventListener("click",e=>{const a=e.target.closest('[data-top]');if(a){e.preventDefault();scrollTo({top:0,behavior:"smooth"})}});
     $("kPrizen").hidden=!k.rows.some(x=>x.skoen||x.lantearne);

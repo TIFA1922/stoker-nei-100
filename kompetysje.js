@@ -54,8 +54,9 @@
     const perWike={}; dagen.filter(x=>x[1]).forEach(x=>{const d=pdD(x[0]);d.setDate(d.getDate()-((d.getDay()+6)%7));const k=isoD(d);perWike[k]=(perWike[k]||0)+1});
     const akt=new Set(dagen.filter(x=>x[1]||x[2]).map(x=>x[0])); let rige=0,beste=0;
     if(akt.size){const ks=[...akt].sort();for(let d=pdD(ks[0]);d<=pdD(ks[ks.length-1]);d.setDate(d.getDate()+1)){if(akt.has(isoD(d))){rige++;beste=Math.max(beste,rige)}else rige=0}}
-    return [["Begûn!",!!r.start],["1% kwyt",pc>=1],["3% kwyt",pc>=3],["5% kwyt",pc>=5],["Healwei it doel",r.doel==null?!!r.doelHelle:pc>=doel/2],["10% kwyt",pc>=10],
-      ["Earste training",(r.trainingen||0)>=1],["10 trainingen",(r.trainingen||0)>=10],["Perfekte wike",Object.values(perWike).some(n=>n>=5)],
+    // ien set medaljes foar elkenien (allinne prosinten en aktiviteit, nea kilo's)
+    return [["Begûn!",!!r.start],["Earste training",(r.trainingen||0)>=1],["1% kwyt",pc>=1],["3% kwyt",pc>=3],["5% kwyt",pc>=5],["10% kwyt",pc>=10],
+      ["15% kwyt",pc>=15],["10 trainingen",(r.trainingen||0)>=10],["Perfekte wike",Object.values(perWike).some(n=>n>=5)],
       ["7 dagen op rige",beste>=7],["10× 10.000 stappen",(r.stappen||0)>=10],["Doel helle!",r.doel==null?!!r.doelHelle:pc>=doel&&pc>0]];
   }
   // hjoeddeiske reeks: dagen op rige aktyf (sporte of 10.000 stappen), oant hjoed of juster
