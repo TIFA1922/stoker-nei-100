@@ -322,6 +322,8 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .offer.nee em{background:transparent;color:var(--up)}
 .offer.ofsein{opacity:.6}.offer.ofsein b{text-decoration:line-through}
 .offer.ofsein em{background:transparent;color:var(--muted)}
+.sjaak{display:flex;gap:10px;align-items:flex-start;margin:10px 0 0;font-size:14px;color:var(--soft)}
+.sjaak>span:first-child{font-size:20px;line-height:1.1}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 /* ===== Koppen (styl B) ===== */
 h2.disp{display:flex;align-items:center;gap:10px;font-size:24px}
@@ -1187,7 +1189,7 @@ function stokerFig(kwyt, total){
   // in tiid kieze set ek it dieldei goed
   $("meiTiid").addEventListener("change",()=>{const v=$("meiTiid").value;if(!v)return;const h=+v.slice(0,2);part=h<12?"moarns":h<17?"middeis":"jûns";pick($("meiParts"),"p",part);typed=true});
   try{const n=localStorage.getItem("stoker-namme");if(n)$("meiNaam").value=n}catch(e){}
-  const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net",ofsein:"Ôfsein"};
+  const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net",ofsein:"🏳️ Ôfsein"};
   const render=rows=>{
     // per wike (moandei oant snein), mei blêdzjen
     bezet=new Set(rows.filter(r=>r.status==="ja"&&r.datum>=today).map(r=>r.datum)); partsBij(); drawDays();
@@ -1223,7 +1225,11 @@ function stokerFig(kwyt, total){
   const renderBoard=rows=>{
     const cnt={}; rows.filter(r=>r.status==="ja"&&r.datum<today).forEach(r=>{const k=norm(r.naam).toLowerCase();cnt[k]=cnt[k]||{n:norm(r.naam),c:0};cnt[k].c++});
     const top=Object.values(cnt).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n)).slice(0,5);
-    $("meiBoard").innerHTML=top.length?'<div class="box"><span class="lbl">Sportmaatsjes</span><div class="board">'+top.map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+x.c+'× mei west</span></div>').join("")+'</div></div>':'';
+    // Sjaak Afhaak 🏳️: wa't it meast ôfsein hat
+    const af={}; rows.filter(r=>r.status==="ofsein"&&String(r.datum).slice(0,7)===today.slice(0,7)).forEach(r=>{const k=norm(r.naam).toLowerCase();af[k]=af[k]||{n:norm(r.naam),c:0};af[k].c++});
+    const sj=Object.values(af).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n))[0];
+    const sjHtml=sj?'<p class="sjaak"><span aria-hidden="true">🏳️</span><span><b>Sjaak Afhaak</b> fan \'e moanne: '+esc(sj.n)+' ('+sj.c+'× ôfsein). Kin bart, mar folgjende kear gewoan komme, hin? 😉</span></p>':'';
+    $("meiBoard").innerHTML=(top.length?'<div class="box"><span class="lbl">Sportmaatsjes</span><div class="board">'+top.map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+x.c+'× mei west</span></div>').join("")+'</div>'+sjHtml+'</div>':(sjHtml?'<div class="box">'+sjHtml+'</div>':''));
   };
   const load=()=>fetch(SB+"?select=*&order=datum.asc,created_at.asc&limit=2000",{headers:{apikey:KEY}})
     .then(r=>{if(!r.ok)throw 0;return r.json()}).then(r=>{render(r);renderBoard(r)}).catch(()=>{$("meiList").innerHTML=""});
