@@ -1228,7 +1228,7 @@ function stokerFig(kwyt, total){
     // Sjaak Afhaak 🏳️: wa't it meast ôfsein hat
     const af={}; rows.filter(r=>r.status==="ofsein"&&String(r.datum).slice(0,7)===today.slice(0,7)).forEach(r=>{const k=norm(r.naam).toLowerCase();af[k]=af[k]||{n:norm(r.naam),c:0};af[k].c++});
     const sj=Object.values(af).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n))[0];
-    const sjHtml=sj?'<p class="sjaak"><span aria-hidden="true">🏳️</span><span><b>Sjaak Afhaak</b> fan \'e moanne: '+esc(sj.n)+' ('+sj.c+'× ôfsein). Kin bart, mar folgjende kear gewoan komme, hin? 😉</span></p>':'';
+    const sjHtml=sj?'<p class="sjaak"><span aria-hidden="true">🏳️</span><span><b>Sjaak Afhaak</b> fan \'e moanne: '+esc(sj.n)+' ('+sj.c+'× ôfsein). Folgjende kear gewoan komme, oars moatst trakteare! 🍰</span></p>':'';
     $("meiBoard").innerHTML=(top.length?'<div class="box"><span class="lbl">Sportmaatsjes</span><div class="board">'+top.map((x,i)=>'<div><i>'+(i+1)+'</i><b>'+esc(x.n)+'</b><span>'+x.c+'× mei west</span></div>').join("")+'</div>'+sjHtml+'</div>':(sjHtml?'<div class="box">'+sjHtml+'</div>':''));
   };
   const load=()=>fetch(SB+"?select=*&order=datum.asc,created_at.asc&limit=2000",{headers:{apikey:KEY}})

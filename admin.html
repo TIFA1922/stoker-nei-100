@@ -237,7 +237,7 @@ function waText(x,kind){
   const n=String(x.naam).trim().split(" ")[0], hm=x.tiid?String(x.tiid).slice(0,5):"", when=fryDate(x.datum)+" "+(hm?"om "+hm:x.dagdiel);
   if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+"geane wy "+watDwaan(x)+" "+watFan(x)[0]+". Oant dan!\nStoker\n\nYn dyn aginda: "+agindaUrl(x);
   if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+"wy geane "+watDwaan(x)+"! "+watFan(x)[0]+"\nStoker\n\nSet it yn dyn aginda: "+agindaUrl(x);
-  if(x.status==="ofsein") return "Hoi "+n+"! Spitich dat it "+when+" net trochgiet. Gjin punt, kies gerust in nije dei op de side: https://stokernei100.nl/ 💪\nStoker";
+  if(x.status==="ofsein") return "Hoi "+n+"! Spitich dat it "+when+" net trochgiet. Pas wol op: sa wurdsto noch Sjaak Afhaak fan 'e moanne op 'e side 🏳️😉 Kies gau in nije dei, dan meitsje wy it goed: https://stokernei100.nl/\nStoker";
   return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://stokernei100.nl/\nStoker";
 }
 const waUrl=(x,kind)=>"https://wa.me/?text="+encodeURIComponent(waText(x,kind));
