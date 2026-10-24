@@ -320,6 +320,8 @@ input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
 .offer em{font-style:normal;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;white-space:nowrap;background:var(--line);color:var(--soft)}
 .offer.ja em{background:var(--accent);color:#06261e}
 .offer.nee em{background:transparent;color:var(--up)}
+.offer.ofsein{opacity:.6}.offer.ofsein b{text-decoration:line-through}
+.offer.ofsein em{background:transparent;color:var(--muted)}
 footer{padding:20px max(20px,env(safe-area-inset-left,0px)) 32px;font-size:12px;color:var(--dim)}
 /* ===== Koppen (styl B) ===== */
 h2.disp{display:flex;align-items:center;gap:10px;font-size:24px}
@@ -1185,7 +1187,7 @@ function stokerFig(kwyt, total){
   // in tiid kieze set ek it dieldei goed
   $("meiTiid").addEventListener("change",()=>{const v=$("meiTiid").value;if(!v)return;const h=+v.slice(0,2);part=h<12?"moarns":h<17?"middeis":"jûns";pick($("meiParts"),"p",part);typed=true});
   try{const n=localStorage.getItem("stoker-namme");if(n)$("meiNaam").value=n}catch(e){}
-  const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net"};
+  const ST={wacht:"Wachtet op Stoker",ja:"Ôfpraat!",nee:"Past net",ofsein:"Ôfsein"};
   const render=rows=>{
     // per wike (moandei oant snein), mei blêdzjen
     bezet=new Set(rows.filter(r=>r.status==="ja"&&r.datum>=today).map(r=>r.datum)); partsBij(); drawDays();
@@ -1206,7 +1208,7 @@ function stokerFig(kwyt, total){
     if(!meiWiken.length){ $("meiList").innerHTML=""; return; }
     const slides=meiWiken.map((w0,i)=>{const yn=meiRows.filter(r=>mo2(r.datum)===w0);
       return '<div class="wkslide" aria-label="'+kopFan(i).join(" ")+'">'+(yn.length?'<div class="offers">'+yn.map(offerRij).join("")+'</div>':'<div class="empty" style="font-size:14px">'+(i===0?"Noch gjinien dizze wike. Wa is de earste?":"Noch neat dizze wike.")+'</div>')+'</div>'}).join("");
-    const t=meiRows.filter(r=>r.status!=="nee").length, w=new Set(meiRows.filter(r=>r.status!=="nee").map(r=>mo2(r.datum))).size;
+    const t=meiRows.filter(r=>r.status!=="nee"&&r.status!=="ofsein").length, w=new Set(meiRows.filter(r=>r.status!=="nee"&&r.status!=="ofsein").map(r=>mo2(r.datum))).size;
     $("meiList").innerHTML='<span class="lbl">Wa giet der mei?</span><div class="wknav"><button type="button" id="meiWkPrev" aria-label="Eardere wike">‹</button><b id="meiWkKop"></b><button type="button" id="meiWkNext" aria-label="Folgjende wike">›</button></div>'+
       '<div class="wkslider" id="meiSlider">'+slides+'</div>'+
       (w>1&&t?'<p class="note" style="margin-top:8px">'+t+(t===1?" ôfspraak":" ôfspraken")+' yn '+w+' wiken. Skow opsij of tik op ‹ ›.</p>':'');

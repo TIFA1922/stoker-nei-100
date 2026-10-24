@@ -64,7 +64,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .offer span{display:block;font-size:14px;color:var(--soft)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .st{font-size:12px;font-weight:600;white-space:nowrap}
-.st.ja{color:var(--accent)}.st.nee{color:#ffb27a}
+.st.ja{color:var(--accent)}.st.nee{color:#ffb27a}.st.ofsein{color:#aaa}
 .empty{color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:16px}
 .kleuren{display:flex;gap:8px;flex-wrap:wrap}
 .kleuren button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 3px var(--bg);cursor:pointer;padding:0}
@@ -237,6 +237,7 @@ function waText(x,kind){
   const n=String(x.naam).trim().split(" ")[0], hm=x.tiid?String(x.tiid).slice(0,5):"", when=fryDate(x.datum)+" "+(hm?"om "+hm:x.dagdiel);
   if(kind==="remind") return "Hoi "+n+"! Net ferjitte: "+dayWord(x.datum)+" "+(hm?"om "+hm:x.dagdiel)+" "+"geane wy "+watDwaan(x)+" "+watFan(x)[0]+". Oant dan!\nStoker\n\nYn dyn aginda: "+agindaUrl(x);
   if(x.status==="ja") return "Hoi "+n+"! "+when[0].toUpperCase()+when.slice(1)+": gesellich, "+"wy geane "+watDwaan(x)+"! "+watFan(x)[0]+"\nStoker\n\nSet it yn dyn aginda: "+agindaUrl(x);
+  if(x.status==="ofsein") return "Hoi "+n+"! Spitich dat it "+when+" net trochgiet. Gjin punt, kies gerust in nije dei op de side: https://stokernei100.nl/ 💪\nStoker";
   return "Hoi "+n+", "+when+" past it my spitigernôch net. Kies gerust in oare dei op de side: https://stokernei100.nl/\nStoker";
 }
 const waUrl=(x,kind)=>"https://wa.me/?text="+encodeURIComponent(waText(x,kind));
@@ -264,7 +265,7 @@ function renderMei(){
   const past=mei.filter(x=>x.datum<today).reverse();
   $("tabMei").textContent="Meisporten"+(open.length?" · "+open.length:"");
   $("meiOpen").innerHTML=open.length?open.map(x=>{const bz=bezetMei(x);return '<div class="offer"><div><b>'+esc(x.naam)+'</b><span>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</span>'+(bz?'<span style="color:#ffb27a;font-size:13px;margin-top:4px">Bezet: die dag heb je al afgesproken met '+esc(bz.naam)+'</span>':'')+'</div><div class="two"><button class="btn" type="button" data-set="ja" data-id="'+esc(x.id)+'"'+(bz?' disabled title="Al afgesproken"':'')+'>Ja, gezellig!</button><button class="btn ghost" type="button" data-set="nee" data-id="'+esc(x.id)+'">Past niet</button></div></div>'}).join(""):'<div class="empty">Geen nieuwe aanbiedingen.</div>';
-  const row=(x,wa)=>'<div class="row'+(wa?(x.status==="ja"?' r5':' r4'):'')+'"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</small>'+(wa?'<button type="button" class="flip" data-set="'+(x.status==='ja'?'nee':'ja')+'" data-id="'+esc(x.id)+'">'+(x.status==='ja'?'Toch niet':'Past toch wel')+'</button>':'')+'</div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord"}[x.status]||"")+'</span>'+(wa&&x.status==="ja"?'<a class="cal" href="'+outlookUrl(x)+'" target="_blank" rel="noopener" aria-label="Zet in Outlook" title="Zet in Outlook">'+CAL+'</a>':'')+(wa?'<a class="wa" href="'+waUrl(x,x.status==="ja"?"remind":"")+'" target="_blank" rel="noopener" aria-label="'+(x.status==="ja"?"Herinnering":"WhatsApp")+' naar '+esc(x.naam)+'" title="'+(x.status==="ja"?"Stuur herinnering":"Stuur WhatsApp")+'">'+WAI+'</a>':'')+'<button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
+  const row=(x,wa)=>'<div class="row'+(wa?(x.status==="ja"?' r5':' r4'):'')+'"><div><b>'+esc(x.naam)+'</b><small>'+nice(x.datum)+' · '+esc(x.dagdiel)+(x.tiid?' '+esc(String(x.tiid).slice(0,5)):'')+' · '+esc(watKoart(x))+'</small>'+(wa?'<button type="button" class="flip" data-set="'+(x.status==='ja'?'nee':'ja')+'" data-id="'+esc(x.id)+'">'+(x.status==='ja'?'Toch niet':x.status==='ofsein'?'Gaat toch door':'Past toch wel')+'</button>'+(x.status==='ja'?' <button type="button" class="flip" data-set="ofsein" data-id="'+esc(x.id)+'">'+esc(String(x.naam).trim().split(" ")[0])+' zegt af</button>':''):'')+'</div><span class="st '+esc(x.status)+'">'+({ja:"Afgesproken",nee:"Past niet",wacht:"Niet beantwoord",ofsein:"Afgezegd"}[x.status]||"")+'</span>'+(wa&&x.status==="ja"?'<a class="cal" href="'+outlookUrl(x)+'" target="_blank" rel="noopener" aria-label="Zet in Outlook" title="Zet in Outlook">'+CAL+'</a>':'')+(wa?'<a class="wa" href="'+waUrl(x,x.status==="ja"?"remind":"")+'" target="_blank" rel="noopener" aria-label="'+(x.status==="ja"?"Herinnering":"WhatsApp")+' naar '+esc(x.naam)+'" title="'+(x.status==="ja"?"Stuur herinnering":"Stuur WhatsApp")+'">'+WAI+'</a>':'')+'<button class="del" type="button" data-mdel="'+esc(x.id)+'" aria-label="Verwijderen">'+BIN+'</button></div>';
   $("meiDone").innerHTML=done.length?done.map(x=>row(x,true)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets afgesproken.</div>';
   $("meiPast").innerHTML=past.length?past.slice(0,30).map(x=>row(x,false)).join(""):'<div style="color:var(--muted);font-size:14px">Nog niets.</div>';
 }
@@ -282,7 +283,7 @@ async function setMei(id,status){
     mei=mei.map(x=>x.id===id?Object.assign({},x,{status}):x); renderMei();
     say("meiMsg","");
     const x=mei.find(m=>m.id===id);
-    $("meiWaTop").innerHTML=x?'<div class="box"><span style="color:var(--accent);font-size:14px">'+(status==="ja"?"Afgesproken! Staat nu op de volgpagina.":"Doorgegeven: past niet.")+'</span><a class="wabtn" href="'+waUrl(x)+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(String(x.naam).trim().split(" ")[0])+' een WhatsApp</a>'+(status==="ja"?'<div class="calbtns"><a href="'+outlookUrl(x)+'" target="_blank" rel="noopener">'+CAL+'Zet in Outlook</a><a href="'+icsUrl(x)+'" download="stoker-'+x.datum+'.ics">'+CAL+'Agendabestand</a></div>':'')+'</div>':'';
+    $("meiWaTop").innerHTML=x?'<div class="box"><span style="color:var(--accent);font-size:14px">'+(status==="ja"?"Afgesproken! Staat nu op de volgpagina.":status==="ofsein"?"Afgezegd. De dag is weer vrij op de site.":"Doorgegeven: past niet.")+'</span><a class="wabtn" href="'+waUrl(x)+'" target="_blank" rel="noopener">'+WAI+'Stuur '+esc(String(x.naam).trim().split(" ")[0])+' een WhatsApp</a>'+(status==="ja"?'<div class="calbtns"><a href="'+outlookUrl(x)+'" target="_blank" rel="noopener">'+CAL+'Zet in Outlook</a><a href="'+icsUrl(x)+'" download="stoker-'+x.datum+'.ics">'+CAL+'Agendabestand</a></div>':'')+'</div>':'';
   }catch(e){ say("meiMsg","Aanpassen mislukt. Probeer het opnieuw."); }
 }
 async function delMei(id){
